@@ -1,3 +1,3 @@
-IFN582 Assignment 3 - BUB (Brisbane University Bouldering Club) Fundraising Platform
+IFN582 Assignment 3 - [Project name TBD]
 
 Setup instructions: TODO

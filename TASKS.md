@@ -1,10 +1,10 @@
 # IFN582 Assignment 3 — Task Breakdown
 
-**Project:** BUB (Brisbane University Bouldering Club) — Charity Event Fundraising Platform
+**Project:** TBD — scenario to be decided by the team
 **Due:** 23/10/2026 (Week 13) | **Demo:** Week 13 tutorial (4 min group demo + 5-6 min individual Q&A)
 **Stack:** Flask + MySQL + Jinja2 + Bootstrap 5.3 only. No JavaScript, PHP, Flask-Admin, or other frameworks. No GenAI.
 
-This builds on **BUB's A1 design + A2 database design** (charity event fundraising scenario). Roles: **Administrator / Fundraiser (event organiser) / Supporter (donor)**.
+This builds on **one team member's A1 design + the corresponding A2 database design** — which member's design to use as the team's base is still to be agreed. Roles: **Administrator / Fundraiser / Supporter** (exact names may be adapted once the scenario is chosen).
 
 ---
 
