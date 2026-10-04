@@ -2,7 +2,7 @@
 <div align = "right">by Yujin Lee </div>
 
 ## Install Git on Your Computer
-- our github repositort: https://github.com/2-ujin/IFN582_grp_assginment
+- our github repositort: https://github.com/2-ujin/IFN582_grp_assignment
 
 ### Windows:
 - Go to git-scm.com/downloads and download Git for Windows.
@@ -25,11 +25,11 @@
 ```
 3. Run the clone command:
 ```
- > git clone https://github.com/2-ujin/IFN582_grp_assginment.git
+ > git clone https://github.com/2-ujin/IFN582_grp_assignment.git
 ```
-4. This creates a new folder called "IFN582_grp_assginment" containing all the project files. Move into it:
+4. This creates a new folder called "IFN582_grp_assignment" containing all the project files. Move into it:
 ```
-> cd IFN582_grp_assginment
+> cd IFN582_grp_assignment
 ```
 (I just ask claude to clone the github repository and my local computer, if u guys have clone or other AI tool they might explain better than me )
 

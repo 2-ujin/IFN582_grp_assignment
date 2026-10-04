@@ -88,7 +88,7 @@ Some files belong to one part only. Others (`views.py`, `models.py`, `forms.py`)
 
 ## Part 1 — Database & Project Foundation
 
-**Owner:** _______________
+**Owner:** Yujin
 **Priority:** Do this first — every other part depends on it.
 
 ### Requirements
@@ -131,7 +131,7 @@ Some files belong to one part only. Others (`views.py`, `models.py`, `forms.py`)
 
 ## Part 2 — Authentication, Base Layout, Error Pages & Shared Style
 
-**Owner:** _______________
+**Owner:** Queenie
 **Depends on:** Part 1 (users table + models.py)
 
 ### Do first (unblocks Parts 3, 4, 5)
@@ -170,7 +170,7 @@ Some files belong to one part only. Others (`views.py`, `models.py`, `forms.py`)
 
 ## Part 3 — Home Page + Fundraiser Details and Donation Page
 
-**Owner:** _______________
+**Owner:** Sky
 **Depends on:** Part 1 (data), Part 2 (`base.html`, login check for donation form)
 
 ### Home Page requirements
@@ -199,7 +199,7 @@ Some files belong to one part only. Others (`views.py`, `models.py`, `forms.py`)
 
 ## Part 4 — Campaign Management Page
 
-**Owner:** _______________
+**Owner:** Lisan
 **Depends on:** Part 1 (data), Part 2 (`base.html`, `@fundraiser_required`)
 
 ### Requirements
@@ -219,7 +219,7 @@ Some files belong to one part only. Others (`views.py`, `models.py`, `forms.py`)
 
 ## Part 5 — Administrator Dashboard
 
-**Owner:** _______________
+**Owner:** Rachel
 **Depends on:** Part 1 (data), Part 2 (`base.html`, `@admin_required`)
 **Note:** This is a required demo page — start as soon as Part 2's decorators are merged, don't leave it to the end.
 
