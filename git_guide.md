@@ -1,5 +1,5 @@
 # How to use git?
-by Yujin Lee 
+<div align = "right">by Yujin Lee </div>
 
 ## Install Git on Your Computer
 - our github repositort: https://github.com/2-ujin/IFN582_grp_assginment
@@ -31,7 +31,9 @@ by Yujin Lee
 ## How to update & Modify file in the repository? 
 
 1. First Make sure ur local file and main branch repository sync well.
- > git pull
+```
+git pull
+```
 2. modify / create files from ur local side
 
 3. update the files you changed
