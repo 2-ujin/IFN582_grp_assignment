@@ -1,0 +1,179 @@
+<diagram program="umletino" version="15.1"><zoom_level>5</zoom_level><help_text></help_text><element><id>Relation</id><coordinates><x>430</x><y>55</y><w>365</w><h>170</h></coordinates><panel_attributes>lt=&lt;&lt;-
+fontsize=16</panel_attributes><additional_attributes>710;10;10;10;10;320</additional_attributes></element><element><id>Relation</id><coordinates><x>900</x><y>150</y><w>15</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;-
+fontsize=16</panel_attributes><additional_attributes>10;10;10;120</additional_attributes></element><element><id>Relation</id><coordinates><x>1030</x><y>55</y><w>350</w><h>160</h></coordinates><panel_attributes>lt=&lt;&lt;-
+fontsize=16</panel_attributes><additional_attributes>10;10;680;10;680;300</additional_attributes></element><element><id>Relation</id><coordinates><x>425</x><y>325</y><w>40</w><h>150</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=0..*
+creates
+fontsize=16</panel_attributes><additional_attributes>10;10;10;280</additional_attributes></element><element><id>Relation</id><coordinates><x>245</x><y>520</y><w>75</w><h>25</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=0..*
+categorises
+fontsize=16</panel_attributes><additional_attributes>10;20;130;20</additional_attributes></element><element><id>Relation</id><coordinates><x>555</x><y>235</y><w>690</w><h>400</h></coordinates><panel_attributes>lt=-
+m1=0..1
+m2=0..*
+reviews
+fontsize=16</panel_attributes><additional_attributes>1360;10;1260;10;1260;770;10;770</additional_attributes></element><element><id>Relation</id><coordinates><x>555</x><y>520</y><w>245</w><h>25</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=0..*
+receives
+fontsize=16</panel_attributes><additional_attributes>10;20;470;20</additional_attributes></element><element><id>Relation</id><coordinates><x>900</x><y>325</y><w>40</w><h>155</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=0..*
+makes
+fontsize=16</panel_attributes><additional_attributes>10;10;10;290</additional_attributes></element><element><id>Relation</id><coordinates><x>435</x><y>650</y><w>65</w><h>75</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m1=1
+m2=0..*
+owns updates
+fontsize=16</panel_attributes><additional_attributes>10;10;10;130</additional_attributes></element><element><id>Relation</id><coordinates><x>440</x><y>790</y><w>65</w><h>75</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m1=1
+m2=0..*
+owns images
+fontsize=16</panel_attributes><additional_attributes>10;10;10;130</additional_attributes></element><element><id>Relation</id><coordinates><x>900</x><y>595</y><w>35</w><h>225</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=0..1
+gives
+fontsize=16</panel_attributes><additional_attributes>10;10;10;430</additional_attributes></element><element><id>Relation</id><coordinates><x>1030</x><y>120</y><w>505</w><h>440</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=0..*
+submits
+fontsize=16</panel_attributes><additional_attributes>10;20;990;20;990;850;910;850</additional_attributes></element><element><id>Relation</id><coordinates><x>1365</x><y>325</y><w>45</w><h>150</h></coordinates><panel_attributes>lt=-
+m1=0..1
+m2=0..*
+reviews
+fontsize=16</panel_attributes><additional_attributes>10;10;10;280</additional_attributes></element><element><id>Relation</id><coordinates><x>555</x><y>645</y><w>690</w><h>25</h></coordinates><panel_attributes>lt=-
+m1=0..1
+m2=0..*
+                                is reported
+fontsize=16</panel_attributes><additional_attributes>10;20;1360;20</additional_attributes></element><element><id>Relation</id><coordinates><x>1035</x><y>685</y><w>360</w><h>195</h></coordinates><panel_attributes>lt=-
+m1=0..1
+m2=0..*
+is reported
+fontsize=16</panel_attributes><additional_attributes>10;360;670;360;670;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>785</x><y>0</y><w>250</w><h>155</h></coordinates><panel_attributes>User
+--
+-userId: Integer
+-firstname: String
+-surname: String
+-email: String
+-password: String
+-accountStatus: String
+--
++register()
++Login()
++Logout()
++editProfile()
+
+fontsize=16</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>215</y><w>250</w><h>115</h></coordinates><panel_attributes>Artist
+--
+
+
+--
++createProject()
++viewCampaignProgress()
++updateProjectInfo()
++publishProjectUpdate()
++uploadProjectUpdateImage()
++viewRecentDonations()
++viewSupporterMessage()
++submitReport()
+fontsize=16</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>785</x><y>210</y><w>250</w><h>120</h></coordinates><panel_attributes>Supporter
+--
+
+
+--
++PledgeAmount()
++NameInDonationForm()
++EmailInDonationForm()
++leaveMessage()
++PaymentMethod()
++submitDonation()
++submitReport()
+fontsize=16</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1235</x><y>205</y><w>250</w><h>125</h></coordinates><panel_attributes>Administrator
+--
+
+
+--
++reviewProjectApproval()
++reviewProjectDetails()
++controlUserStatus()
++resolveReport()
++setFeaturedProject()
++setSuccessStories()
+fontsize=16</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>465</y><w>250</w><h>90</h></coordinates><panel_attributes>Category
+--
+-categoryID: Integer
+-categoryName: String
+
+
+
+--
++listProjects()
+fontsize=16</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>465</y><w>250</w><h>190</h></coordinates><panel_attributes>Project
+--
+-projectID: Integer
+-Featured: Boolean
+-ProjectName: String
+-location: String
+-ArtistName: String
+-imagePath: String
+-goal: Float
+-amountRaised: Float
+-fundingPercent: Integer
+-no.ofSupporter: Integer
+-deadline: Date
+-status: String
+-ProjectDescription: String
+-ArtistIntro: String
+--
++browseProject()
+fontsize=16</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>790</x><y>470</y><w>250</w><h>130</h></coordinates><panel_attributes>Donation
+--
+-donationId: Integer
+-amount: Float
+-donatedDate: Date
+-paymentMethod: String
+-paymentStatus: String
+--
++reviewDonation()
+
+fontsize=16</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1235</x><y>465</y><w>250</w><h>225</h></coordinates><panel_attributes>Report
+--
+-reportId: Integer
+-reportedContent: String
+-reason: String
+-reporterName: String
+-reporterRole: String
+-submittedDate: Date
+-status: String
+
+--
++reviewReport()
+
+fontsize=16</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>715</y><w>250</w><h>80</h></coordinates><panel_attributes>ProjectUpdate
+--
+-no.ofUpdates: Integer
+-publishedDate: Date
+-title: String
+-description: String
+--
++browseUpdate()
+
+fontsize=16</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>855</y><w>250</w><h>70</h></coordinates><panel_attributes>Image
+--
+-imageID: Integer
+-imagePath: String
+
+--
++add()
++remove()
+fontsize=16</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>790</x><y>810</y><w>250</w><h>115</h></coordinates><panel_attributes>SupporterMessage
+--
+-messageID: Integer
+-supporterName: String
+-postedDate: Date
+-message: String
+-visibility: Boolean
+--
++browseMessage()
+
+fontsize=16</panel_attributes><additional_attributes></additional_attributes></element></diagram>
