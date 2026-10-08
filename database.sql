@@ -1,5 +1,5 @@
 /*
-Yujin Lee created this file
+Yujin Lee CREATEd this file
 - schema: maf (MakeArtsFund)
 - table related UMF File
 */
@@ -9,22 +9,22 @@ Yujin Lee created this file
 
     DROP DATABASE IF EXISTS maf; -- to avoid code error
 
-    create database maf
+    CREATE DATABASE maf
     ;
 
-    use maf
+    USE maf
     ;
 
 -- User table
     -- link to Artist, Supporter and Administrator tables
-    create table user (
+    CREATE TABLE user (
         userId int AUTO_INCREMENT ,
-        firstname varchar(50) not null,
-        surname varchar(50) not null,
-        email varchar(100) unique not null, -- email should not be null and unique
-        password varchar(255) not null, -- for werkzeug 
-        accountStatus varchar(20) not null default 'active', -- active, suspended, deactivated
-        primary key (userId)
+        firstname varchar(50) NOT NULL,
+        surname varchar(50) NOT NULL,
+        email varchar(100) UNIQUE NOT NULL, -- email should not be null and UNIQUE
+        password varchar(255) NOT NULL, -- for werkzeug 
+        accountStatus varchar(20) NOT NULL default 'active', -- active, suspended, deactivated
+        PRIMARY KEY (userId)
     )
     ;
 
@@ -32,10 +32,10 @@ Yujin Lee created this file
 -- Artist table
     -- this table is child table of user.
     -- make sure to inherit from user table. (add function related to inheritance)
-    create table artist (
+    CREATE TABLE artist (
         userId int,
-        primary key (userId),
-        foreign key (userId) references user(userId)
+        PRIMARY KEY (userId),
+        FOREIGN KEY (userId) REFERENCES user(userId)
 
     )
     ;
@@ -44,58 +44,58 @@ Yujin Lee created this file
 -- Supporter:
     -- this table is child table of user.
     -- make sure to inherit from user table. (add function related to inheritance)
-    create table supporter (
+    CREATE TABLE supporter (
         userId int,
-        primary key (userId),
-        foreign key (userId) references user(userId)
+        PRIMARY KEY (userId),
+        FOREIGN KEY (userId) REFERENCES user(userId)
     )
     ;
 
 -- Administrator:
     -- this table is child table of user.
     -- make sure to inherit from user table. (add function related to inheritance)
-    create table administrator (
+    CREATE TABLE administrator (
         userId int,
-        primary key (userId),
-        foreign key (userId) references user(userId)
+        PRIMARY KEY (userId),
+        FOREIGN KEY (userId) REFERENCES user(userId)
     )
     ;
 
 
 -- Category:
-    create table category (
+    CREATE TABLE category (
         categoryId int AUTO_INCREMENT ,
-        categoryName varchar(50) unique not null, -- category name should not be null and unique
-        primary key (categoryId)
+        categoryName varchar(50) UNIQUE NOT NULL, -- category name should not be null and UNIQUE
+        PRIMARY KEY (categoryId)
     )
     ;
 
 
 -- Project table
     -- FK from artist & category table
-    create table project (
+    CREATE TABLE project (
         projectId int AUTO_INCREMENT,
-        creatorId int not null,
-        categoryId int not null,
-        projectName varchar(100) not null,
+        creatorId int NOT NULL,
+        categoryId int NOT NULL,
+        projectName varchar(100) NOT NULL,
         location varchar(100),
         imagePath varchar(255),
         goal decimal(16,2),
         deadline date,
         /* changed the column status -> approvalStatus & projectStatus for requirement for A3*/
-        approvalStatus varchar(20) not null default 'pending', -- pending, approved, rejected, suspended
+        approvalStatus varchar(20) NOT NULL default 'pending', -- pending, approved, rejected, suspended
 
-        projectStatus varchar(20) not null default 'active', -- active, paused, closed
+        projectStatus varchar(20) NOT NULL default 'active', -- active, paused, closed
         projectDescription text,
         artistIntro text,
-        featured boolean not null default false,
-        successStoryFeatured boolean not null default false,
+        featured boolean NOT NULL default false,
+        successStoryFeatured boolean NOT NULL default false,
         reviewerId int,
-        updateDt datetime not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-        primary key (projectId),
-        foreign key (creatorId) references artist(userId),
-        foreign key (categoryId) references category(categoryId),
-        foreign key (reviewerId) references administrator(userId)
+        updateDt datetime NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+        PRIMARY KEY (projectId),
+        FOREIGN KEY (creatorId) REFERENCES artist(userId),
+        FOREIGN KEY (categoryId) REFERENCES category(categoryId),
+        FOREIGN KEY (reviewerId) REFERENCES administrator(userId)
     )
     ;
 
@@ -103,17 +103,17 @@ Yujin Lee created this file
 -- donation table
     -- FK from project & supporter table
 
-    create table donation (
+    CREATE TABLE donation (
         donationId int AUTO_INCREMENT ,
-        projectId int not null,
-        supporterId int not null,
-        amount decimal(16,2) not null,
-        donationDate datetime  not null default (now()),
-        paymentMethod varchar(50)  not null,
-        paymentStatus varchar(20) not null default 'pending', -- pending, completed, failed
-        primary key (donationId),
-        foreign key (projectId) references project(projectId),
-        foreign key (supporterId) references supporter(userId)
+        projectId int NOT NULL,
+        supporterId int NOT NULL,
+        amount decimal(16,2) NOT NULL,
+        donationDate datetime  NOT NULL default (now()),
+        paymentMethod varchar(50)  NOT NULL,
+        paymentStatus varchar(20) NOT NULL default 'pending', -- pending, completed, failed
+        PRIMARY KEY (donationId),
+        FOREIGN KEY (projectId) REFERENCES project(projectId),
+        FOREIGN KEY (supporterId) REFERENCES supporter(userId)
     )
     ;
 
@@ -121,27 +121,27 @@ Yujin Lee created this file
 -- Supporter message table
     -- FK from donation
 
-    create table supporterMessage (
+    CREATE TABLE supporterMessage (
         messageId int AUTO_INCREMENT,
-        donationId int unique not null,
-        postedDate datetime not null default (now()),
-        message text not null,
-        visibility boolean not null default true,
-        primary key (messageId),
-        foreign key (donationId) references donation(donationId)
+        donationId int UNIQUE NOT NULL,
+        postedDate datetime NOT NULL default (now()),
+        message text NOT NULL,
+        visibility boolean NOT NULL default true,
+        PRIMARY KEY (messageId),
+        FOREIGN KEY (donationId) REFERENCES donation(donationId)
     )
     ;
 
 -- Project update table 
     -- FK from project table
-    create table projectUpdate (
+    CREATE TABLE projectUpdate (
         updateId int AUTO_INCREMENT,
-        projectId int not null,
-        publishedDate datetime not null default (now()),
-        title varchar(100) not null,
+        projectId int NOT NULL,
+        publishedDate datetime NOT NULL default (now()),
+        title varchar(100) NOT NULL,
         description text,
-        primary key (updateId),
-        foreign key (projectId) references project(projectId)
+        PRIMARY KEY (updateId),
+        FOREIGN KEY (projectId) REFERENCES project(projectId)
 
     )
     ;
@@ -150,22 +150,22 @@ Yujin Lee created this file
 -- Report table 
     -- FK from project & user& message,  table
 
-    create table report (
+    CREATE TABLE report (
         reportId int AUTO_INCREMENT ,
-        reporterId int not null,
+        reporterId int NOT NULL,
         projectId int,
         messageId int,
         reportedContent text,
         reason varchar(255),
         reporterRole varchar(50),
-        submittedDate datetime not null default (now()),
-        status varchar(20) not null default 'pending',
+        submittedDate datetime NOT NULL default (now()),
+        status varchar(20) NOT NULL default 'pending',
         reviewerId int,
-        primary key (reportId),
-        foreign key (reporterId) references user(userId),
-        foreign key (projectId) references project(projectId),
-        foreign key (messageId) references supporterMessage(messageId),
-        foreign key (reviewerId) references administrator(userId)
+        PRIMARY KEY (reportId),
+        FOREIGN KEY (reporterId) REFERENCES user(userId),
+        FOREIGN KEY (projectId) REFERENCES project(projectId),
+        FOREIGN KEY (messageId) REFERENCES supporterMessage(messageId),
+        FOREIGN KEY (reviewerId) REFERENCES administrator(userId)
     )
     ;
 
@@ -173,12 +173,12 @@ Yujin Lee created this file
 
 -- image table 
     -- FK from projectUpdate table
-    create table image (
+    CREATE TABLE image (
         imageId int AUTO_INCREMENT,
-        updateId int not null,
-        imagePath varchar(255) not null,
-        primary key (imageId),
-        foreign key (updateId) references projectUpdate(updateId)
+        updateId int NOT NULL,
+        imagePath varchar(255) NOT NULL,
+        PRIMARY KEY (imageId),
+        FOREIGN KEY (updateId) REFERENCES projectUpdate(updateId)
     )
     ;
 
