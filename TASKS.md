@@ -10,9 +10,9 @@ This builds on **one team member's A1 design + the corresponding A2 database des
 
 ## Decisions to make first
 
-- [ ] **Scenario** (pick one): Charity event fundraising / Crowdfunding for creative projects / Subscription-based funding
-- [ ] **Whose A1 design + A2 database** is the team's base
-- [ ] **Role names** for the chosen scenario (e.g. Administrator / Fundraiser / Supporter)
+- [v] **Scenario** (pick one): Charity event fundraising / Crowdfunding for creative projects / Subscription-based funding
+- [v] **Whose A1 design + A2 database** is the team's base
+- [v] **Role names** for the chosen scenario (e.g. Administrator / Fundraiser / Supporter)
 - [ ] **Categories** used for browsing (e.g. location, creator type, content type) — at least 2
 - [ ] **Account deletion policy** — soft delete (status flag) or cascade? What happens to donations/posts of a removed user?
 - [ ] **Suspended users** — blocked from logging in? (recommended: yes)
@@ -93,8 +93,8 @@ Some files belong to one part only. Others (`views.py`, `models.py`, `forms.py`)
 
 ### Requirements
 - [ ] `database.sql` — hand-written (NOT an exported dump) SQL script that:
-  - [ ] Creates the database (`CREATE DATABASE`) and all tables derived from the A2 data model (3NF)
-  - [ ] Defines primary keys, foreign keys, and other constraints
+  - [v] Creates the database (`CREATE DATABASE`) and all tables derived from the A2 data model (3NF)
+  - [v] Defines primary keys, foreign keys, and other constraints
   - [ ] Inserts all sample data, including the test login accounts (stored as **hashed** passwords — see Part 2)
 - [ ] Schema supports: user status (e.g. active/suspended), campaign approval status (pending/approved/rejected/suspended) separate from operational status (active/paused/closed), featured flag, categories, reported-content records
 - [ ] Sample data must meet these minimums:
