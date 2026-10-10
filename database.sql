@@ -291,7 +291,7 @@ Yujin Lee CREATEd this file
         (projectId, supporterId, amount, donationDate, paymentMethod, paymentStatus)
     VALUES
         (1,11, 200, '2026-08-21', 'Card', 'Pending'),
-        (2,7, 300, '2026-08-14', 'PayPal', 'Received'),
+        (3,7, 300, '2026-08-14', 'PayPal', 'Received'),
         (1,12, 120, '2026-08-14', 'Card', 'Received'),
         (3,16, 100, '2026-08-02', 'BankTransfer', 'Received'),
         (4,2, 500, '2026-08-02', 'Card', 'Received')
@@ -305,7 +305,7 @@ Yujin Lee CREATEd this file
         (donationId, postedDate, message, visibility)
     VALUES
         (1, '2026-08-21 19:42:00', 'Can''t wait to see the new bead collection! Wishing Janet and Queenie all the best.', TRUE),
-        (1, '2026-08-14 10:15:00', 'I bought one of your bracelets at a Brisbane market last year and still wear it every day. So happy to support you!', TRUE),
+        (2, '2026-08-14 10:15:00', 'I bought one of your bracelets at a Brisbane market last year and still wear it every day. So happy to support you!', TRUE),
         (3, '2026-08-14 21:03:00', 'Good luck reaching your goal!', TRUE),
         (4, '2026-08-02 13:27:00', 'Click the link below and veiw more about caft activities: www.hellocraft.com !', FALSE),
         (5, '2026-08-02 08:50:00', 'Twelve years of craft deserves this next step. Proud to be one of your first supporters!', TRUE)
