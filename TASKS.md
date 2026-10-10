@@ -29,7 +29,6 @@ This builds on **one team member's A1 design + the corresponding A2 database des
 - Work on your own branch, open a PR into `IFN582_grp_assginment` _(verify the branch name — possible typo)_ when a part is ready, and tag someone for review before merging.
 - If a requirement is unclear, ask in the group chat before guessing — markers check against the brief exactly.
 - **Each owner checks their own pages at mobile and tablet widths before opening a PR.**
-- **Ethics / cultural sensitivity (ULO3):** sample data, images and wording must be appropriate and respectful.
 
 ---
 
@@ -92,39 +91,38 @@ Some files belong to one part only. Others (`views.py`, `models.py`, `forms.py`)
 **Priority:** Do this first — every other part depends on it.
 
 ### Requirements
-- [ ] `database.sql` — hand-written (NOT an exported dump) SQL script that:
-  - [v] Creates the database (`CREATE DATABASE`) and all tables derived from the A2 data model (3NF)
-  - [v] Defines primary keys, foreign keys, and other constraints
-  - [ ] Inserts all sample data, including the test login accounts (stored as **hashed** passwords — see Part 2)
-- [ ] Schema supports: user status (e.g. active/suspended), campaign approval status (pending/approved/rejected/suspended) separate from operational status (active/paused/closed), featured flag, categories, reported-content records
-- [ ] Sample data must meet these minimums:
-  - [ ] ≥ 15 campaigns/events, across ≥ 2 categories
-  - [ ] ≥ 6 users: ≥ 2 administrators, ≥ 2 fundraisers, ≥ 2 supporters
-  - [ ] ≥ 5 donation/support records, across different fundraisers
-  - [ ] ≥ 3 campaign posts/updates, across different fundraisers
-  - [ ] ≥ 2 campaigns with status "pending approval"
-  - [ ] ≥ 2 campaigns marked as featured
-  - [ ] ≥ 2 reported-content records, attached to different campaigns/posts
-  - [ ] Data shows different roles, multiple interaction types, and realistic relationships
-  - [ ] Content is realistic, respectful and culturally appropriate
-- [ ] `models.py` — Python classes representing each DB table (one class per entity), following the pattern taught in class (constructor + `get_*_details()` method)
-- [ ] `requirements.txt` containing only permitted packages
-- [ ] Flask project skeleton set up and running locally, matching the required submission structure:
+- [x] `database.sql` — hand-written (NOT an exported dump) SQL script that:
+  - [x] Creates the database (`CREATE DATABASE`) and all tables derived from the A2 data model (3NF)
+  - [x] Defines primary keys, foreign keys, and other constraints
+  - [x] Inserts all sample data, including the test login accounts (stored as **hashed** passwords — see Part 2)
+- [x] Schema supports: user status (e.g. active/suspended), campaign approval status (pending/approved/rejected/suspended) separate from operational status (active/paused/closed), featured flag, categories, reported-content records
+- [x] Sample data must meet these minimums:
+  - [x] ≥ 15 campaigns/events, across ≥ 2 categories
+  - [x] ≥ 6 users: ≥ 2 administrators, ≥ 2 fundraisers, ≥ 2 supporters
+  - [x] ≥ 5 donation/support records, across different fundraisers
+  - [x] ≥ 3 campaign posts/updates, across different fundraisers
+  - [x] ≥ 2 campaigns with status "pending approval"
+  - [x] ≥ 2 campaigns marked as featured
+  - [x] ≥ 2 reported-content records, attached to different campaigns/posts
+  - [x] Data shows different roles, multiple interaction types, and realistic relationships
+- [x] `models.py` — Python classes representing each DB table (one class per entity)
+- [x] `requirements.txt` containing only permitted packages
+- [x] Flask project skeleton set up and running locally, matching the required submission structure:
   ```
   run.py
   README.txt
   requirements.txt
-  database.sql
   project/
       __init__.py
       models.py
       views.py
       forms.py
+      database.sql
       static/css/
       static/img/
       templates/
   ```
-- [ ] Flask app successfully connects to MySQL and can run one test query end-to-end
+- [x] Flask app successfully connects to MySQL and can run one test query end-to-end
 - [ ] Share DB setup instructions (how to create the local MySQL database and import `database.sql`) with the team
 
 ---
@@ -144,7 +142,6 @@ Some files belong to one part only. Others (`views.py`, `models.py`, `forms.py`)
 - [ ] Registration, Login, Logout — fully working
 - [ ] Hashed passwords (no plaintext storage)
 - [ ] Session-based authentication
-- [ ] Suspended accounts cannot log in
 - [ ] Registered Supporters and Fundraisers can use their role's functionality immediately — **no admin approval needed for new accounts**
 - [ ] New campaigns still require admin approval before going public (handled in Part 4 + Part 5, but auth must support the role check)
 - [ ] **Mandatory:** directly below the username/password fields on the login page, a clearly labelled **"Test Login Credentials For Assessment"** section showing role + username + password for working sample accounts — **two accounts per role** (admin, fundraiser, supporter)

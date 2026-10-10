@@ -1,1 +1,5 @@
-# TODO: Part 1 owner - see TASKS.md
+from project import create_app
+
+if __name__ == '__main__':
+    app = create_app()
+    app.run(debug = True, port=8888)
