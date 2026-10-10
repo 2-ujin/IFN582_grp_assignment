@@ -110,7 +110,7 @@ Yujin Lee CREATEd this file
         amount decimal(16,2) NOT NULL,
         donationDate datetime  NOT NULL default (now()),
         paymentMethod varchar(50)  NOT NULL,
-        paymentStatus varchar(20) NOT NULL default 'Pending', -- pending, completed, failed
+        paymentStatus varchar(20) NOT NULL default 'Pending', -- Pending, Received, Failed
         PRIMARY KEY (donationId),
         FOREIGN KEY (projectId) REFERENCES project(projectId),
         FOREIGN KEY (supporterId) REFERENCES supporter(userId)
@@ -157,7 +157,6 @@ Yujin Lee CREATEd this file
         messageId int,
         reportedContent text,
         reason varchar(255),
-        reporterRole varchar(50),
         submittedDate datetime NOT NULL default (now()),
         status varchar(20) NOT NULL default 'Pending',
         reviewerId int,
@@ -194,23 +193,23 @@ Yujin Lee CREATEd this file
                 accountStatus -- active, suspended, deactivated
         )
     VALUES 
-        ('Queenie', 'Kwok', 'queenie.work@gmail.com' ,'0b14d501a594442a01c6859541bcb3e8164d183d32937b851835442f69d5c94e', 'Active'),
-        ('Melanie', 'Brant', 'm.brant@gmail.com' ,'6cf615d5bcaac778352a8f1f3360d23f02f34ec182e259897fd6ce485d7870d4', 'Active'),
-        ('M.', 'Cheung', 'marcokhc22@gmail.com' ,'5906ac361a137e2d286465cd6588ebb5ac3f5ae955001100bc41577c3d751764', 'Active'),
-        ('Lily ', 'Cronin', 'n12345678@qut.edu.au' ,'b97873a40f73abedd8d685a7cd5e5f85e4a9cfb83eac26886640a0813850122b', 'Suspended'),
-        ('Kayshay', 'Smith', 'kayshay@gmail.com' ,'8b2c86ea9cf2ea4eb517fd1e06b74f399e7fec0fef92e3b482a6cf2e2b092023', 'Active'),
-        ('Tim', 'Lee', 'leetim@gmail.com' ,'598a1a400c1dfdf36974e69d7e1bc98593f2e15015eed8e9b7e47a83b31693d5', 'Active'),
-        ('Eloise', 'Bao', 'ebao@hotmail.com' ,'5860836e8f13fc9837539a597d4086bfc0299e54ad92148d54538b5c3feefb7c', 'Active'),
-        ('Janet', 'White', 'fpwjanet@gmail.com' ,'57f3ebab63f156fd8f776ba645a55d96360a15eeffc8b0e4afe4c05fa88219aa', 'Active'),
-        ('Samantha', 'Robinson', 'admin2@makeartsfund.com ' ,'9323dd6786ebcbf3ac87357cc78ba1abfda6cf5e55cd01097b90d4a286cac90e', 'Active'),
-        ('Casey', 'Bright', 'admin23@makeartsfund.com ' ,'aa4a9ea03fcac15b5fc63c949ac34e7b0fd17906716ac3b8e58c599cdc5a52f0', 'Active'),
-        ('Johnathan', 'Jones', 'jjones@gmail.com' ,'53d453b0c08b6b38ae91515dc88d25fbecdd1d6001f022419629df844f8ba433', 'Active'),
-        ('Hannah ', 'Brown', 'hannahbrown@gmail.com' ,'b3d17ebbe4f2b75d27b6309cfaae1487b667301a73951e7d523a039cd2dfe110', 'Active'),
-        ('Maria', 'Watts', 'admin13@makeartsfund.com ' ,'48caafb68583936afd0d78a7bfd7046d2492fad94f3c485915f74bb60128620d', 'Active'),
-        ('Jayden', 'Butler', 'admin14@makeartsfund.com ' ,'c6863e1db9b396ed31a36988639513a1c73a065fab83681f4b77adb648fac3d6', 'Active'),
-        ('Nina', 'Burcher', 'admin15@makeartsfund.com ' ,'c63c2d34ebe84032ad47b87af194fedd17dacf8222b2ea7f4ebfee3dd6db2dfb', 'Active'),
-        ('John ', 'Thompson', 'thomjohn@gmail.com' ,'17a3379984b560dc311bb921b7a46b28aa5cb495667382f887a44a7fdbca7a7a', 'Active'),
-        ('Karen ', 'Hack', 'khacker@gmail.com' ,'69bfb918de05145fba9dcee9688dfb23f6115845885e48fa39945eebb99d8527', 'Active')
+        ('Queenie', 'Kwok', 'queenie.work@gmail.com' ,'scrypt:32768:8:1$s9hNSCfN6VfIv5b4$078546c973768f5f4366de35994ed0c532ebe82502806c44cffd747c8971e3941c4a255a972a4844391ddac82b4143b1d1a4345588267975f54819c1f9b7740e', 'Active'),
+        ('Melanie', 'Brant', 'm.brant@gmail.com' ,'scrypt:32768:8:1$N3kKmV1pQoBEw3Pb$bd5d0d425d83e5f40f7f4c4dec553b9457520ae4a9cc50493e079e48ef79c3252f40b48cb4dd770ec03fb54d3b3100fde27d2e88ac0ec48bd7ab6bcb682803df', 'Active'),
+        ('M.', 'Cheung', 'marcokhc22@gmail.com' ,'scrypt:32768:8:1$iGPZHCx6oI7rWykK$d24e2800d8f3c496d26f732b98a0d636d7b8617fbcae91df077e9698dac6b82b880ab1946cc11be767e55173a8802924367d2298ed40d97616c0d7e23588155d', 'Active'),
+        ('Lily', 'Cronin', 'n12345678@qut.edu.au' ,'scrypt:32768:8:1$FuEboelfJxtqOxUn$13e475ac6f57c35ce29af4411d9f44776e8f245b6db0b928780dfbbfe1b17d6ba9e46396a6a8c088e39bb034ae07222b6e837c23ba73eb87bcd2ba792155ea5b', 'Suspended'),
+        ('Kayshay', 'Smith', 'kayshay@gmail.com' ,'scrypt:32768:8:1$ti40HvI1hawZpmu4$8ce337e88c0653ef15defb80dcf3ccb355d55a2c9a4226f9f5a14757a93beab87bae04bf95cbb01db535ce5ec8b4699ee2f3b1ae4001ff7a6df82d1472ebe3a0', 'Active'),
+        ('Tim', 'Lee', 'leetim@gmail.com' ,'scrypt:32768:8:1$MIrhekl5wvbG9Lmr$d89fa862a957a298fdca06ace8075396d3d1c10b2313cdf6dda0b47e3ac35c1c2adf48a48c7e82089a25ec10f0070132094f51527dc41992c45eb40b7047e7c4', 'Active'),
+        ('Eloise', 'Bao', 'ebao@hotmail.com' ,'scrypt:32768:8:1$EEwwzeh9Nz0U5G0l$a0fa6cb00dd544c6e8e58de7202e0c4d402100738ee9ea8420692e086fc989deca75dac3902e838ea4fb61b8a7ab131a925a9461ce541e000d677da95b3dba76', 'Active'),
+        ('Janet', 'White', 'fpwjanet@gmail.com' ,'scrypt:32768:8:1$pSMtn40qdpzFLtj5$819fd726a663abaf6a6c1346cf173457835159018936c3969369f9adab28524f21ce36003f7aa025026561219d069c3abb4c9360d8051d4781c585bcda87611d', 'Active'),
+        ('Samantha', 'Robinson', 'admin2@makeartsfund.com' ,'scrypt:32768:8:1$mV21J0yAIS3bGqF0$8abba29b932cde2829e822a7030590823bafeec001e0ea7427402ff5f8abd19b5094d92cba700b368c7d12eb1bfa3a56e638578f8da1a83de5fdb6ed5e94ec5a', 'Active'),
+        ('Casey', 'Bright', 'admin23@makeartsfund.com' ,'scrypt:32768:8:1$Mr8kkZh5YNvRDNDE$ea4d538435288a5f31d73935c562295f925ab9cf2977f8f9efb090c056b93cd81541c753cc91fc390131f3fbc98823dfef4edee74f21b12597cc96c7b05261e6', 'Active'),
+        ('Johnathan', 'Jones', 'jjones@gmail.com' ,'scrypt:32768:8:1$IWpwzvluZ7V5cuYe$3f58971ee6791d40da20ef32f029818542948ddf8c0e637f0fd2da049d27906849c883c7ffc3fbeec9085128f8bc2235eb21dd724931e6020340bc25cfe779fd', 'Active'),
+        ('Hannah', 'Brown', 'hannahbrown@gmail.com' ,'scrypt:32768:8:1$y7YkDrsNfmeAEnKZ$5750ad754a7b0fa625a1d5cdd8e3652018e998948336fa7ec8296ba4410cc882289e6b42394897dca5253ee5e005c2819465e27e2229f359f367dea1c241636f', 'Active'),
+        ('Maria', 'Watts', 'admin13@makeartsfund.com' ,'scrypt:32768:8:1$2M4NRQ8xsX5OMS7n$9c61c2c6180f2096156a822450e7f96520648495bb8dd7de940f7b9e22470e8fdf46a0ace8f66b30555ecbab1de60eccf4dc7b66a7970f2d25f454a1b3a52dde', 'Active'),
+        ('Jayden', 'Butler', 'admin14@makeartsfund.com' ,'scrypt:32768:8:1$HhrniNXNIxQgmGKR$20ce724ce71732287d413706a506db9009e8926734a90a427ee5627800747bf039ed043b9f99a47a128a57dfccc623c3bcca20a6b9e8c9f3ef6954f00766915a', 'Active'),
+        ('Nina', 'Burcher', 'admin15@makeartsfund.com' ,'scrypt:32768:8:1$3TcUO7DZM5eXGzUj$7b464ed0dab5dfaaf32f94ac3ab62e6857bef48dce33954c008b9d2a3204e866bec34fc59ad03fe56ab48e22d6d813f3be95b094ed1ee2fe31a5d60c53914f66', 'Active'),
+        ('John', 'Thompson', 'thomjohn@gmail.com' ,'scrypt:32768:8:1$QW5P5ulQPDy42uN1$1c3582e77aeb9c4e1120eb1e8454b64764386c2b2e6d6eda0926e56055a6202176383506de2d6d518ba1907df0d620fdfdc96d6629df81f223ebc8aef961446b', 'Active'),
+        ('Karen', 'Hack', 'khacker@gmail.com' ,'scrypt:32768:8:1$HSMvlTkC0HzoDfLH$c23fa8b83e434ceeccc842612e4b8c4b1dbd3607291b3b4d893afafb748edb94a5f048d2866992d479cbd493b5ad8f512923cb25e3e5a8fe7245088f90d0a4e1', 'Active')
     ;
 
 -- ARTIST
@@ -292,10 +291,10 @@ Yujin Lee CREATEd this file
         (projectId, supporterId, amount, donationDate, paymentMethod, paymentStatus)
     VALUES
         (1,11, 200, '2026-08-21', 'Card', 'Pending'),
-        (1,7, 300, '2026-08-14', 'PayPal', 'Received'),
+        (2,7, 300, '2026-08-14', 'PayPal', 'Received'),
         (1,12, 120, '2026-08-14', 'Card', 'Received'),
-        (1,16, 100, '2026-08-02', 'BankTransfer', 'Received'),
-        (1,2, 500, '2026-08-02', 'Card', 'Received')
+        (3,16, 100, '2026-08-02', 'BankTransfer', 'Received'),
+        (4,2, 500, '2026-08-02', 'Card', 'Received')
     ;
 
 
@@ -306,8 +305,8 @@ Yujin Lee CREATEd this file
         (donationId, postedDate, message, visibility)
     VALUES
         (1, '2026-08-21 19:42:00', 'Can''t wait to see the new bead collection! Wishing Janet and Queenie all the best.', TRUE),
-        (2, '2026-08-14 10:15:00', 'I bought one of your bracelets at a Brisbane market last year and still wear it every day. So happy to support you!', TRUE),
-        (3, '2026-08-14 21:03:00', 'Love that this is a mother and daughter project. Good luck reaching your goal!', TRUE),
+        (1, '2026-08-14 10:15:00', 'I bought one of your bracelets at a Brisbane market last year and still wear it every day. So happy to support you!', TRUE),
+        (3, '2026-08-14 21:03:00', 'Good luck reaching your goal!', TRUE),
         (4, '2026-08-02 13:27:00', 'Click the link below and veiw more about caft activities: www.hellocraft.com !', FALSE),
         (5, '2026-08-02 08:50:00', 'Twelve years of craft deserves this next step. Proud to be one of your first supporters!', TRUE)
     ;
@@ -320,16 +319,15 @@ Yujin Lee CREATEd this file
         messageId,
         reportedContent,
         reason,
-        reporterRole,
         submittedDate,
         status,
         reviewerId)
     VALUES
-        (1, 2, NULL, 'Project image', 'Copyright of image posted', 'Artist', '2026-08-19', 'Pending', NULL),
-        (5, NULL, 4, 'Supporter messages', 'Inappropriate language.', 'Artist', '2026-08-06', 'Resolved', 13),
-        (17, 3, NULL, 'Project description', 'Misleading information', 'Supporter', '2026-08-05', 'Resolved', 14),
-        (12, 4, NULL, 'Content under Project Updates', 'Disclosure of sensitive personal info', 'Supporter', '2026-07-20', 'Resolved', 10),
-        (2, 4, NULL, 'Project image', 'Copyright of image posted', 'Supporter', '2026-07-21', 'Resolved', 9)
+        (1, 2, NULL, 'Project image', 'Copyright of image posted', '2026-08-19', 'Pending', NULL),
+        (5, NULL, 4, 'Supporter messages', 'Inappropriate language.', '2026-08-06', 'Resolved', 13),
+        (17, 3, NULL, 'Project description', 'Misleading information', '2026-08-05', 'Resolved', 14),
+        (12, 4, NULL, 'Content under Project Updates', 'Disclosure of sensitive personal info', '2026-07-20', 'Resolved', 10),
+        (2, 4, NULL, 'Project image', 'Copyright of image posted', '2026-07-21', 'Resolved', 9)
     ;
 
 
