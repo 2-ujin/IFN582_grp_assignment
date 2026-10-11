@@ -26,16 +26,19 @@ def index():
 
 # ----- Part 5. Admin Dashboard -----
 from flask import render_template, redirect, url_for, flash
-from .models import get_pending_projects, review_project_approval
+from .models import (get_pending_projects, review_project_approval,
+                     get_reviewed_projects, change_project_status, soft_delete_project)
 from .forms import AdminActionForm
 
 # TODO: add login function for admin
 @main.route('/admin')
 def admin_dashboard():
     pending_projects = get_pending_projects()
+    reviewed_projects = get_reviewed_projects()
     form = AdminActionForm()
     return render_template('admin_dashboard.html',
                            pending_projects = pending_projects,
+                           reviewed_projects = reviewed_projects,
                            form = form)
 
 @main.route('/admin/projects/<int:project_id>/approve', methods = ['POST'])
@@ -58,6 +61,45 @@ def reject_project(project_id):
             flash('The project has been rejected.', 'success') 
         else: 
             flash('This project could not be found or is no longer pending approval.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Change project status from 'Approved' to 'Suspended'
+@main.route('/admin/projects/<int:project_id>/suspend', methods = ['POST'])
+def suspend_project(project_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if change_project_status(project_id, 'Approved', 'Suspended') == 1:
+           flash('The project has been suspended and is no longer visible to supporters.', 'success') 
+        else: 
+            flash('Only approved projects can be suspended.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Change project status from 'Suspended' to 'Approved'
+@main.route('/admin/projects/<int:project_id>/restore', methods = ['POST'])
+def restore_project(project_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if change_project_status(project_id, 'Suspended', 'Approved') == 1:
+           flash('The project has been restored and is visible to supporters again.', 'success') 
+        else: 
+            flash('Only suspended projects can be restored.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Remove projects from admin dashboard
+@main.route('/admin/projects/<int:project_id>/remove', methods = ['POST'])
+def remove_project(project_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if soft_delete_project(project_id) == 1:
+           flash('The project has been removed.', 'success') 
+        else: 
+            flash('This project could not be found or cannot be removed.', 'warning')
     else:
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))

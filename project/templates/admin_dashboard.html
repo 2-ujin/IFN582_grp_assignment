@@ -119,6 +119,71 @@
           </div>
         </section>
 
+        <!-- Project Management -->
+        <section id="project-management" class="admin-panel mb-4" aria-labelledby="project-management-heading">
+          <div class="admin-panel-heading">
+            <h2 id="project-management-heading">Project Management</h2>
+
+            <div class="admin-heading-actions">
+              <span class="admin-count-badge">{{ reviewed_projects|length }} Projects</span>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table admin-table align-middle">
+              <caption class="visually-hidden">Reviewed projects</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Project name</th>
+                  <th scope="col">Creator</th>
+                  <th scope="col">Category</th>
+                  <th scope="col">Location</th>
+                  <th scope="col">Project status</th>
+                  <th scope="col">Approval</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for project in reviewed_projects %}
+                  <tr>
+                    <th scope="row">{{ project.projectName }}</th>
+                    <td>{{ project.creatorName }}</td>
+                    <td>{{ project.categoryName }}</td>
+                    <td>{{ project.location }}</td>
+                    <td>{{ project.projectStatus }}</td>
+                    <td><span class="table-status status-{{ project.approvalStatus|lower }}">{{ project.approvalStatus }}</span></td>
+                    <td>
+                      <div class="d-flex flex-wrap gap-1"> 
+                      {% if project.approvalStatus == 'Approved' %}
+                        <form method="post" action="{{ url_for('main.suspend_project', project_id = project.projectId) }}">
+                          {{ form.csrf_token}}
+                          <button type="submit" class="btn btn-sm btn-outline-danger" style="min-width: 5rem;">Suspend</button>  {# style > css 파일로 옮길 것#}
+                        </form>      
+                      {% elif project.approvalStatus == 'Suspended' %}
+                        <form method="post" action="{{ url_for('main.restore_project', project_id = project.projectId) }}">
+                          {{ form.csrf_token}}
+                          <button type="submit" class="btn btn-sm btn-outline-coral" style="min-width: 5rem;">Restore</button>
+                        </form>                           
+                      {% endif %}
+                      <form method="post" action="{{ url_for('main.remove_project', project_id = project.projectId) }}">
+                        {{ form.csrf_token}}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                      </form>
+                      </div>
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td colspan="7">No projects have been reviewed yet.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+
+
       </div>
     </section>
   </main>
