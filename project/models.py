@@ -142,3 +142,30 @@ class Image:
     imageId: int
     update: ProjectUpdate
     imagePath: str
+
+
+# ----- Part 5. Admin Dashboard -----
+from . import database
+
+def get_pending_projects():
+    # Projects waiting for admin to approve or reject
+
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  project.projectId,
+                project.projectName,
+                CONCAT(user.firstname, ' ', user.surname) AS creatorName,
+                category.categoryName,
+                project.location,
+                project.updateDt AS submittedDate  -- submitted date 추가할 수 있는지 Part 1과 확인 필요
+        FROM project
+        JOIN user ON user.userId = project.creatorId
+        JOIN category ON category.categoryId = project.categoryId
+        WHERE project.approvalStatus = 'Pending'
+        ORDER BY project.updateDt ASC
+    """)
+
+    pending_projects = cursor.fetchall()
+    cursor.close()
+    return pending_projects
+

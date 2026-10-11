@@ -22,3 +22,15 @@ def index():
 
     # Return as plain text so it shows in the browser without a template
     return str(projects)
+
+
+# ----- Part 5. Admin Dashboard -----
+from flask import render_template
+from .models import get_pending_projects
+
+# TODO: add login function for admin
+@main.route('/admin')
+def admin_dashboard():
+    pending_projects = get_pending_projects()
+    return render_template('admin_dashboard.html',
+                           pending_projects = pending_projects)
