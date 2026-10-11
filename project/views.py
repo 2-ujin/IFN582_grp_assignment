@@ -27,19 +27,34 @@ def index():
 # ----- Part 5. Admin Dashboard -----
 from flask import render_template, redirect, url_for, flash
 from .models import (get_pending_projects, review_project_approval,
-                     get_reviewed_projects, change_project_status, soft_delete_project)
-from .forms import AdminActionForm
+                     get_reviewed_projects, change_project_status, soft_delete_project,
+                     get_featured_projects, get_feature_candidates,
+                     add_to_featured, remove_from_featured)
+from .forms import AdminActionForm, FeatureProjectForm
+
+def create_feature_form():
+    # Build a dopdown with the projects that can be featured
+    feature_form = FeatureProjectForm()
+    options = []
+    for project in get_feature_candidates():
+        options.append((project['projectId'], project['projectName']))
+    feature_form.project_id.choices = options
+    return feature_form
 
 # TODO: add login function for admin
 @main.route('/admin')
 def admin_dashboard():
     pending_projects = get_pending_projects()
     reviewed_projects = get_reviewed_projects()
+    fetured_projects = get_featured_projects()
     form = AdminActionForm()
+    feature_form = create_feature_form()
     return render_template('admin_dashboard.html',
                            pending_projects = pending_projects,
                            reviewed_projects = reviewed_projects,
-                           form = form)
+                           featured_projects = fetured_projects,
+                           form = form,
+                           feature_form = feature_form)
 
 @main.route('/admin/projects/<int:project_id>/approve', methods = ['POST'])
 def approve_project(project_id):
@@ -91,15 +106,43 @@ def restore_project(project_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
 
-# Remove projects from admin dashboard
-@main.route('/admin/projects/<int:project_id>/remove', methods = ['POST'])
-def remove_project(project_id):
+# Soft delete projects from admin dashboard
+@main.route('/admin/projects/<int:project_id>/delete', methods = ['POST'])
+def delete_project(project_id):
     form = AdminActionForm()
     if form.validate_on_submit():
         if soft_delete_project(project_id) == 1:
-           flash('The project has been removed.', 'success') 
+           flash('The project has been deleted.', 'success') 
         else: 
-            flash('This project could not be found or cannot be removed.', 'warning')
+            flash('This project could not be found or cannot be deleted.', 'warning')
     else:
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
+
+# Add featured projects
+@main.route('/admin/featured/add', methods=['POST'])
+def add_featured_project():
+    feature_form = create_feature_form()
+    if feature_form.validate_on_submit():
+        if add_to_featured(feature_form.project_id.data) == 1:
+            flash('This project has been added to the Featured section.', 'success')
+        else:
+            flash('This project cannot be featured.', 'warning')
+    else:
+        flash('Please choose a valid project to feature.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Remove from featured section
+@main.route('/admin/featured/<int:project_id>/remove', methods=['POST'])
+def remove_featured_project(project_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if remove_from_featured(project_id) == 1:
+            flash('This project has been removed from the Featured section.', 'success')
+        else:
+            flash('This project is not in the Featured section.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))        
+
+    

@@ -222,11 +222,11 @@ def change_project_status(project_id, current_status, new_status):
     return updated_rows
 
 def soft_delete_project(project_id):
-    # Hide reviewed projects by setting their approval status to 'Removed'
+    # Hide reviewed projects by setting their approval status to 'Deleted'
     cursor = database.connection.cursor()
     cursor.execute("""
         UPDATE project
-        SET approvalStatus = 'Removed',
+        SET approvalStatus = 'Deleted',
             featured = FALSE   
         WHERE projectId = %s
           And approvalStatus IN ('Approved', 'Suspended', 'Rejected')
@@ -235,3 +235,72 @@ def soft_delete_project(project_id):
     updated_rows = cursor.rowcount
     cursor.close()
     return updated_rows
+
+def get_featured_projects():
+    # Get projects that are currently in featured section
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  project.projectId,
+                project.projectName,
+                CONCAT(user.firstname, ' ', user.surname) AS creatorName,
+                category.categoryName,
+                project.location
+        FROM project
+        JOIN user ON user.userId = project.creatorId
+        JOIN category ON category.categoryId = project.categoryId
+        WHERE project.featured = TRUE
+        ORDER BY project.projectName ASC
+    """)
+
+    featured_projects = cursor.fetchall()
+    cursor.close()
+    return featured_projects
+
+def get_feature_candidates():
+    # Get projects that can be added to featured section
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  project.projectId,
+                project.projectName
+        FROM project
+        WHERE project.approvalStatus = 'Approved'
+        AND project.projectStatus = 'Active'
+        AND project.featured = FALSE
+        ORDER BY project.projectName ASC
+    """)
+
+    feature_candidates = cursor.fetchall()
+    cursor.close()
+    return feature_candidates
+
+def add_to_featured(project_id):
+    # Show a project in featured section
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        UPDATE project
+        SET featured = TRUE   
+        WHERE projectId = %s
+          And approvalStatus = 'Approved'
+          And projectStatus = 'Active'
+          AND featured = FALSE
+    """, (project_id,)) 
+    database.connection.commit()
+    updated_rows = cursor.rowcount
+    cursor.close()
+    return updated_rows
+
+def remove_from_featured(project_id):
+    # Take a project out from featured section
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        UPDATE project
+        SET featured = FALSE   
+        WHERE projectId = %s
+          AND featured = TRUE
+    """, (project_id,)) 
+    database.connection.commit()
+    updated_rows = cursor.rowcount
+    cursor.close()
+    return updated_rows
+
+
