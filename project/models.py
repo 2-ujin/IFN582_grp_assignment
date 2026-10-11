@@ -169,3 +169,16 @@ def get_pending_projects():
     cursor.close()
     return pending_projects
 
+def review_project_approval(project_id, new_status):
+    # Admin reviews a pending project and approves or rejects it
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        UPDATE project
+        SET approvalStatus = %s
+        WHERE projectId = %s
+          And approvalStatus = 'Pending'
+    """, (new_status, project_id)) 
+    database.connection.commit()
+    updated_rows = cursor.rowcount
+    cursor.close()
+    return updated_rows

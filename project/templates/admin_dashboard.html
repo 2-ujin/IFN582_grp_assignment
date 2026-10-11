@@ -48,6 +48,13 @@
     <section class="admin-dashboard-section">
       <div class="container">
 
+        {# Flash messages (TEMPORARY) #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{category}}" role="alert">{{ message }}</div>
+          {% endfor %}
+        {% endwith %}
+
         <!-- Admin Overview -->
         <section id="administration-overview" class="mb-4" aria-labelledby="overview-heading">
           <div class="section-heading mb-4">
@@ -79,21 +86,32 @@
                   <th scope="col">Location</th>
                   <th scope="col">Submission date</th>
                   <th scope="col">Status</th>
+                  <th scope="col">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {% for project in pending_projects %}
                   <tr>
-                    <th scope="row">{{ project['projectName'] }}</th>
-                    <td>{{ project['creatorName'] }}</td>
-                    <td>{{ project['categoryName'] }}</td>
-                    <td>{{ project['location'] }}</td>
-                    <td>{{ project['submittedDate'].strftime('%d %B %Y') }}</td>
+                    <th scope="row">{{ project.projectName }}</th>
+                    <td>{{ project.creatorName }}</td>
+                    <td>{{ project.categoryName }}</td>
+                    <td>{{ project.location }}</td>
+                    <td>{{ project.submittedDate.strftime('%d %B %Y') }}</td>
                     <td><span class="table-status status-pending">Pending</span></td>
+                    <td>
+                        <form method="post" action="{{ url_for('main.approve_project', project_id=project.projectId) }}" class="d-inline">
+                            {{ form.csrf_token }}
+                            <button type="submit" class="btn btn-sm btn-coral">Approve</button>
+                        </form>
+                        <form method="post" action="{{ url_for('main.reject_project', project_id=project.projectId) }}" class="d-inline">
+                            {{ form.csrf_token }}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                        </form>                        
+                    </td>
                   </tr>
                 {% else %}
                   <tr>
-                    <td colspan="6">No projects are waiting for approval.</td>
+                    <td colspan="7">No projects are waiting for approval.</td>
                   </tr>
                 {% endfor %}
                 </tbody>
