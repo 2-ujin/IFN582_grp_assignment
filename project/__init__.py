@@ -17,6 +17,9 @@ def create_app():
     from .views import main
     app.register_blueprint(main)
 
+    from .management import management_bp
+    app.register_blueprint(management_bp)
+
 
 # ---- @Queenie: This is the place for ur error handlers ------ :) 
 
@@ -27,7 +30,7 @@ def create_app():
     app.config['MYSQL_USER'] = 'root' # dont change
    
 ## !IMPORTANT! Change the password before you run the code.  
-    app.config['MYSQL_PASSWORD'] = '582Assignment2' # change it to ur local password
+    app.config['MYSQL_PASSWORD'] = 'sqlqut26' # change it to ur local password
     
     
     app.config['MYSQL_DB'] = 'maf' # same schema to database.sql
