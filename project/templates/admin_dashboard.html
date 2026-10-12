@@ -222,6 +222,69 @@
           </div>
         </section>
 
+        <!-- User Management -->
+        <section id="user-management" class="admin-panel mb-4" aria-labelledby="user-management-heading">
+          <div class="admin-panel-heading">
+            <h2 id="user-management-heading">User Management</h2>
+
+            <div class="admin-heading-actions">
+              <span class="admin-count-badge">{{ users|length }} Active Accounts</span>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table admin-table align-middle">
+              <caption class="visually-hidden">Registered user accounts</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Email address</th>
+                  <th scope="col">Role</th>
+                  <th scope="col">Account status</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for user in users %}
+                  <tr>
+                    <th scope="row">{{ user.fullName }}</th>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                    <td><span class="table-status status-{{ user.accountStatus|lower }}">{{ user.accountStatus }}</span></td>
+                    <td>
+                      {% if user.role != 'Administrator' %}
+                        <div class="d-flex flex-wrap gap-1">
+                          {% if user.accountStatus == 'Active' %}
+                            <form method="post" action="{{ url_for('main.suspend_user', user_id = user.userId) }}">
+                              {{ form.csrf_token}}
+                              <button type="submit" class="btn btn-sm btn-outline-danger" style="min-width: 6rem;">Suspend</button>
+                            </form>
+                          {% elif user.accountStatus == 'Suspended' %}
+                            <form method="post" action="{{ url_for('main.reactivate_user', user_id = user.userId) }}">
+                              {{ form.csrf_token}}
+                              <button type="submit" class="btn btn-sm btn-outline-coral" style="min-width: 6rem;">Reactivate</button>
+                            </form>
+                          {% endif %}
+                          <form method="post" action="{{ url_for('main.delete_user', user_id = user.userId) }}">
+                            {{ form.csrf_token}}
+                            <button type="submit" class="btn btn-sm btn-outline-danger" style="min-width: 6rem;">Delete</button>
+                          </form>                          
+                           {# TODO: Edit button #}
+                        </div>  
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td colspan="5">There are no user accounts yet.</td>
+                  </tr>
+                {% endfor %}        
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+
         <!-- Featured Projects -->
         <div class="row g-4">
           <div class="col-lg-6">

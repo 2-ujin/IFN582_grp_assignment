@@ -228,7 +228,7 @@ def review_project_approval(project_id, new_status):
         UPDATE project
         SET approvalStatus = %s
         WHERE projectId = %s
-          And approvalStatus = 'Pending'
+          AND approvalStatus = 'Pending'
     """, (new_status, project_id)) 
     database.connection.commit()
     updated_rows = cursor.rowcount
@@ -266,7 +266,7 @@ def change_project_status(project_id, current_status, new_status):
         SET approvalStatus = %s,
             featured = FALSE  # Remove suspended projects from featured projects 
         WHERE projectId = %s
-          And approvalStatus = %s
+          AND approvalStatus = %s
     """, (new_status, project_id, current_status)) 
     database.connection.commit()
     updated_rows = cursor.rowcount
@@ -281,12 +281,67 @@ def soft_delete_project(project_id):
         SET approvalStatus = 'Deleted',
             featured = FALSE   
         WHERE projectId = %s
-          And approvalStatus IN ('Approved', 'Suspended', 'Rejected')
+          AND approvalStatus IN ('Approved', 'Suspended', 'Rejected')
     """, (project_id,)) 
     database.connection.commit()
     updated_rows = cursor.rowcount
     cursor.close()
     return updated_rows
+
+def get_users():
+    # Display all accounts for the user management table
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  user.userId,
+                CONCAT(user.firstname, ' ', user.surname) AS fullName,
+                user.email,
+                CASE
+                    WHEN administrator.userId IS NOT NULL THEN 'Administrator'
+                    WHEN artist.userId IS NOT NULL THEN 'Artist'
+                    WHEN supporter.userId IS NOT NULL THEN 'Supporter'
+                    ELSE 'Unknown'
+                END AS role,
+                user.accountStatus
+        FROM user
+        LEFT JOIN administrator ON administrator.userId = user.userId
+        LEFT JOIN artist ON artist.userId = user.userId
+        LEFT JOIN supporter ON supporter.userId = user.userId
+        WHERE user.accountStatus <> 'Deleted'
+        ORDER BY user.firstname ASC        
+    """)
+    users = cursor.fetchall()
+    cursor.close()
+    return users
+
+def change_user_status(user_id, current_status, new_status):
+    # Suspend or reactivate an artist/supporter account
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        UPDATE user
+        SET accountStatus = %s
+        WHERE userId = %s
+          AND accountStatus = %s
+          AND userId NOT IN (SELECT administrator.userId FROM administrator)
+    """, (new_status, user_id, current_status))
+    database.connection.commit()
+    updated_rows = cursor.rowcount
+    cursor.close()
+    return updated_rows
+
+def soft_delete_user(user_id):
+    # Hide an artist/supporter account and keep the record in database
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        UPDATE user
+        SET approvalStatus = 'Deleted'   
+        WHERE userId = %s
+          AND accountStatus IN ('Active', 'Suspended')
+          AND userId NOT IN (SELECT administrator.userId FROM administrator)
+    """, (user_id,)) 
+    database.connection.commit()
+    updated_rows = cursor.rowcount
+    cursor.close()
+    return updated_rows    
 
 def get_featured_projects():
     # Get projects that are currently in featured section

@@ -29,6 +29,7 @@ from flask import render_template, redirect, url_for, flash
 from .models import (get_campaign_stats, get_creator_count, get_supporter_count, get_report_stats,
                      get_pending_projects, review_project_approval,
                      get_reviewed_projects, change_project_status, soft_delete_project,
+                     get_users, change_user_status, soft_delete_user,
                      get_featured_projects, get_feature_candidates,
                      add_to_featured, remove_from_featured)
 
@@ -52,6 +53,7 @@ def admin_dashboard():
     report_stats = get_report_stats()
     pending_projects = get_pending_projects()
     reviewed_projects = get_reviewed_projects()
+    users = get_users()
     fetured_projects = get_featured_projects()
     form = AdminActionForm()
     feature_form = create_feature_form()
@@ -63,6 +65,7 @@ def admin_dashboard():
                            pending_projects = pending_projects,
                            reviewed_projects = reviewed_projects,
                            featured_projects = fetured_projects,
+                           users = users,
                            form = form,
                            feature_form = feature_form)
 
@@ -125,6 +128,45 @@ def delete_project(project_id):
            flash('The project has been deleted.', 'success') 
         else: 
             flash('This project could not be found or cannot be deleted.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Change user account from 'Active' to 'Suspend'
+@main.route('/admin/users/<int:user_id>/suspend', methods = ['POST'])
+def suspend_user(user_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if change_user_status(user_id, 'Active', 'Suspended') == 1:
+           flash('The account has been suspended.', 'success') 
+        else: 
+            flash('This account could not be suspended.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Change user account from 'Suspend' to 'Active'
+@main.route('/admin/users/<int:user_id>/reactivate', methods = ['POST'])
+def reactivate_user(user_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if change_user_status(user_id, 'Suspended', 'Active') == 1:
+           flash('The account has been reactivated.', 'success') 
+        else: 
+            flash('This account could not be reactivated.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Soft delete user accounts from admin dashboard
+@main.route('/admin/users/<int:user_id>/delete', methods = ['POST'])
+def delete_user(user_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if soft_delete_user(user_id) == 1:
+           flash('The account has been deleted.', 'success') 
+        else: 
+            flash('This account could not be found or cannot be deleted.', 'warning')
     else:
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
