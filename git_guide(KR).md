@@ -80,6 +80,31 @@ add (스테이징 준비) > commit (라벨 붙이기) > push (GitHub에 업로�
 - `git push`는 **commit된** 변경사항만 올립니다. `Everything up-to-date`가 뜨면 `git add` / `git commit`을 빠뜨렸을 가능성이 높습니다.
 - `git status`로 아직 commit 안 된 파일을 확인할 수 있습니다.
 
+### 3-1. 작업 중에 메인 브랜치가 바뀌었을 때 — 내 브랜치 동기화하기
+내가 작업하는 동안 팀원의 PR이 merge되면, 내 브랜치는 메인보다 뒤처지게 됩니다.
+(PR 페이지에 *"This branch is out-of-date with the base branch"* 라고 표시됩니다.)
+최신 메인을 **내 브랜치**로 가져오세요:
+```
+> git branch --show-current                         # 1) 내 브랜치에 있는지 확인
+> git add [파일 이름]                                # 2) 지금 작업을 먼저 commit
+> git commit -m "WIP: 작업 설명"
+> git fetch origin                                  # 3) 최신 메인 다운로드
+> git merge origin/IFN582_grp_assignment --no-edit  # 4) 최신 메인을 내 브랜치에 합치기
+> git push                                          # 5) 업로드 — PR이 자동으로 업데이트됨
+```
+- **Conflict가 없으면:** 끝. 내 브랜치에 팀원들의 최신 코드 + 내 작업이 모두 들어 있습니다.
+- **Conflict가 나면** (`CONFLICT (content): Merge conflict in ...`):
+  1. VS Code에서 그 파일을 열고 *Accept Current* (내 것) / *Accept Incoming* (메인) / *Accept Both* 중 선택합니다.
+  2. 저장한 다음:
+  ```
+  > git add [파일 이름]
+  > git commit --no-edit
+  > git push
+  ```
+  3. 어느 코드를 남길지 모르겠으면 그 코드를 쓴 팀원에게 단톡방에서 물어보세요.
+- 중간에 merge를 취소하고 싶으면: `git merge --abort` (4단계 이전 상태로 돌아갑니다).
+- **팀원의 브랜치**를 고쳐주는 경우? 같은 순서지만, 먼저 `git fetch origin` → `git switch [팀원 브랜치]` → `git pull`을 하세요. 그리고 팀원에게 작업을 계속하기 전에 `git pull`을 하라고 알려주세요.
+
 ### 4. Pull Request(PR) 열기
 1. https://github.com/2-ujin/IFN582_grp_assignment 에 접속합니다.
 2. **"Compare & pull request"** 를 클릭합니다 (또는 Pull requests → New pull request).
