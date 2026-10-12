@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{# Use the supplied HTTP status to choose a safe, user-friendly page message. #}
+{% set display_code = status_code|default(404) %}
+{% if display_code == 403 %}
+  {% set page_title = page_title|default("Access denied") %}
+  {% set page_message = page_message|default("You do not have permission to view this page.") %}
+{% elif display_code == 404 %}
+  {% set page_title = page_title|default("Page not found") %}
+  {% set page_message = page_message|default("The page may have moved, or the address may be incorrect.") %}
+{% else %}
+  {% set page_title = page_title|default("Something went wrong") %}
+  {% set page_message = page_message|default("We could not complete your request. Please try again shortly.") %}
+{% endif %}
+
+{% block title %}{{ page_title }} | MakeArtsFund{% endblock %}
+
+{% block content %}
+<section class="error-section section-padding" aria-labelledby="error-title">
+  <div class="container">
+    <div class="error-card">
+      <p class="error-code">Error {{ display_code }}</p>
+      <h1 id="error-title">{{ page_title }}</h1>
+      <p class="error-message">{{ page_message }}</p>
+      <a class="btn btn-coral btn-lg" href="{{ url_for('main.index') }}">Return to MakeArtsFund</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
