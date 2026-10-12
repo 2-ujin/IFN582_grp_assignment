@@ -1,0 +1,717 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap");
+
+/* Design tokens keep colours consistent and make later theme changes local. */
+/* =========================
+   MakeArtsFund colour palette
+   ========================= */
+
+:root {
+  --charcoal: #25242a;
+  --coral: #e76f51;
+  --coral-dark: #c9553b;
+  --cream: #fffaf5;
+  --tint: #f7f0ea;
+  --ash: #727078;
+  --line: #eadfd6;
+  --white: #ffffff;
+}
+
+/* =========================
+   General styles
+   ========================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 1rem;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  color: var(--charcoal);
+  background: var(--cream);
+  font-family: "DM Sans", Arial, sans-serif;
+  line-height: 1.6;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+a {
+  color: var(--coral-dark);
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  color: #9f432e;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--charcoal);
+  outline-offset: 3px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--charcoal);
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 700;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(2.35rem, 5vw, 4.5rem);
+  letter-spacing: -0.04em;
+}
+
+.container {
+  width: min(100% - 2rem, 1320px);
+}
+
+.skip-link {
+  position: absolute;
+  top: 10px;
+  left: -9999px;
+  z-index: 1000;
+  padding: 0.6rem 1rem;
+  color: var(--white);
+  background: var(--charcoal);
+  border-radius: 0.4rem;
+}
+
+.skip-link:focus {
+  left: 10px;
+  color: var(--white);
+}
+
+/* Keep a visible outline for keyboard focus so controls are easier to locate. */
+
+/* =========================
+   Shared navigation
+   ========================= */
+
+.site-navbar {
+  padding: 1rem 0;
+  background: rgba(255, 250, 245, 0.97);
+  border-bottom: 1px solid var(--line);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.brand-mark {
+  color: var(--charcoal);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.brand-mark:hover {
+  color: var(--charcoal);
+}
+
+.brand-mark span {
+  color: var(--coral-dark);
+}
+
+.header-navigation {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.header-main {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.language-option {
+  flex: 0 0 auto;
+}
+
+.header-select {
+  min-height: 2.6rem;
+  padding: 0.5rem 2rem 0.5rem 0.85rem;
+  color: var(--charcoal);
+  background-color: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.site-navbar .navbar-nav {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.site-navbar .nav-link {
+  color: var(--charcoal);
+  font-weight: 600;
+}
+
+.site-navbar .nav-link:hover,
+.site-navbar .nav-link:focus-visible {
+  color: var(--coral-dark);
+}
+
+.header-actions {
+  gap: 0.55rem;
+}
+
+.account-context {
+  color: var(--charcoal);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.account-role {
+  display: block;
+  color: var(--ash);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.logout-form {
+  display: inline-flex;
+  margin: 0;
+}
+
+.search-form {
+  display: flex;
+  width: min(100%, 310px);
+  margin: 0 auto;
+}
+
+.search-form .form-control {
+  min-width: 0;
+  padding: 0.65rem 1rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-right: 0;
+  border-radius: 999px 0 0 999px;
+}
+
+.search-form .form-control:focus,
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--coral-dark);
+  box-shadow: 0 0 0 0.2rem rgba(231, 111, 81, 0.2);
+}
+
+.btn-search {
+  padding: 0.65rem 1rem;
+  color: var(--white);
+  background: var(--charcoal);
+  border: 1px solid var(--charcoal);
+  border-radius: 0 999px 999px 0;
+  font-weight: 700;
+}
+
+.btn-search:hover {
+  color: var(--white);
+  background: var(--coral-dark);
+  border-color: var(--coral-dark);
+}
+
+/* =========================
+   Shared buttons and forms
+   ========================= */
+
+.btn {
+  padding: 0.7rem 1.25rem;
+  font-weight: 700;
+  border-radius: 999px;
+}
+
+.btn-coral {
+  color: var(--white);
+  background: var(--coral);
+  border: 1px solid var(--coral);
+}
+
+.btn-coral:hover {
+  color: var(--white);
+  background: var(--coral-dark);
+  border-color: var(--coral-dark);
+}
+
+.btn-outline-coral {
+  color: var(--coral-dark);
+  background: transparent;
+  border: 1px solid var(--coral-dark);
+}
+
+.btn-outline-coral:hover {
+  color: var(--white);
+  background: var(--coral-dark);
+  border-color: var(--coral-dark);
+}
+
+.sign-in-button {
+  white-space: nowrap;
+}
+
+.form-label {
+  color: var(--charcoal);
+  font-weight: 700;
+}
+
+.form-control,
+.form-select {
+  min-height: 2.9rem;
+  border-color: #b8afb0;
+  border-radius: 0.65rem;
+}
+
+.form-text,
+.text-muted {
+  color: #625f67 !important;
+}
+
+/* =========================
+   Shared page spacing and feedback
+   ========================= */
+
+.section-padding {
+  padding: 5.5rem 0;
+}
+
+.section-padding-sm {
+  padding: 2.4rem 0;
+}
+
+.section-tint {
+  background: var(--tint);
+}
+
+.flash-messages {
+  /* Stack multiple status messages with breathing room between them. */
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 1rem;
+}
+
+.flash-messages .alert {
+  margin: 0;
+  border-radius: 0.75rem;
+}
+
+/* =========================
+   Shared error page
+   ========================= */
+
+.error-section {
+  /* Vertically centre the shared 403/404/500 card when there is room. */
+  min-height: 55vh;
+  display: flex;
+  align-items: center;
+  background: var(--cream);
+}
+
+.error-card {
+  width: min(100%, 760px);
+  margin: 0 auto;
+  padding: clamp(2rem, 6vw, 4.5rem);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: 0 0.5rem 1.8rem rgba(37, 36, 42, 0.07);
+}
+
+.error-code {
+  margin-bottom: 0.6rem;
+  color: var(--coral-dark);
+  font-size: clamp(1.35rem, 3vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.error-card h1 {
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  max-width: 55ch;
+  margin-bottom: 1.75rem;
+  color: var(--ash);
+  font-size: 1.08rem;
+}
+
+/* =========================
+   Authentication pages
+   ========================= */
+
+.auth-section {
+  /* A subtle coral glow ties account pages to the assessment design palette. */
+  background:
+    radial-gradient(circle at 4% 8%, rgba(231, 111, 81, 0.08), transparent 24rem),
+    var(--cream);
+}
+
+.auth-layout {
+  /* The form and explanatory panel sit side by side on wider screens. */
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+  align-items: stretch;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+.auth-layout-login {
+  grid-template-columns: minmax(0, 780px);
+  justify-content: center;
+  max-width: 780px;
+}
+
+.auth-card {
+  min-width: 0;
+  padding: clamp(1.5rem, 4vw, 3.25rem);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: 0 0.5rem 1.8rem rgba(37, 36, 42, 0.07);
+}
+
+.auth-card h1 {
+  margin-bottom: 0.7rem;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+}
+
+.auth-layout-login .auth-card h1 {
+  margin-bottom: 1.5rem;
+  font-size: clamp(2.4rem, 5vw, 3.5rem);
+  font-weight: 700;
+}
+
+.auth-layout-register .auth-card h1 {
+  margin-bottom: 1.5rem;
+}
+
+.eyebrow {
+  margin-bottom: 0.45rem;
+  color: var(--coral-dark);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.auth-intro,
+.test-credentials-intro {
+  color: var(--ash);
+}
+
+.auth-intro {
+  margin-bottom: 1.75rem;
+}
+
+.field-error {
+  margin: 0.35rem 0 0;
+  color: #9f3026;
+  font-size: 0.9rem;
+}
+
+.test-credentials {
+  /* Keep marker login details grouped visually below the form fields. */
+  margin-top: 1.25rem;
+  padding: 1.15rem;
+  background: var(--tint);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.test-credentials .eyebrow {
+  margin-bottom: 0.25rem;
+}
+
+.test-credentials h2 {
+  margin-bottom: 0.45rem;
+  font-family: "DM Sans", Arial, sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: 0;
+}
+
+.test-credentials-intro {
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.credential-table {
+  margin-bottom: 0;
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--charcoal);
+  font-size: 0.86rem;
+}
+
+.credential-table th {
+  color: var(--charcoal);
+  white-space: nowrap;
+}
+
+.credential-table td,
+.credential-table th {
+  padding: 0.55rem 0.45rem;
+  border-color: var(--line);
+}
+
+.credential-table code {
+  color: #58372f;
+  font-family: "DM Sans", Arial, sans-serif;
+  font-size: 0.84rem;
+  overflow-wrap: anywhere;
+}
+
+.auth-switch {
+  margin: 1.25rem 0 0;
+  color: var(--ash);
+  text-align: center;
+}
+
+.auth-switch a {
+  font-weight: 700;
+}
+
+.auth-aside {
+  /* The dark panel provides a visual counterweight to the white form card. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.75rem, 4vw, 3.25rem);
+  color: #f6eee8;
+  background:
+    radial-gradient(circle at 90% 10%, rgba(231, 111, 81, 0.48), transparent 17rem),
+    #1d1c21;
+  border-radius: 22px;
+}
+
+.auth-aside-light {
+  color: var(--charcoal);
+  background:
+    radial-gradient(circle at 90% 10%, rgba(231, 111, 81, 0.12), transparent 17rem),
+    var(--tint);
+  border: 1px solid var(--line);
+}
+
+.auth-aside h2 {
+  margin-bottom: 1rem;
+  color: var(--white);
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.auth-aside > p {
+  color: #d7d0cb;
+}
+
+.auth-aside-light h2 {
+  color: var(--charcoal);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+}
+
+.auth-aside-light > p {
+  color: var(--ash);
+}
+
+.auth-aside-note {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 1.5rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 13px;
+}
+
+.auth-aside-note span {
+  color: #d7d0cb;
+  font-size: 0.92rem;
+}
+
+.role-summary {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.role-summary article {
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 13px;
+}
+
+.auth-aside-light .role-summary article {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: var(--line);
+}
+
+.role-summary h3 {
+  margin-bottom: 0.35rem;
+  color: var(--white);
+  font-family: "DM Sans", Arial, sans-serif;
+  font-size: 1rem;
+}
+
+.auth-aside-light .role-summary h3 {
+  color: var(--charcoal);
+}
+
+.role-summary p {
+  margin: 0;
+  color: #d7d0cb;
+  font-size: 0.9rem;
+}
+
+.auth-aside-light .role-summary p {
+  color: var(--ash);
+}
+
+/* =========================
+   Shared footer
+   ========================= */
+
+.site-footer {
+  margin-top: auto;
+  padding: 3rem 0 2rem;
+  color: #d7d0cb;
+  background: #1d1c21;
+}
+
+.footer-links-only {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.footer-links-only a {
+  color: var(--white);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.footer-links-only a:hover {
+  color: var(--coral);
+}
+
+.site-footer hr {
+  margin: 2rem 0 1.5rem;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.copyright {
+  color: #9d9793;
+  font-size: 0.8rem;
+}
+
+/* =========================
+   Responsive layout
+   ========================= */
+
+/* At tablet width, reduce large page spacing and let the two-column cards stack. */
+@media (max-width: 991.98px) {
+  .header-inner {
+    flex-wrap: wrap;
+  }
+
+  .header-navigation {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .header-main {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+  }
+
+  .search-form {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
+  .header-actions {
+    align-items: flex-start !important;
+    flex-wrap: wrap;
+    padding-top: 0.25rem;
+  }
+
+  .auth-layout {
+    grid-template-columns: 1fr;
+    max-width: 760px;
+  }
+
+  .auth-aside {
+    min-height: 300px;
+  }
+}
+
+/* Small-phone adjustments keep buttons, cards, and credentials readable. */
+@media (max-width: 575.98px) {
+  .section-padding {
+    padding: 4rem 0;
+  }
+
+  .error-card {
+    padding: 1.6rem;
+  }
+
+  .auth-card,
+  .auth-aside {
+    padding: 1.4rem;
+    border-radius: 17px;
+  }
+
+  .test-credentials {
+    padding: 0.85rem;
+  }
+
+  .credential-table {
+    font-size: 0.8rem;
+  }
+
+  .credential-table td,
+  .credential-table th {
+    padding: 0.45rem 0.3rem;
+  }
+
+  .site-footer {
+    padding: 2.25rem 0 1.5rem;
+  }
+
+  .footer-links-only {
+    gap: 0.85rem 1.15rem;
+  }
+}
+
+/* Honour the user's operating-system preference to reduce animated scrolling. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
