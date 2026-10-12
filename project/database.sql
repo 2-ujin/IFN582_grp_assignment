@@ -267,11 +267,11 @@ Yujin Lee CREATEd this file
 
     )
     VALUES 
-        (1, 2, 'janie._.bean', 'Brisbane', 'img/janie._.bead.png', '5000', '2026-09-23', 'Approved','Active', 'janie._.bean is a family-based handmade seed bead project run by Janet and Queenie.', 'For 12 years, I''ve been making seed beads with my mother, Janet, and now we''ve decided to take it a step further to janie._.bean.', TRUE, FALSE, 15, '2026-08-01'),
-        (3, 3, 'MORY Model Diary', 'Perth', 'img/MORY-Model-Diary.png', '6000', '2026-09-18', 'Approved','Active', 'Original 3D printed models.', 'Makes original printed models for 3 years.', TRUE, FALSE, 13, '2026-08-12'),
-        (5, 2, 'Croshay', 'Sydney', 'img/Croshay.png', '8000', '2026-09-11', 'Approved', 'Active', 'Handmade local crochet accessories.', 'Design crochet accessories for 8 years.', TRUE, FALSE, 14, '2026-09-01'),
-        (6, 4, 'Positioning in Melbourne', 'Melbourne', 'img/Positioning-in-Melbourne.png', '4500', '2026-08-02', 'Suspended', 'Completed', 'A photo series retracing postcard images to identify and photograph their exact original locations in Melbourne.', 'Capture my hometown in Melbourne.', FALSE, TRUE, 10, '2026-07-15'),
-        (8, 2, 'Get Thready', 'Brisbane', 'img/Get-Thready.png', '7000', '2026-08-12', 'Suspended', 'Completed', 'Delicate handmade flower accessories crocheted from single strands of embroidery thread.', 'Makes embroidered flower accessories for 12 years.', FALSE, TRUE, 9, '2026-07-01'),
+        (1, 2, 'janie._.bean', 'Brisbane', 'img/janie._.bead.png', '5000', '2026-10-23', 'Approved','Active', 'janie._.bean is a family-based handmade seed bead project run by Janet and Queenie.', 'For 12 years, I''ve been making seed beads with my mother, Janet, and now we''ve decided to take it a step further to janie._.bean.', TRUE, FALSE, 15, '2026-08-01'),
+        (3, 3, 'MORY Model Diary', 'Perth', 'img/MORY-Model-Diary.png', '6000', '2026-11-18', 'Approved','Active', 'Original 3D printed models.', 'Makes original printed models for 3 years.', TRUE, FALSE, 13, '2026-08-12'),
+        (5, 2, 'Croshay', 'Sydney', 'img/Croshay.png', '8000', '2026-11-11', 'Approved', 'Active', 'Handmade local crochet accessories.', 'Design crochet accessories for 8 years.', TRUE, FALSE, 14, '2026-09-01'),
+        (6, 4, 'Positioning in Melbourne', 'Melbourne', 'img/Positioning-in-Melbourne.png', '4500', '2026-10-02', 'Suspended', 'Completed', 'A photo series retracing postcard images to identify and photograph their exact original locations in Melbourne.', 'Capture my hometown in Melbourne.', FALSE, TRUE, 10, '2026-07-15'),
+        (8, 2, 'Get Thready', 'Brisbane', 'img/Get-Thready.png', '7000', '2026-10-12', 'Suspended', 'Completed', 'Delicate handmade flower accessories crocheted from single strands of embroidery thread.', 'Makes embroidered flower accessories for 12 years.', FALSE, TRUE, 9, '2026-07-01'),
         (5, 2, 'Doll Craft', 'Gold Coast', 'img/Doll_Craft.jpg', '5500', '2026-12-15', 'Pending', 'Active', 'Handmade fabric dolls with hand-stitched outfits and tiny accessories.', 'Sewing and designing one-of-a-kind dolls for 6 years.', FALSE, FALSE, 13, '2026-10-02'),
         (3, 4, 'Brisbane After Dark', 'Brisbane', 'img/Brisbane-After-Dark.png', '4000', '2026-12-20', 'Pending', 'Active', 'A night photography series capturing Brisbane''s laneways, bridges and riverfront after sunset.', 'Shooting long-exposure city photography for 5 years.', FALSE, FALSE, 10, '2026-10-06'),
         (8, 1, 'Inkwell Botanica', 'Hobart', 'img/Inkwell-Botanica.png', '3500', '2026-11-30', 'Approved', 'Active', 'Botanical ink and watercolour illustrations of native Tasmanian plants.', 'Illustrating native flora for 7 years.', FALSE, FALSE, 15, '2026-09-20'),
@@ -304,11 +304,11 @@ Yujin Lee CREATEd this file
     INSERT INTO supporterMessage 
         (donationId, postedDate, message, visibility)
     VALUES
-        (1, '2026-08-21 19:42:00', 'Can''t wait to see the new bead collection! Wishing Janet and Queenie all the best.', TRUE),
-        (2, '2026-08-14 10:15:00', 'I bought one of your bracelets at a Brisbane market last year and still wear it every day. So happy to support you!', TRUE),
-        (3, '2026-08-14 21:03:00', 'Good luck reaching your goal!', TRUE),
-        (4, '2026-08-02 13:27:00', 'Click the link below and veiw more about caft activities: www.hellocraft.com !', FALSE),
-        (5, '2026-08-02 08:50:00', 'Twelve years of flower craft deserves this next step. Proud to be one of your first supporters!', TRUE)
+        (1, '2026-09-21 19:42:00', 'Can''t wait to see the new bead collection! Wishing Janet and Queenie all the best.', TRUE),
+        (2, '2026-09-14 10:15:00', 'I bought one of your bracelets at a Brisbane market last year and still wear it every day. So happy to support you!', TRUE),
+        (3, '2026-09-14 21:03:00', 'Good luck reaching your goal!', TRUE),
+        (4, '2026-10-02 13:27:00', 'Click the link below and veiw more about caft activities: www.hellocraft.com !', FALSE),
+        (5, '2026-10-02 08:50:00', 'Twelve years of flower craft deserves this next step. Proud to be one of your first supporters!', TRUE)
     ;
 
 -- REPORT
@@ -336,10 +336,10 @@ Yujin Lee CREATEd this file
     INSERT INTO projectUpdate 
         (projectId, publishedDate, title, description)
     VALUES
-        (1, '2026-08-14', 'Pop-Up Store in September', 'We''re excited to announce that janie._.bean is preparing for a pop-up store at Wintergarden, Queen Street Mall, starting from 1 September 2026 for a month.'),
-        (1, '2026-08-02', 'See you at the West End Market this Saturday!', 'We''re excited to share that we will have a sales booth at the West End Market on 8 August, from 9:00 am to 2:00 pm.'),
-        (2, '2026-08-11', 'Our First Product is Out!', 'The first printed model is on sale now.'),
-        (3, '2026-09-07', 'Halloween crochet series', 'No tricks but just treats: up to 20% off for the Halloween Series'),
+        (1, '2026-10-14', 'Pop-Up Store in October', 'We''re excited to announce that janie._.bean is preparing for a pop-up store at Wintergarden, Queen Street Mall, starting from 1 September 2026 for a month.'),
+        (1, '2026-10-02', 'See you at the West End Market this Saturday!', 'We''re excited to share that we will have a sales booth at the West End Market on 8 August, from 9:00 am to 2:00 pm.'),
+        (2, '2026-10-11', 'Our First Product is Out!', 'The first printed model is on sale now.'),
+        (3, '2026-10-07', 'Halloween crochet series', 'No tricks but just treats: up to 20% off for the Halloween Series'),
         (4, '2026-07-20', 'Upcoming exhibit', 'The final photo album is ready to exhibit on 30 July')
     ;
 
