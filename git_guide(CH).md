@@ -80,6 +80,31 @@ add（準備暫存）> commit（加上標記）> push（上傳到 GitHub）
 - `git push` 只會上傳**已 commit** 的修改。如果看到 `Everything up-to-date`，很可能是忘了 `git add` / `git commit`。
 - 用 `git status` 可以查看哪些檔案還沒 commit。
 
+### 3-1. 工作途中主分支有更新？同步你的分支
+如果你還在工作時，組員的 PR 已經 merge，你的分支就會落後於主分支。
+（PR 頁面會顯示 *"This branch is out-of-date with the base branch"*。）
+請把最新的主分支合併到**你的**分支：
+```
+> git branch --show-current                         # 1) 確認你在自己的分支上
+> git add [檔案名稱]                                 # 2) 先 commit 目前的工作
+> git commit -m "WIP: 工作說明"
+> git fetch origin                                  # 3) 下載最新的主分支
+> git merge origin/IFN582_grp_assignment --no-edit  # 4) 把最新主分支合併到你的分支
+> git push                                          # 5) 上傳 — PR 會自動更新
+```
+- **沒有衝突：** 完成。你的分支現在包含組員最新的程式碼 + 你的工作。
+- **有衝突**（`CONFLICT (content): Merge conflict in ...`）：
+  1. 在 VS Code 開啟該檔案，選擇 *Accept Current*（你的）/ *Accept Incoming*（主分支）/ *Accept Both*。
+  2. 存檔後：
+  ```
+  > git add [檔案名稱]
+  > git commit --no-edit
+  > git push
+  ```
+  3. 不確定要保留哪段程式碼？請在群組聊天室詢問寫那段程式碼的組員。
+- 想中途取消 merge：`git merge --abort`（回到步驟 4 之前的狀態）。
+- 要幫**組員的分支**修改？步驟相同，但先執行 `git fetch origin` → `git switch [組員分支]` → `git pull`。並提醒組員繼續工作前先 `git pull`。
+
 ### 4. 開 Pull Request（PR）
 1. 前往 https://github.com/2-ujin/IFN582_grp_assignment
 2. 點選 **「Compare & pull request」**（或 Pull requests → New pull request）。
