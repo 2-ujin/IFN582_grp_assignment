@@ -60,9 +60,49 @@
           <div class="section-heading mb-4">
             <h1 id="overview-heading">Administration Overview</h1>
           </div>
-
-          {# TODO: statistic cards (total campaigns, creators, supporters, reports) #}
           
+          <div class="row g-4">
+            <div class="col-sm-6 col-xl-3">
+              <a class="admin-stat-link" href="#pending-approvals">
+                <article class="admin-stat-card">
+                  <span class="admin-stat-label">Total campaigns</span>
+                  <strong class="admin-stat-value">{{ campaign_stats.totalCampaigns }}</strong>
+                  <span class="admin-stat-note">{{ campaign_stats.activeCampaigns }} Active Campaigns</span>
+                  <span class="admin-stat-note">{{ campaign_stats.pendingCampaigns }} Pending Approval</span>
+                </article>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+              <a class="admin-stat-link" href="#user-management">
+                <article class="admin-stat-card">
+                  <span class="admin-stat-label">Total creators</span>
+                  <strong class="admin-stat-value">{{ creator_count.activeCreators }}</strong>
+                  <span class="admin-stat-note">Active Accounts</span>
+                </article>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+              <a class="admin-stat-link" href="#user-management">
+                <article class="admin-stat-card">
+                  <span class="admin-stat-label">Total supporters</span>
+                  <strong class="admin-stat-value">{{ supporter_count.activeSupporters }}</strong>
+                  <span class="admin-stat-note">Active Accounts</span>
+                </article>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+              <a class="admin-stat-link" href="#reported-content">
+                <article class="admin-stat-card">
+                  <span class="admin-stat-label">Total reports</span>
+                  <strong class="admin-stat-value">{{ report_stats.totalReports }}</strong>
+                  <span class="admin-stat-note">{{ report_stats.pendingReports }} Pending Review</span>
+                </article>
+              </a>
+            </div>
+          </div>
         </section>
 
         <!-- Pending Project Approvals -->

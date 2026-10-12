@@ -26,10 +26,12 @@ def index():
 
 # ----- Part 5. Admin Dashboard -----
 from flask import render_template, redirect, url_for, flash
-from .models import (get_pending_projects, review_project_approval,
+from .models import (get_campaign_stats, get_creator_count, get_supporter_count, get_report_stats,
+                     get_pending_projects, review_project_approval,
                      get_reviewed_projects, change_project_status, soft_delete_project,
                      get_featured_projects, get_feature_candidates,
                      add_to_featured, remove_from_featured)
+
 from .forms import AdminActionForm, FeatureProjectForm
 
 def create_feature_form():
@@ -44,12 +46,20 @@ def create_feature_form():
 # TODO: add login function for admin
 @main.route('/admin')
 def admin_dashboard():
+    campaign_stats = get_campaign_stats()
+    creator_count = get_creator_count()
+    supporter_count = get_supporter_count()
+    report_stats = get_report_stats()
     pending_projects = get_pending_projects()
     reviewed_projects = get_reviewed_projects()
     fetured_projects = get_featured_projects()
     form = AdminActionForm()
     feature_form = create_feature_form()
     return render_template('admin_dashboard.html',
+                           campaign_stats = campaign_stats,
+                           creator_count = creator_count,
+                           supporter_count = supporter_count,
+                           report_stats = report_stats,
                            pending_projects = pending_projects,
                            reviewed_projects = reviewed_projects,
                            featured_projects = fetured_projects,

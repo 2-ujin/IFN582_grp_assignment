@@ -147,6 +147,58 @@ class Image:
 # ----- Part 5. Admin Dashboard -----
 from . import database
 
+def get_campaign_stats():
+    # Display the total number of campaigns including active and pending
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  COUNT(*) AS totalCampaigns,
+                SUM(project.approvalStatus = 'Approved' AND project.projectStatus = 'Active') AS activeCampaigns,
+                SUM(project.approvalStatus = 'Pending') AS pendingCampaigns
+        FROM project
+        WHERE project.approvalStatus <> 'Deleted'
+    """)
+    campaign_stats = cursor.fetchone()
+    cursor.close()
+    return campaign_stats
+
+def get_creator_count():
+    # Display the total number of active creators
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  COUNT(*) AS activeCreators
+        FROM artist
+        JOIN user ON user.userId = artist.userId
+        WHERE user.accountStatus = 'Active'
+    """)
+    creator_count = cursor.fetchone()
+    cursor.close()
+    return creator_count
+
+def get_supporter_count():
+    # Display the total number of active supporters
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  COUNT(*) AS activeSupporters
+        FROM supporter
+        JOIN user ON user.userId = supporter.userId
+        WHERE user.accountStatus = 'Active'
+    """)
+    supporter_count = cursor.fetchone()
+    cursor.close()
+    return supporter_count
+
+def get_report_stats():
+    # Display the total number of reports including pending
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  COUNT(*) AS totalReports,
+                SUM(report.status = 'Pending') AS pendingReports
+        FROM report
+    """)
+    report_stats = cursor.fetchone()
+    cursor.close()
+    return report_stats
+
 def get_pending_projects():
     # Projects waiting for admin to approve or reject
 
@@ -157,7 +209,7 @@ def get_pending_projects():
                 CONCAT(user.firstname, ' ', user.surname) AS creatorName,
                 category.categoryName,
                 project.location,
-                project.updateDt AS submittedDate  -- submitted date 추가할 수 있는지 Part 1과 확인 필요
+                project.updateDt AS submittedDate
         FROM project
         JOIN user ON user.userId = project.creatorId
         JOIN category ON category.categoryId = project.categoryId
