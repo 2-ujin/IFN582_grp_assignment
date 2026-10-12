@@ -92,7 +92,7 @@ Yujin Lee CREATEd this file
         successStoryFeatured boolean NOT NULL default false,
         reviewerId int,
         updateDt datetime NOT NULL default CURRENT_TIMESTAMP ,
-        KEY (projectId),
+        PRIMARY KEY (projectId),
         FOREIGN KEY (creatorId) REFERENCES artist(userId),
         FOREIGN KEY (categoryId) REFERENCES category(categoryId),
         FOREIGN KEY (reviewerId) REFERENCES administrator(userId)
