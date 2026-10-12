@@ -29,11 +29,7 @@ def create_app():
     app.config['MYSQL_USER'] = 'root' # dont change
    
 ## !IMPORTANT! Change the password before you run the code.  
-<<<<<<< HEAD
     app.config['MYSQL_PASSWORD'] = '123456' # change it to ur local password
-=======
-    app.config['MYSQL_PASSWORD'] = '582Assignment2' # change it to ur local password
->>>>>>> origin/IFN582_grp_assignment
     
     
     app.config['MYSQL_DB'] = 'maf' # same schema to database.sql
