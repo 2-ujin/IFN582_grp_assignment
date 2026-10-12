@@ -21,7 +21,7 @@ def index():
         c.categoryName,
         IFNULL(SUM(d.amount), 0) AS totalRaised,
         ROUND(IFNULL(SUM(d.amount), 0) / p.goal * 100) AS progressPercentage,
-        GREATEST(DATEDIFF(p.deadline, CURDATE()), 0) AS daysRemaining           
+        GREATEST(DATEDIFF(CURDATE(), p.deadline), 0) AS daysRemaining         
         FROM project p
         JOIN user u ON p.creatorId = u.userId
         JOIN category c ON p.categoryId = c.categoryId
