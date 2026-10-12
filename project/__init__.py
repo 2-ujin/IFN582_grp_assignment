@@ -19,6 +19,9 @@ def create_app():
     from .views import main
     app.register_blueprint(main)
 
+    from .management import management_bp
+    app.register_blueprint(management_bp)
+
 
 # ---- @Queenie: This is the place for ur error handlers ------ :) 
 
