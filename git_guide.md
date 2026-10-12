@@ -81,6 +81,31 @@ add (ready for staging) > commit (labelling) > push (upload to GitHub)
 - `git push` only uploads **committed** changes. If you see `Everything up-to-date`, you probably forgot `git add` / `git commit`.
 - `git status` shows what is not committed yet.
 
+### 3-1. Main branch changed while you're working? Sync your branch
+If a teammate's PR gets merged while you are still working, your branch falls behind main.
+(On your PR page GitHub shows *"This branch is out-of-date with the base branch"*.)
+Bring the latest main into **your** branch:
+```
+> git branch --show-current                         # 1) make sure you're on YOUR branch
+> git add [file name]                               # 2) commit your current work first
+> git commit -m "WIP: description"
+> git fetch origin                                  # 3) download the latest main
+> git merge origin/IFN582_grp_assignment --no-edit  # 4) merge latest main into your branch
+> git push                                          # 5) upload — your PR updates automatically
+```
+- **No conflict:** done. Your branch now has teammates' latest code + your work.
+- **Conflict** (`CONFLICT (content): Merge conflict in ...`):
+  1. Open the file in VS Code — choose *Accept Current* (yours) / *Accept Incoming* (main) / *Accept Both*.
+  2. Save, then:
+  ```
+  > git add [file name]
+  > git commit --no-edit
+  > git push
+  ```
+  3. Not sure which code to keep? Ask the teammate who wrote it in the group chat.
+- Want to cancel the merge halfway? `git merge --abort` (goes back to how it was before step 4).
+- Fixing a **teammate's branch**? Same steps, but first `git fetch origin` → `git switch [their-branch]` → `git pull`. Tell them to `git pull` before they continue working.
+
 ### 4. Open a Pull Request (PR)
 1. Go to https://github.com/2-ujin/IFN582_grp_assignment
 2. Click **"Compare & pull request"** (or Pull requests → New pull request).
