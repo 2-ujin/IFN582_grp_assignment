@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 from flask import Blueprint, render_template
+=======
+from flask import Blueprint
+>>>>>>> origin/IFN582_grp_assignment
 from . import database
 
 # Blueprint that groups all MakeArtsFund routes
@@ -16,6 +20,7 @@ main = Blueprint('main', __name__)
 def index():
     # Connection test: fetch every project name from the database
     cursor = database.connection.cursor()
+<<<<<<< HEAD
     cursor.execute("""
         SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
         c.categoryName,
@@ -49,3 +54,11 @@ def index():
 
     # Return as plain text so it shows in the browser without a template
     return render_template('home.html', projects=projects, success_stories=success_stories)
+=======
+    cursor.execute('SELECT projectName FROM project')
+    projects = cursor.fetchall()
+    cursor.close()
+
+    # Return as plain text so it shows in the browser without a template
+    return str(projects)
+>>>>>>> origin/IFN582_grp_assignment

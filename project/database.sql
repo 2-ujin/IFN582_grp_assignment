@@ -91,7 +91,11 @@ Yujin Lee CREATEd this file
         featured boolean NOT NULL default false,
         successStoryFeatured boolean NOT NULL default false,
         reviewerId int,
+<<<<<<< HEAD
         updateDt datetime NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+=======
+        updateDt datetime NOT NULL default CURRENT_TIMESTAMP ,
+>>>>>>> origin/IFN582_grp_assignment
         PRIMARY KEY (projectId),
         FOREIGN KEY (creatorId) REFERENCES artist(userId),
         FOREIGN KEY (categoryId) REFERENCES category(categoryId),
@@ -267,6 +271,7 @@ Yujin Lee CREATEd this file
 
     )
     VALUES 
+<<<<<<< HEAD
         (1, 2, 'janie._.bean', 'Brisbane', 'img/janie._.bead.png', '5000', '2026-09-23', 'Approved','Active', 'janie._.bean is a family-based handmade seed bead project run by Janet and Queenie.', 'For 12 years, I''ve been making seed beads with my mother, Janet, and now we''ve decided to take it a step further to janie._.bean.', TRUE, FALSE, 15, '2026-08-01'),
         (3, 3, 'MORY Model Diary', 'Perth', 'img/MORY-Model-Diary.png', '6000', '2026-09-18', 'Approved','Active', 'Original 3D printed models.', 'Makes original printed models for 3 years.', TRUE, FALSE, 13, '2026-08-12'),
         (5, 2, 'Croshay', 'Sydney', 'img/Croshay.png', '8000', '2026-09-11', 'Approved', 'Active', 'Handmade local crochet accessories.', 'Design crochet accessories for 8 years.', TRUE, FALSE, 14, '2026-09-01'),
@@ -274,13 +279,26 @@ Yujin Lee CREATEd this file
         (8, 2, 'Get Thready', 'Brisbane', 'img/Get-Thready.png', '7000', '2026-08-12', 'Suspended', 'Completed', 'Delicate handmade flower accessories crocheted from single strands of embroidery thread.', 'Makes embroidered flower accessories for 12 years.', FALSE, TRUE, 9, '2026-07-01'),
         (5, 2, 'Doll Craft', 'Gold Coast', 'img/Doll_Craft.jpg', '5500', '2026-12-15', 'Pending', 'Active', 'Handmade fabric dolls with hand-stitched outfits and tiny accessories.', 'Sewing and designing one-of-a-kind dolls for 6 years.', FALSE, FALSE, 13, '2026-10-02'),
         (3, 4, 'Brisbane After Dark', 'Brisbane', 'img/Brisbane-After-Dark.png', '4000', '2026-12-20', 'Pending', 'Active', 'A night photography series capturing Brisbane''s laneways, bridges and riverfront after sunset.', 'Shooting long-exposure city photography for 5 years.', FALSE, FALSE, 10, '2026-10-06'),
+=======
+        (1, 2, 'janie._.bean', 'Brisbane', 'img/janie._.bead.png', '5000', '2026-10-23', 'Approved','Active', 'janie._.bean is a family-based handmade seed bead project run by Janet and Queenie.', 'For 12 years, I''ve been making seed beads with my mother, Janet, and now we''ve decided to take it a step further to janie._.bean.', TRUE, FALSE, 15, '2026-08-01'),
+        (3, 3, 'MORY Model Diary', 'Perth', 'img/MORY-Model-Diary.png', '6000', '2026-11-18', 'Approved','Active', 'Original 3D printed models.', 'Makes original printed models for 3 years.', TRUE, FALSE, 13, '2026-08-12'),
+        (5, 2, 'Croshay', 'Sydney', 'img/Croshay.png', '8000', '2026-11-11', 'Approved', 'Active', 'Handmade local crochet accessories.', 'Design crochet accessories for 8 years.', TRUE, FALSE, 14, '2026-09-01'),
+        (6, 4, 'Positioning in Melbourne', 'Melbourne', 'img/Positioning-in-Melbourne.png', '4500', '2026-10-02', 'Suspended', 'Completed', 'A photo series retracing postcard images to identify and photograph their exact original locations in Melbourne.', 'Capture my hometown in Melbourne.', FALSE, TRUE, 10, '2026-07-15'),
+        (8, 2, 'Get Thready', 'Brisbane', 'img/Get-Thready.png', '7000', '2026-10-12', 'Suspended', 'Completed', 'Delicate handmade flower accessories crocheted from single strands of embroidery thread.', 'Makes embroidered flower accessories for 12 years.', FALSE, TRUE, 9, '2026-07-01'),
+        (5, 2, 'Doll Craft', 'Gold Coast', 'img/Doll_Craft.jpg', '5500', '2026-12-15', 'Pending', 'Active', 'Handmade fabric dolls with hand-stitched outfits and tiny accessories.', 'Sewing and designing one-of-a-kind dolls for 6 years.', FALSE, FALSE, NULL, '2026-10-02'),
+        (3, 4, 'Brisbane After Dark', 'Brisbane', 'img/Brisbane-After-Dark.png', '4000', '2026-12-20', 'Pending', 'Active', 'A night photography series capturing Brisbane''s laneways, bridges and riverfront after sunset.', 'Shooting long-exposure city photography for 5 years.', FALSE, FALSE, NULL, '2026-10-06'),
+>>>>>>> origin/IFN582_grp_assignment
         (8, 1, 'Inkwell Botanica', 'Hobart', 'img/Inkwell-Botanica.png', '3500', '2026-11-30', 'Approved', 'Active', 'Botanical ink and watercolour illustrations of native Tasmanian plants.', 'Illustrating native flora for 7 years.', FALSE, FALSE, 15, '2026-09-20'),
         (6, 5, 'Botanic Garden Jazz Concert', 'Brisbane', 'img/Botanic-Garden-Jazz-Concert.png', '9000', '2026-12-05', 'Approved', 'Active', 'A free outdoor jazz concert series held at Brisbane''s City Botanic Gardens on summer evenings.', 'Performing and organising live jazz gigs for 10 years.', TRUE, FALSE, 14, '2026-09-25'),
         (8, 6, 'Small Stage Stories', 'Adelaide', 'img/Small-Stage-Stories.png', '12000', '2026-12-18', 'Approved', 'Active', 'A short documentary following three independent theatre troupes through one festival season.', 'Directing short films about local performers for 4 years.', FALSE, FALSE, 13, '2026-10-01'),
         (1, 6, 'Puppet Theatre on Wheels', 'Canberra', 'img/Puppet-Theatre-on-Wheels.png', '7500', '2026-11-20', 'Approved', 'Active', 'A travelling puppet show bringing free performances to regional schools.', 'Building puppets and performing for children for 11 years.', TRUE, FALSE, 9, '2026-09-15'),
         (3, 1, 'Street Canvas Project', 'Melbourne', 'img/Street-Canvas-Project.png', '6500', '2026-08-20', 'Approved', 'Completed', 'Community murals painted with local residents on blank laneway walls.', 'Painting public murals for 9 years.', FALSE, TRUE, 9, '2026-06-15'),
         (5, 5, 'Choir of the Coast', 'Gold Coast', 'img/Choir-of-the-Coast.png', '5000', '2026-07-30', 'Approved', 'Completed', 'A community choir recording its first album of coastal folk songs.', 'Leading a community choir for 15 years.', FALSE, TRUE, 15, '2026-05-20'),
+<<<<<<< HEAD
         (3, 3, 'Tiny Terrain', 'Darwin', 'img/Tiny-Terrain.png', '4800', '2027-01-10', 'Pending', 'Active', '3D printed miniature dioramas of Top End landscapes.', 'Designing printable terrain models for 2 years.', FALSE, FALSE, 14, '2026-10-08'),
+=======
+        (3, 3, 'Tiny Terrain', 'Darwin', 'img/Tiny-Terrain.png', '4800', '2027-01-10', 'Pending', 'Active', '3D printed miniature dioramas of Top End landscapes.', 'Designing printable terrain models for 2 years.', FALSE, FALSE, NULL, '2026-10-08'),
+>>>>>>> origin/IFN582_grp_assignment
         (1, 5, 'Lo-fi Bedroom Beats', 'Sydney', 'img/Lo-fi-Bedroom-Beats.png', '3000', '2027-01-15', 'Suspended', 'Active', 'A lo-fi instrumental album produced entirely in a home studio.', 'Producing chill beats for 3 years.', FALSE, FALSE, 10, '2026-09-12')
 ;
 
@@ -290,11 +308,25 @@ Yujin Lee CREATEd this file
     INSERT INTO donation 
         (projectId, supporterId, amount, donationDate, paymentMethod, paymentStatus)
     VALUES
+<<<<<<< HEAD
         (1,11, 200, '2026-08-21', 'Card', 'Pending'),
         (3,7, 300, '2026-08-14', 'PayPal', 'Received'),
         (1,12, 120, '2026-08-14', 'Card', 'Received'),
         (3,16, 100, '2026-08-02', 'BankTransfer', 'Received'),
         (5,2, 500, '2026-08-02', 'Card', 'Received')
+=======
+        (1,11, 200, '2026-09-21', 'Card', 'Pending'),
+        (3,7, 300, '2026-09-14', 'PayPal', 'Received'),
+        (1,12, 120, '2026-09-14', 'Card', 'Received'),
+        (3,16, 100, '2026-10-02', 'BankTransfer', 'Received'),
+        (3,2, 500, '2026-10-02', 'Card', 'Received'),
+        (1,17, 10, '2026-10-09', 'Card', 'Received'),
+        (1,17, 10, '2026-10-10', 'Card', 'Received'),
+        (8,7, 250, '2026-09-24', 'Card', 'Received'),
+        (8,12, 60, '2026-10-05', 'BankTransfer', 'Pending'),
+        (9,11, 400, '2026-09-30', 'Card', 'Received'),
+        (9,17, 150, '2026-10-07', 'PayPal', 'Received')
+>>>>>>> origin/IFN582_grp_assignment
     ;
 
 
@@ -304,11 +336,26 @@ Yujin Lee CREATEd this file
     INSERT INTO supporterMessage 
         (donationId, postedDate, message, visibility)
     VALUES
+<<<<<<< HEAD
         (1, '2026-08-21 19:42:00', 'Can''t wait to see the new bead collection! Wishing Janet and Queenie all the best.', TRUE),
         (2, '2026-08-14 10:15:00', 'I bought one of your bracelets at a Brisbane market last year and still wear it every day. So happy to support you!', TRUE),
         (3, '2026-08-14 21:03:00', 'Good luck reaching your goal!', TRUE),
         (4, '2026-08-02 13:27:00', 'Click the link below and veiw more about caft activities: www.hellocraft.com !', FALSE),
         (5, '2026-08-02 08:50:00', 'Twelve years of flower craft deserves this next step. Proud to be one of your first supporters!', TRUE)
+=======
+        (1, '2026-09-21 19:42:00', 'Can''t wait to see the new bead collection! Wishing Janet and Queenie all the best.', TRUE),
+        (2, '2026-09-14 10:15:00', 'I bought one of your bracelets at a Brisbane market last year and still wear it every day. So happy to support you!', TRUE),
+        (3, '2026-09-14 21:03:00', 'Good luck reaching your goal!', TRUE),
+        (4, '2026-10-02 13:27:00', 'Click the link below and veiw more about caft activities: www.hellocraft.com !', FALSE),
+        (5, '2026-10-02 08:50:00', '8 years of Croshay deserves this next step. Proud to be one of your first supporters!', TRUE),
+        (6, '2026-10-10 14:55:00', 'Hello please contact me: 0401111222 !', TRUE),
+        (7, '2026-10-11 10:27:00', 'Hello please contact me: 0401111222 !', TRUE),
+        (8, '2026-09-24 09:10:00', 'Tasmanian flora deserves more love. Beautiful illustrations!', TRUE),
+        (9, '2026-10-05 20:32:00', 'Would love a print of the waratah piece one day. Good luck!', TRUE),
+        (10, '2026-09-30 17:05:00', 'Summer jazz in the Botanic Gardens sounds perfect. Count me in!', TRUE),
+        (11, '2026-10-07 12:40:00', 'Free concerts for everyone, such a lovely idea for Brisbane.', TRUE)
+
+>>>>>>> origin/IFN582_grp_assignment
     ;
 
 -- REPORT
@@ -323,11 +370,22 @@ Yujin Lee CREATEd this file
         status,
         reviewerId)
     VALUES
+<<<<<<< HEAD
         (1, 2, NULL, 'Project image', 'Copyright of image posted', '2026-08-19', 'Pending', NULL),
         (5, NULL, 4, 'Supporter messages', 'Inappropriate language.', '2026-08-06', 'Resolved', 13),
         (17, 3, NULL, 'Project description', 'Misleading information', '2026-08-05', 'Resolved', 14),
         (12, 4, NULL, 'Content under Project Updates', 'Disclosure of sensitive personal info', '2026-07-20', 'Resolved', 10),
         (2, 4, NULL, 'Project image', 'Copyright of image posted', '2026-07-21', 'Resolved', 9)
+=======
+        (1, 2, NULL, 'Project image', 'Copyright of image posted', '2026-09-19', 'Pending', NULL),
+        (5, NULL, 4, 'Supporter messages', 'Inappropriate language.', '2026-10-06', 'Resolved', 13),
+        (17, 3, NULL, 'Project description', 'Misleading information', '2026-09-05', 'Resolved', 14),
+        (12, 4, NULL, 'Content under Project Updates', 'Disclosure of sensitive personal info', '2026-07-20', 'Resolved', 10),
+        (2, 4, NULL, 'Project image', 'Copyright of image posted', '2026-07-21', 'Resolved', 9),
+        (1, NULL, 6, 'Supporter messages', 'Personal detail updated', '2026-10-11', 'Pending', NULL),
+        (12, NULL, 7, 'Supporter messages', 'Duplicate messages looks like spam', '2026-10-12', 'Pending', NULL)
+
+>>>>>>> origin/IFN582_grp_assignment
     ;
 
 
@@ -336,10 +394,17 @@ Yujin Lee CREATEd this file
     INSERT INTO projectUpdate 
         (projectId, publishedDate, title, description)
     VALUES
+<<<<<<< HEAD
         (1, '2026-08-14', 'Pop-Up Store in September', 'We''re excited to announce that janie._.bean is preparing for a pop-up store at Wintergarden, Queen Street Mall, starting from 1 September 2026 for a month.'),
         (1, '2026-08-02', 'See you at the West End Market this Saturday!', 'We''re excited to share that we will have a sales booth at the West End Market on 8 August, from 9:00 am to 2:00 pm.'),
         (2, '2026-08-11', 'Our First Product is Out!', 'The first printed model is on sale now.'),
         (3, '2026-09-07', 'Halloween crochet series', 'No tricks but just treats: up to 20% off for the Halloween Series'),
+=======
+        (1, '2026-10-14', 'Pop-Up Store in November', 'We''re excited to announce that janie._.bean is preparing for a pop-up store at Wintergarden, Queen Street Mall, starting from 1 November 2026 for a month.'),
+        (1, '2026-10-02', 'See you at the West End Market 24 October!', 'We''re excited to share that we will have a sales booth at the West End Market on 24 October, from 9:00 am to 2:00 pm.'),
+        (2, '2026-10-11', 'Our First Product is Out!', 'The first printed model is on sale now.'),
+        (3, '2026-10-07', 'Halloween crochet series', 'No tricks but just treats: up to 20% off for the Halloween Series'),
+>>>>>>> origin/IFN582_grp_assignment
         (4, '2026-07-20', 'Upcoming exhibit', 'The final photo album is ready to exhibit on 30 July')
     ;
 
