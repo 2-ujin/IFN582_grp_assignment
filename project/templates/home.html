@@ -76,7 +76,7 @@
         <div class="row g-4 mt-2">
             {% for project in projects %}
           <div class="col-md-6 col-lg-4">
-            <a class="project-link" href="#">
+            <a class="project-link" href="{{ url_for('main.project_detail', project_id=project['projectId']) }}">
               <article class="project-card h-100">
                 <img class="project-image" src="{{ url_for('static', filename=project['imagePath']) }}" alt="{{ project['projectName'] }}" loading="lazy">
                 <div class="card-body">
