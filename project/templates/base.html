@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  {# Shared document metadata and title; child pages can replace the title block. #}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MakeArtsFund connects Australian artists with community supporters to bring creative projects to life.">
+  <title>{% block title %}MakeArtsFund | Fund the Art, Make a Start{% endblock %}</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  {# Keyboard users can skip repeated navigation links and jump to page content. #}
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  {# Child pages can hide site links here while keeping the shared logo and language. #}
+  <header>
+    <nav class="navbar site-navbar" aria-label="Primary navigation">
+      <div class="container header-inner">
+        <a class="navbar-brand brand-mark" href="{{ request.script_root }}/" aria-label="MakeArtsFund home">Make<span>Arts</span>Fund</a>
+
+        {% block header_navigation %}
+        <div class="header-navigation">
+          <div class="header-main">
+            <form class="search-form" role="search" method="get" action="{{ request.script_root }}/">
+              <label class="visually-hidden" for="project-search">Search creative projects</label>
+              <input id="project-search" class="form-control" type="search" name="q" value="{{ request.args.get('q', '') }}" placeholder="Search projects" autocomplete="off">
+              <button class="btn btn-search" type="submit">Search</button>
+            </form>
+
+            <ul class="navbar-nav align-items-lg-center header-actions">
+              <li class="nav-item"><a class="nav-link" href="{{ request.script_root }}/#featured-projects">Explore Projects</a></li>
+              <li class="nav-item"><a class="nav-link" href="{{ request.script_root }}/#how-it-works">How It Works</a></li>
+              {% block role_navigation %}{% endblock %}
+              {% if current_user.is_authenticated %}
+                <li class="nav-item account-context">
+                  <span>{{ current_user.firstname }} <span class="account-role">{{ current_user.role }}</span></span>
+                </li>
+                <li class="nav-item">
+                  <form class="logout-form" method="post" action="{{ request.script_root }}/logout">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-outline-coral sign-in-button" type="submit">Sign Out</button>
+                  </form>
+                </li>
+              {% else %}
+                <li class="nav-item"><a class="btn btn-outline-coral sign-in-button" href="{{ request.script_root }}/login">Sign In</a></li>
+                <li class="nav-item"><a class="btn btn-coral" href="{{ request.script_root }}/register">Create Account</a></li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+        {% endblock %}
+
+        <div class="language-option">
+          <label class="visually-hidden" for="language-select">Language</label>
+          <select id="language-select" class="header-select" aria-label="Language">
+            <option value="en-AU" selected>English</option>
+          </select>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <div class="container">
+      {# Flask flash messages communicate login, registration, and logout results. #}
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <section class="flash-messages" aria-label="Notifications" aria-live="polite">
+            {% for category, message in messages %}
+              {% set alert_class = {
+                'success': 'success',
+                'error': 'danger',
+                'danger': 'danger',
+                'warning': 'warning',
+                'info': 'info'
+              }.get(category or 'info', 'info') %}
+              <div class="alert alert-{{ alert_class }}" role="alert">{{ message }}</div>
+            {% endfor %}
+          </section>
+        {% endif %}
+      {% endwith %}
+    </div>
+    {# Individual pages insert their main content into this block. #}
+    {% block content %}{% endblock %}
+  </main>
+
+  {# Shared footer follows the four links used in the Assessment 1 design. #}
+  <footer class="site-footer">
+    <div class="container">
+      <nav class="footer-links-only" aria-label="Footer navigation">
+        <a href="#">About</a>
+        <a href="#">Contact Us</a>
+        <a href="#">Terms</a>
+        <a href="#">Press</a>
+      </nav>
+      <hr>
+      <p class="copyright mb-0">&copy; {{ current_year|default(2026) }} MakeArtsFund.</p>
+    </div>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

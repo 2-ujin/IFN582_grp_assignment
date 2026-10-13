@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block header_navigation %}{% endblock %}
+
+{# Keep the status label, heading, and explanation together for each error type. #}
+{% set display_code = status_code|default(404) %}
+{% if display_code == 403 %}
+  {% set status_label = "Error 403" %}
+  {% set page_title = page_title|default("Access denied") %}
+  {% set page_message = page_message|default("You do not have permission to view this page.") %}
+{% elif display_code == 404 %}
+  {% set status_label = "404 Not Found" %}
+  {% set page_title = page_title|default("Whoops! Page not found :(") %}
+  {% set page_message = page_message|default("The page you are looking for cannot be found on this server") %}
+{% else %}
+  {% set status_label = "500 Internal Server Error" %}
+  {% set page_title = page_title|default("Something went wrong") %}
+  {% set page_message = page_message|default("Sorry, your request cannot be completed. Please try again shortly.") %}
+{% endif %}
+
+{% block title %}{{ page_title }} | MakeArtsFund{% endblock %}
+
+{% block content %}
+<section class="error-section section-padding" aria-labelledby="error-title">
+  <div class="container">
+    <div class="error-card">
+      <p class="error-code">{{ status_label }}</p>
+      <h1 id="error-title">{{ page_title }}</h1>
+      <p class="error-message">{{ page_message }}</p>
+      <a class="btn btn-coral btn-lg" href="{{ url_for('main.index') }}">Return to MakeArtsFund</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

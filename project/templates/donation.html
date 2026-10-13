@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}{{ project.projectName if project else 'Project Details' }} | MakeArtsFund{% endblock %}
+{% block content %}
+
+    <!-- Breadcrumb -->
+    <section class="details-breadcrumb">
+      <div class="container">
+        <nav aria-label="Breadcrumb">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Project Details</li>
+          </ol>
+        </nav>
+      </div>
+    </section>
+
+    <!-- Project overview -->
+    <section class="details-hero section-padding">
+      <div class="container">
+        <div class="row g-5 align-items-start">
+          <div class="col-lg-7">
+            <img class="details-project-image" src="{{ url_for('static', filename=project.imagePath if project and project.imagePath else 'img/janie._.bead.png') }}" alt="{{ project.projectName if project else 'Project Image' }}">
+
+            <div class="project-heading mt-4">
+              <p class="eyebrow">Featured local project</p>
+              <h1>{{ project.projectName if project else 'janie._.bean' }}</h1>
+
+              <div class="project-detail-meta">
+                <span class="detail-artist-name">{{ project.artistName if project else 'Queenie Kwok' }}</span>
+                <span>
+                    {{ project.categoryName if project else 'Handicraft' }}
+                  <b class="meta-separator">•</b>
+                  {{ project.location if project and project.location else 'Brisbane' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Funding summary -->
+          <div class="col-lg-5">
+            <aside class="funding-card" aria-labelledby="funding-summary-heading">
+              <h2 id="funding-summary-heading">Funding Summary</h2>
+
+              <div class="funding-amount">
+                <strong>${{ "{:,.0f}".format(project.totalRaised) if project and project.totalRaised else 0 }}</strong>
+                <span>raised of ${{ "{:,.0f}".format(project.goal) if project and project.goal else 0 }} goal</span>
+              </div>
+
+              <div class="progress-label">
+                <span>Funding progress</span>
+                <span>{{ project.progressPercentage if project else 0 }}%</span>
+              </div>
+
+              <div class="progress mb-3" role="progressbar" aria-label="Funding progress" aria-valuenow="{{ project.progressPercentage if project else 0 }}" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar" style="width: {{ [project.progressPercentage, 100]|min if project else 0 }}%"></div>
+              </div>
+
+              <div class="funding-stats">
+                <div>
+                  <strong>{{ supporter_count }}</strong>
+                  <span>Supporters</span>
+                </div>
+                <div>
+                  <strong>{{ project.daysRemaining if project else 0 }}</strong>
+                  <span>Days remaining</span>
+                </div>
+              </div>
+
+              <a class="btn btn-coral btn-lg w-100 mt-4" href="#donation-form">
+                Fund This Art
+              </a>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Project content -->
+    <section class="section-padding details-content-section">
+      <div class="container">
+        <div class="row g-5">
+          <div class="col-lg-8">
+
+            <!-- About Project -->
+            <article class="content-panel mb-4">
+              <h2>About This Project</h2>
+              <p>{{ project.projectDescription if project and project.projectDescription else 'No description provided.' }}</p>
+            </article>
+
+            <!-- About Artist -->
+            <article class="content-panel mb-4">
+              <h2>About the Artist</h2>
+              <div class="artist-profile">
+                <div class="artist-avatar">{{ (project.artistName[:2] | upper) if project and project.artistName else 'AR' }}</div>
+                <div>
+                  <h3>{{ project.artistName if project else 'Queenie Kwok' }}</h3>
+                  <p>{{ project.artistIntro if project and project.artistIntro else 'Artist introduction not available.' }}</p>
+                  </div>
+              </div>
+            </article>
+
+            <!-- Project updates -->
+            <article class="content-panel mb-4">
+              <div class="panel-heading-row">
+                <h2>Project Updates</h2>
+                <span class="update-count">{{ updates|length }} Updates</span>
+              </div>
+
+                {% if updates %}
+                    {% for update in updates %}
+                        <div class="update-item">
+                            <div class="update-date">{{ update.publishedDate.strftime('%-d %B %Y')|upper if update.publishedDate else '' }}</div>
+                            <h3>{{ update.title }}</h3>
+                            <p>{{ update.description }}</p>
+
+
+
+                            <!---- if update has picture-->
+                    {% if update.imagePath %}
+                        <div class="update-image-wrapper mt-3">
+                            <img class="img-fluid rounded" 
+                                src="{{ url_for('static', filename='img/' + update.imagePath) }}" 
+                                alt="{{ update.title }}"
+                                onerror="this.parentElement.style.display='none';">
+                        </div>
+                            {% endif %}
+                        </div>
+                    
+                    {% endfor %}
+                {% else %}
+                      <p class="text-muted">No updates yet.</p>
+                {% endif %}
+                  </article> 
+
+            <!-- Supporter msg -->
+            <article class="content-panel">
+              <h2>Supporter Messages</h2>
+                {% if donations %}
+                    {% for msg in donations %}
+                        <div class="supporter-message">
+                            <div class="message-avatar">{{ (msg.donorName[:2] | upper) if msg.donorName else 'SP' }}</div>
+                            <div>
+                            <h3>{{ msg.donorName }}</h3>
+                            <div class="message-date">{{ msg.postedDate.strftime('%-d %B %Y')|upper if msg.postedDate else '' }}</div>
+                            <p>{{ msg.message }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No messages yet. Be the first to leave a message!</p>
+                {% endif %}
+            </article>
+          </div>
+
+          <!-- Donation form -->
+          <div class="col-lg-4">
+            <aside class="donation-card" id="donation-form" aria-labelledby="donation-heading">
+              <h2 id="donation-heading">Fund This Art</h2>
+              <p class="donation-intro">Complete the form below to indicate your support for this project.</p>
+
+              <form method="POST">
+                <div class="mb-3">
+                  <label class="form-label" for="pledge-amount">Pledge amount</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input id="pledge-amount" class="form-control" type="number" name="pledge-amount" min="1" placeholder="50" required>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label" for="supporter-name">Name</label>
+                  <input id="supporter-name" class="form-control" type="text" name="supporter-name" placeholder="Your name" required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label" for="supporter-email">Email</label>
+                  <input id="supporter-email" class="form-control" type="email" name="supporter-email" placeholder="abc@gamil.com" required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label" for="artist-message">Message to artist</label>
+                  <textarea id="artist-message" class="form-control" name="artist-message" rows="4" placeholder="Write a message to the artist..."></textarea>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label" for="payment-method">Payment method</label>
+                  <select id="payment-method" class="form-select" name="payment-method" required>
+                    <option value="">Select a payment method</option>
+                    <option value="card">Credit or debit card</option>
+                    <option value="paypal">PayPal</option>
+                    <option value="bank-transfer">Bank transfer</option>
+                  </select>
+                </div>
+
+                <button class="btn btn-coral w-100" type="submit">Pay</button>
+              </form>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+{% endblock %}
+
+
+  

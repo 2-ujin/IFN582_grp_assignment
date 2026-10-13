@@ -61,8 +61,8 @@
       <div class="container">
         <nav aria-label="Breadcrumb">
           <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Project Details</li>
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ project['projectName'] }}</li>
           </ol>
         </nav>
       </div>
