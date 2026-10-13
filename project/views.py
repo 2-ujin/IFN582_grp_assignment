@@ -12,6 +12,7 @@ main = Blueprint('main', __name__)
 # move the query into models.py). Please keep the function name
 # ====================================================================
 
+ # home page 
 @main.route('/')
 def index():
     # Connection test: fetch every project name from the database
@@ -21,7 +22,7 @@ def index():
         c.categoryName,
         IFNULL(SUM(d.amount), 0) AS totalRaised,
         ROUND(IFNULL(SUM(d.amount), 0) / p.goal * 100) AS progressPercentage,
-        GREATEST(DATEDIFF(CURDATE(), p.deadline), 0) AS daysRemaining         
+        GREATEST(DATEDIFF(p.deadline, CURDATE()), 0) AS daysRemaining         
         FROM project p
         JOIN user u ON p.creatorId = u.userId
         JOIN category c ON p.categoryId = c.categoryId
@@ -49,8 +50,60 @@ def index():
 
     # Return as plain text so it shows in the browser without a template
     return render_template('home.html', projects=projects, success_stories=success_stories)
-    return str(projects)
+    
 
+ # danation page
+@main.route('/donation')
+@main.route('/donation/<int:project_id>')
+def project_detail(project_id = 1):
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
+        c.categoryName,
+        IFNULL(SUM(d.amount), 0) AS totalRaised,
+        ROUND(IFNULL(SUM(d.amount), 0) / p.goal * 100) AS progressPercentage,
+        GREATEST(DATEDIFF(p.deadline, CURDATE()), 0) AS daysRemaining         
+        FROM project p
+        JOIN user u ON p.creatorId = u.userId
+        JOIN category c ON p.categoryId = c.categoryId
+        LEFT JOIN donation d ON p.projectId = d.projectId           
+        WHERE p.projectId = %s
+        GROUP BY p.projectId
+                         
+    """,(project_id,))
+    project_data = cursor.fetchone()
+# update project
+    cursor.execute("""
+        SELECT pu.*, MIN(im.imagePath) AS imagePath
+        FROM projectUpdate pu
+        LEFT JOIN image im ON pu.updateId = im.updateId
+        WHERE pu.projectId = %s
+        GROUP BY pu.updateId
+        ORDER BY pu.publishedDate DESC
+    """, (project_id,))
+    updates = cursor.fetchall()
+
+#supporter message  
+    cursor.execute("""
+            SELECT sm.*, d.amount, CONCAT(u.firstname, ' ', u.surname) AS donorName
+            FROM supporterMessage sm
+            JOIN donation d ON sm.donationId = d.donationId
+            JOIN user u ON d.supporterId = u.userId
+            WHERE d.projectId = %s AND sm.visibility = TRUE
+            ORDER BY sm.postedDate DESC
+        """, (project_id,))
+    donations = cursor.fetchall()
+    cursor.close()
+
+    supporter_count = len(donations)
+
+    return render_template(
+        'donation.html',
+        project=project_data,
+        updates=updates,
+        donations=donations,
+        supporter_count=supporter_count
+    )  
 
 # ----- Part 5. Admin Dashboard -----
 from flask import render_template, redirect, url_for, flash
