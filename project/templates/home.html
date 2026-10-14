@@ -105,17 +105,18 @@
         <div class="row g-4">
             {% for story in success_stories %}
           <div class="col-md-6">
-            <article class="success-card">
-              <img class="success-image" src="{{ url_for('static', filename=story['imagePath']) }}" alt="{{ story['projectName'] }}" loading="lazy">
-              <div class="success-content">
-                <div>
-                  <h3>{{ story['projectName'] }}</h3>
-                  <p>{{ story['artistName'] }} · {{ story['categoryName'] }} · {{ story['location'] }}</p>
+                <article class="success-card">
+                <img class="success-image" src="{{ url_for('static', filename=story['imagePath']) }}" alt="{{ story['projectName'] }}" loading="lazy">
+                <div class="success-content">
+                    <div>
+                    <h3>{{ story['projectName'] }}</h3>
+                    <p>{{ story['artistName'] }} · {{ story['categoryName'] }} · {{ story['location'] }}</p>
+                    </div>
+                    <span class="completed-label">Completed</span>
                 </div>
-                <span class="completed-label">Completed</span>
-              </div>
-              <p>{{ story['projectDescription'] }}</p>
-            </article>
+                <p>{{ story['projectDescription'] }}</p>
+                </article>
+            
           </div>
           {% endfor %}
         </div>
