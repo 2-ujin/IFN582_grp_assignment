@@ -232,3 +232,216 @@ class Image:
     imageId: int
     update: ProjectUpdate
     imagePath: str
+
+
+# ----- Part 5. Admin Dashboard -----
+
+def get_campaign_stats():
+    # Display the total number of campaigns including active and pending
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  COUNT(*) AS totalCampaigns,
+                SUM(project.approvalStatus = 'Approved' AND project.projectStatus = 'Active') AS activeCampaigns,
+                SUM(project.approvalStatus = 'Pending') AS pendingCampaigns
+        FROM project
+        WHERE project.approvalStatus <> 'Deleted'
+    """)
+    campaign_stats = cursor.fetchone()
+    cursor.close()
+    return campaign_stats
+
+def get_creator_count():
+    # Display the total number of active creators
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  COUNT(*) AS activeCreators
+        FROM artist
+        JOIN user ON user.userId = artist.userId
+        WHERE user.accountStatus = 'Active'
+    """)
+    creator_count = cursor.fetchone()
+    cursor.close()
+    return creator_count
+
+def get_supporter_count():
+    # Display the total number of active supporters
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  COUNT(*) AS activeSupporters
+        FROM supporter
+        JOIN user ON user.userId = supporter.userId
+        WHERE user.accountStatus = 'Active'
+    """)
+    supporter_count = cursor.fetchone()
+    cursor.close()
+    return supporter_count
+
+def get_report_stats():
+    # Display the total number of reports including pending
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  COUNT(*) AS totalReports,
+                SUM(report.status = 'Pending') AS pendingReports
+        FROM report
+    """)
+    report_stats = cursor.fetchone()
+    cursor.close()
+    return report_stats
+
+def get_pending_projects():
+    # Projects waiting for admin to approve or reject
+
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  project.projectId,
+                project.projectName,
+                CONCAT(user.firstname, ' ', user.surname) AS creatorName,
+                category.categoryName,
+                project.location,
+                project.updateDt AS submittedDate
+        FROM project
+        JOIN user ON user.userId = project.creatorId
+        JOIN category ON category.categoryId = project.categoryId
+        WHERE project.approvalStatus = 'Pending'
+        ORDER BY project.updateDt ASC
+    """)
+
+    pending_projects = cursor.fetchall()
+    cursor.close()
+    return pending_projects
+
+def review_project_approval(project_id, new_status):
+    # Admin reviews a pending project and approves or rejects it
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        UPDATE project
+        SET approvalStatus = %s
+        WHERE projectId = %s
+          And approvalStatus = 'Pending'
+    """, (new_status, project_id)) 
+    database.connection.commit()
+    updated_rows = cursor.rowcount
+    cursor.close()
+    return updated_rows
+
+def get_reviewed_projects():
+    # Projects that have already been reviewed (not Pending or Removed)
+    
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  project.projectId,
+                project.projectName,
+                CONCAT(user.firstname, ' ', user.surname) AS creatorName,
+                category.categoryName,
+                project.location,
+                project.projectStatus,
+                project.approvalStatus
+        FROM project
+        JOIN user ON user.userId = project.creatorId
+        JOIN category ON category.categoryId = project.categoryId
+        WHERE project.approvalStatus IN ('Approved', 'Suspended', 'Rejected')
+        ORDER BY project.projectName ASC
+    """)
+
+    reviewed_projects = cursor.fetchall()
+    cursor.close()
+    return reviewed_projects
+
+def change_project_status(project_id, current_status, new_status):
+    # Update project approval status (approved -> suspended or suspended -> approved)
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        UPDATE project
+        SET approvalStatus = %s,
+            featured = FALSE  # Remove suspended projects from featured projects 
+        WHERE projectId = %s
+          And approvalStatus = %s
+    """, (new_status, project_id, current_status)) 
+    database.connection.commit()
+    updated_rows = cursor.rowcount
+    cursor.close()
+    return updated_rows
+
+def soft_delete_project(project_id):
+    # Hide reviewed projects by setting their approval status to 'Deleted'
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        UPDATE project
+        SET approvalStatus = 'Deleted',
+            featured = FALSE   
+        WHERE projectId = %s
+          And approvalStatus IN ('Approved', 'Suspended', 'Rejected')
+    """, (project_id,)) 
+    database.connection.commit()
+    updated_rows = cursor.rowcount
+    cursor.close()
+    return updated_rows
+
+def get_featured_projects():
+    # Get projects that are currently in featured section
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  project.projectId,
+                project.projectName,
+                CONCAT(user.firstname, ' ', user.surname) AS creatorName,
+                category.categoryName,
+                project.location
+        FROM project
+        JOIN user ON user.userId = project.creatorId
+        JOIN category ON category.categoryId = project.categoryId
+        WHERE project.featured = TRUE
+        ORDER BY project.projectName ASC
+    """)
+
+    featured_projects = cursor.fetchall()
+    cursor.close()
+    return featured_projects
+
+def get_feature_candidates():
+    # Get projects that can be added to featured section
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  project.projectId,
+                project.projectName
+        FROM project
+        WHERE project.approvalStatus = 'Approved'
+        AND project.projectStatus = 'Active'
+        AND project.featured = FALSE
+        ORDER BY project.projectName ASC
+    """)
+
+    feature_candidates = cursor.fetchall()
+    cursor.close()
+    return feature_candidates
+
+def add_to_featured(project_id):
+    # Show a project in featured section
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        UPDATE project
+        SET featured = TRUE   
+        WHERE projectId = %s
+          And approvalStatus = 'Approved'
+          And projectStatus = 'Active'
+          AND featured = FALSE
+    """, (project_id,)) 
+    database.connection.commit()
+    updated_rows = cursor.rowcount
+    cursor.close()
+    return updated_rows
+
+def remove_from_featured(project_id):
+    # Take a project out from featured section
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        UPDATE project
+        SET featured = FALSE   
+        WHERE projectId = %s
+          AND featured = TRUE
+    """, (project_id,)) 
+    database.connection.commit()
+    updated_rows = cursor.rowcount
+    cursor.close()
+    return updated_rows
+
+
