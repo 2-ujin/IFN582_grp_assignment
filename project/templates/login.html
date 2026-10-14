@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In | MakeArtsFund{% endblock %}
+
+{% block header_navigation %}{% endblock %}
+
+{% block content %}
+{# Login is a server-submitted form: Flask validates it and views.py checks the account. #}
+<section class="auth-section section-padding" aria-labelledby="login-title">
+  <div class="container">
+    <div class="auth-layout auth-layout-login">
+      <div class="auth-card">
+        <h1 id="login-title">Sign In</h1>
+
+        <form method="post" action="{{ url_for('main.login', next=request.args.get('next')) if request.args.get('next') else url_for('main.login') }}" novalidate>
+          {# hidden_tag() includes the CSRF token and any hidden form fields. #}
+          {{ form.hidden_tag() }}
+
+          <div class="mb-3">
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-control", autocomplete="email", inputmode="email", placeholder="abc@gmail.com", autofocus=true, **{"aria-describedby": "email-errors"}) }}
+            <div id="email-errors">
+              {% for error in form.email.errors %}
+                <p class="field-error">{{ error }}</p>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control", autocomplete="current-password", placeholder="Enter your password", **{"aria-describedby": "password-errors"}) }}
+            <div id="password-errors">
+              {% for error in form.password.errors %}
+                <p class="field-error">{{ error }}</p>
+              {% endfor %}
+            </div>
+          </div>
+
+          {# These displayed passwords are verified against the matching SQL hashes. #}
+          <section class="test-credentials" aria-labelledby="test-credentials-title">
+            <h2 id="test-credentials-title">Test Login Credentials For Assessment</h2>
+            <div class="table-responsive">
+              <table class="table credential-table align-middle">
+                <caption class="visually-hidden">Test account email addresses and passwords for each MakeArtsFund role</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Role</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Password</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for account in test_accounts %}
+                  <tr>
+                    <th scope="row">{{ account.role }}</th>
+                    <td><code>{{ account.email }}</code></td>
+                    <td><code>{{ account.password }}</code></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {{ form.submit(class="btn btn-coral w-100 mt-3") }}
+        </form>
+
+        <p class="auth-switch">New to MakeArtsFund? <a href="{{ url_for('main.register') }}">Create an account</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
