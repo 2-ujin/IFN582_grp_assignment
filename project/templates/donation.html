@@ -109,7 +109,7 @@
                 {% if updates %}
                     {% for update in updates %}
                         <div class="update-item">
-                            <div class="update-date">{{ update.publishedDate.strftime('%-d %B %Y')|upper if update.publishedDate else '' }}</div>
+                            <div class="update-date">{{ update.publishedDate.strftime('%d %B %Y')|upper if update.publishedDate else '' }}</div>
                             <h3>{{ update.title }}</h3>
                             <p>{{ update.description }}</p>
 
@@ -141,7 +141,7 @@
                             <div class="message-avatar">{{ (msg.donorName[:2] | upper) if msg.donorName else 'SP' }}</div>
                             <div>
                             <h3>{{ msg.donorName }}</h3>
-                            <div class="message-date">{{ msg.postedDate.strftime('%-d %B %Y')|upper if msg.postedDate else '' }}</div>
+                            <div class="message-date">{{ msg.postedDate.strftime('%d %B %Y')|upper if msg.postedDate else '' }}</div>
                             <p>{{ msg.message }}</p>
                             </div>
                         </div>
@@ -159,6 +159,9 @@
               <p class="donation-intro">Complete the form below to indicate your support for this project.</p>
 
               <form method="POST">
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                 <div class="mb-3">
                   <label class="form-label" for="pledge-amount">Pledge amount</label>
                   <div class="input-group">
@@ -169,12 +172,15 @@
 
                 <div class="mb-3">
                   <label class="form-label" for="supporter-name">Name</label>
-                  <input id="supporter-name" class="form-control" type="text" name="supporter-name" placeholder="Your name" required>
+                <!-- auto fill already log in account-->
+                  <input id="supporter-name" class="form-control" type="text" name="supporter-name" placeholder="Your name" required
+                  value="{{ (current_user.firstname ~ ' ' ~ current_user.surname) if current_user.is_authenticated else '' }}">
                 </div>
 
                 <div class="mb-3">
                   <label class="form-label" for="supporter-email">Email</label>
-                  <input id="supporter-email" class="form-control" type="email" name="supporter-email" placeholder="abc@gamil.com" required>
+                  <input id="supporter-email" class="form-control" type="email" name="supporter-email" placeholder="abc@gamil.com" required
+                  value="{{ current_user.email if current_user.is_authenticated else '' }}">
                 </div>
 
                 <div class="mb-3">

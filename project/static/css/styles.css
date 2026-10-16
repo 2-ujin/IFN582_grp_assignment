@@ -715,3 +715,13 @@ h1 {
     scroll-behavior: auto;
   }
 }
+
+
+/* donation active box*/
+.category-item.active {
+  border-color: #e05a47 !important;
+  background-color: #fff4f2 !important;
+  color: #e05a47 !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 12px rgba(224, 90, 71, 0.15) !important;
+}
