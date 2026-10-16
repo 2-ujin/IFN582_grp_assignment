@@ -379,6 +379,16 @@ body {
   background: var(--charcoal);
 }
 
+.success-section h2,
+.success-card h3 {
+  color: var(--white) !important;
+}
+
+.success-content p,
+.success-card > p {
+  color: #d7d0cb !important;
+}
+
 .success-card {
   height: 100%;
   padding-bottom: 1.5rem;

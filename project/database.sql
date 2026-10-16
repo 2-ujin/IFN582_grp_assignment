@@ -247,6 +247,7 @@ Yujin Lee CREATEd this file
 
 
 -- PROJECT
+-- PROJECT
     INSERT INTO project 
     (
         creatorId,
@@ -267,17 +268,51 @@ Yujin Lee CREATEd this file
 
     )
     VALUES 
-        (1, 2, 'janie._.bean', 'Brisbane', 'img/janie._.bead.png', '5000', '2026-10-23', 'Approved','Active', 'janie._.bean is a family-based handmade seed bead project run by Janet and Queenie.', 'For 12 years, I''ve been making seed beads with my mother, Janet, and now we''ve decided to take it a step further to janie._.bean.', TRUE, FALSE, 15, '2026-08-01'),
-        (3, 3, 'MORY Model Diary', 'Perth', 'img/MORY-Model-Diary.png', '6000', '2026-11-18', 'Approved','Active', 'Original 3D printed models.', 'Makes original printed models for 3 years.', TRUE, FALSE, 13, '2026-08-12'),
-        (5, 2, 'Croshay', 'Sydney', 'img/Croshay.png', '8000', '2026-11-11', 'Approved', 'Active', 'Handmade local crochet accessories.', 'Design crochet accessories for 8 years.', TRUE, FALSE, 14, '2026-09-01'),
+        (1, 2, 'janie._.bean', 'Brisbane', 'img/janie._.bead.png', '5000', '2026-10-23', 'Approved','Active', 
+            'janie._.bean is a family-based handmade seed bead project run by Janet and Queenie. Every piece is threaded by hand, one tiny bead at a time, turning delicate glass seed beads into bracelets, necklaces, earrings and phone charms. Janet brings years of patient craft experience, while Queenie adds fresh colour palettes and modern designs. Together they blend traditional beadwork with a playful, contemporary style. Your support will fund bulk materials, packaging and the launch of their first online store, so more of their small-batch, one-of-a-kind pieces can reach people who love handmade.',
+            'Hi, this is Queenie, and I''ve always loved beading. For 12 years, I''ve been making seed beads with my mother, Janet, and now we''ve decided to take it a step further to janie._.bean.
+            
+            For me, beading is a relaxing way to spend quality time with my mum. Every piece is made carefully by hand, with patience and attention to detail.
+            Through janie._.bean, I hope to share our creativity with more people at local markets, pop-up stores, and online. Thank you for supporting my work and our mother-and-daughter project!',
+            TRUE, FALSE, 15, '2026-08-01'
+        ),
+        (3, 3, 'MORY Model Diary', 'Perth', 'img/MORY-Model-Diary.png', '6000', '2026-11-18', 'Approved','Active'
+        , 'Original 3D printed models designed from scratch, ranging from small desk figures to detailed collectible pieces. Each model is sketched, sculpted digitally, test printed and then hand finished, with sanding and painting used to bring out the fine details. MORY Model Diary documents this whole journey and shares the design process behind every release. Funding will go toward a higher-quality resin printer, better materials and paints, and packaging, so each release can be sharper, more durable and ready to display.', 'Hi, I''m the maker behind MORY Model Diary. For 3 years, I''ve been designing and printing original models, and what started as a hobby has grown into something I''m really proud of.
+
+            I love every step of the process, from the first sketch to the moment a print comes off the bed. Each model is sanded and finished by hand so the small details really show.
+
+            Through MORY Model Diary, I hope to share my designs and my process with more collectors and makers. Thank you for supporting my work!'
+        , TRUE, FALSE, 13, '2026-08-12'),
+        (5, 2, 'Croshay', 'Sydney', 'img/Croshay.png', '8000', '2026-11-11', 'Approved', 'Active'
+        , 'Handmade local crochet accessories designed in Sydney, including bags, scrunchies, hair clips and small wearable pieces. Each item is crocheted stitch by stitch using soft, durable yarns chosen for their colour and comfort. Croshay mixes classic crochet techniques with modern shapes, making everyday accessories feel personal and unique. Funding will help buy quality yarn in larger quantities, develop new seasonal collections and set up stalls at local markets, so more people can enjoy slow-made, locally crafted pieces.', 'Hi, I''m the designer behind Croshay. For 8 years, I''ve been designing and crocheting accessories, and I''ve always loved how a simple ball of yarn can become something wearable.
+
+        For me, crochet is a calming craft that rewards patience. Every piece is made stitch by stitch, with careful attention to colour, shape and comfort.
+
+        Through Croshay, I hope to share my designs with more people at local markets and online. Thank you for supporting my work and my little handmade label!', TRUE, FALSE, 14, '2026-09-01'),
         (6, 4, 'Positioning in Melbourne', 'Melbourne', 'img/Positioning-in-Melbourne.png', '4500', '2026-10-02', 'Suspended', 'Completed', 'A photo series retracing postcard images to identify and photograph their exact original locations in Melbourne.', 'Capture my hometown in Melbourne.', FALSE, TRUE, 10, '2026-07-15'),
         (8, 2, 'Get Thready', 'Brisbane', 'img/Get-Thready.png', '7000', '2026-10-12', 'Suspended', 'Completed', 'Delicate handmade flower accessories crocheted from single strands of embroidery thread.', 'Makes embroidered flower accessories for 12 years.', FALSE, TRUE, 9, '2026-07-01'),
         (5, 2, 'Doll Craft', 'Gold Coast', 'img/Doll_Craft.jpg', '5500', '2026-12-15', 'Pending', 'Active', 'Handmade fabric dolls with hand-stitched outfits and tiny accessories.', 'Sewing and designing one-of-a-kind dolls for 6 years.', FALSE, FALSE, NULL, '2026-10-02'),
         (3, 4, 'Brisbane After Dark', 'Brisbane', 'img/Brisbane-After-Dark.png', '4000', '2026-12-20', 'Pending', 'Active', 'A night photography series capturing Brisbane''s laneways, bridges and riverfront after sunset.', 'Shooting long-exposure city photography for 5 years.', FALSE, FALSE, NULL, '2026-10-06'),
-        (8, 1, 'Inkwell Botanica', 'Hobart', 'img/Inkwell-Botanica.png', '3500', '2026-11-30', 'Approved', 'Active', 'Botanical ink and watercolour illustrations of native Tasmanian plants.', 'Illustrating native flora for 7 years.', FALSE, FALSE, 15, '2026-09-20'),
-        (6, 5, 'Botanic Garden Jazz Concert', 'Brisbane', 'img/Botanic-Garden-Jazz-Concert.png', '9000', '2026-12-05', 'Approved', 'Active', 'A free outdoor jazz concert series held at Brisbane''s City Botanic Gardens on summer evenings.', 'Performing and organising live jazz gigs for 10 years.', TRUE, FALSE, 14, '2026-09-25'),
-        (8, 6, 'Small Stage Stories', 'Adelaide', 'img/Small-Stage-Stories.png', '12000', '2026-12-18', 'Approved', 'Active', 'A short documentary following three independent theatre troupes through one festival season.', 'Directing short films about local performers for 4 years.', FALSE, FALSE, 13, '2026-10-01'),
-        (1, 6, 'Puppet Theatre on Wheels', 'Canberra', 'img/Puppet-Theatre-on-Wheels.png', '7500', '2026-11-20', 'Approved', 'Active', 'A travelling puppet show bringing free performances to regional schools.', 'Building puppets and performing for children for 11 years.', TRUE, FALSE, 9, '2026-09-15'),
+        (8, 1, 'Inkwell Botanica', 'Hobart', 'img/Inkwell-Botanica.png', '3500', '2026-11-30', 'Approved', 'Active', 'Botanical ink and watercolour illustrations of native Tasmanian plants, drawn with careful attention to leaf shape, flower structure and natural colour. Each piece starts with field sketches and reference studies before being built up with fine ink linework and layered watercolour washes. The project celebrates Tasmania''s unique flora and the people who protect it. Funding will go toward archival paper, quality pigments and giclée printing for a series of prints and a small illustrated collection, so these plants can be enjoyed at home.', 'Hi, I''m the illustrator behind Inkwell Botanica. For 7 years, I''ve been drawing and painting the native plants of Tasmania, and I never get tired of discovering new ones.
+
+        I begin each piece outdoors with sketches and close observation, then bring it to life with fine ink lines and soft watercolour. I want every illustration to feel true to the plant it comes from.
+
+        Through Inkwell Botanica, I hope to share the beauty of Tasmanian flora with more people. Thank you for supporting my work and our native plants!', FALSE, FALSE, 15, '2026-09-20'),
+        (6, 5, 'Botanic Garden Jazz Concert', 'Brisbane', 'img/Botanic-Garden-Jazz-Concert.png', '9000', '2026-12-05', 'Approved', 'Active', 'A free outdoor jazz concert series held at Brisbane''s City Botanic Gardens on summer evenings. Local and visiting musicians perform relaxed sets as the sun goes down, while families, friends and music lovers are invited to bring a picnic rug and enjoy the music. The series aims to make live jazz accessible to everyone at no cost. Funding will cover performer fees, sound equipment hire, stage and lighting setup, event permits and safety costs, helping bring a full season of evenings to the community.', 'Hi, I''m a jazz musician and the organiser of the Botanic Garden Jazz Concert. For 10 years, I''ve been performing and organising live gigs, and nothing beats a warm evening of music with a crowd.
+
+        To me, jazz is about connection, between the musicians on stage and the people listening. I believe great live music should be open to everyone, whether you bring a picnic or just stop by.
+
+        Through this concert series, I hope to bring our community together in the gardens. Thank you for supporting live music in Brisbane!', TRUE, FALSE, 14, '2026-09-25'),
+        (8, 6, 'Small Stage Stories', 'Adelaide', 'img/Small-Stage-Stories.png', '12000', '2026-12-18', 'Approved', 'Active', 'A short documentary following three independent theatre troupes through one festival season, from the first rehearsals to the final curtain call. The film goes behind the scenes to capture the late nights, nerves, humour and teamwork that rarely reach the audience. It aims to give small, local performers a platform and show the passion that keeps independent theatre alive. Funding will support camera and sound equipment, travel between venues, editing and colour grading, and festival screening submissions.', 'Hi, I''m the director behind Small Stage Stories. For 4 years, I''ve been making short films about local performers, and I''m endlessly inspired by the people who create theatre for the love of it.
+
+        I like to spend time with the troupes before the cameras roll, so the film can capture real moments, from nervous rehearsals to the cheers at the end of a show.
+
+        Through Small Stage Stories, I hope to give independent theatre a bigger audience. Thank you for supporting my work and the performers in it!', FALSE, FALSE, 13, '2026-10-01'),
+        (1, 6, 'Puppet Theatre on Wheels', 'Canberra', 'img/Puppet-Theatre-on-Wheels.png', '7500', '2026-11-20', 'Approved', 'Active', 'A travelling puppet show bringing free performances to regional schools, where live theatre is often hard to access. Handmade puppets, original stories and interactive moments invite children to laugh, imagine and join in. Each show is built to fit in a van and be set up in minutes, so it can visit small schools as easily as large ones. Funding will go toward vehicle running costs, new puppets and stage sets, sound gear and scheduling school visits for a full year of tours.', 'Hi, I''m the puppeteer behind Puppet Theatre on Wheels. For 11 years, I''ve been building puppets and performing for children, and their laughter is still my favourite sound.
+
+        Every puppet is made by hand, and every show is written to be playful and easy to join in. I love seeing a quiet classroom turn into a room full of imagination.
+
+        Through Puppet Theatre on Wheels, I hope to bring live theatre to more regional schools, free of charge. Thank you for supporting my work and the children we visit!', TRUE, FALSE, 9, '2026-09-15'),
         (3, 1, 'Street Canvas Project', 'Melbourne', 'img/Street-Canvas-Project.png', '6500', '2026-08-20', 'Approved', 'Completed', 'Community murals painted with local residents on blank laneway walls.', 'Painting public murals for 9 years.', FALSE, TRUE, 9, '2026-06-15'),
         (5, 5, 'Choir of the Coast', 'Gold Coast', 'img/Choir-of-the-Coast.png', '5000', '2026-07-30', 'Approved', 'Completed', 'A community choir recording its first album of coastal folk songs.', 'Leading a community choir for 15 years.', FALSE, TRUE, 15, '2026-05-20'),
         (3, 3, 'Tiny Terrain', 'Darwin', 'img/Tiny-Terrain.png', '4800', '2027-01-10', 'Pending', 'Active', '3D printed miniature dioramas of Top End landscapes.', 'Designing printable terrain models for 2 years.', FALSE, FALSE, NULL, '2026-10-08'),

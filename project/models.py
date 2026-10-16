@@ -1,35 +1,122 @@
 from dataclasses import dataclass, field
-from datetime import datetime,date
-from typing import Optional
+from datetime import datetime, date
+from typing import ClassVar, Optional
 from enum import Enum
 
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash
 
-# user
+from . import database
+
+# Part 2- account status value 
+
 
 class AccountStatus(Enum):
     ACTIVE = 'Active'
     SUSPENDED = 'Suspended'
     DEACTIVATED = 'Deactivated'
-    
+# Part 2- authentication model classes    
 @dataclass
-class User:
+class User(UserMixin):
     id: int
     firstname: str
     surname: str
     email: str
     password: str = field (repr=False)
     accountStatus: AccountStatus = AccountStatus.ACTIVE
+    role: ClassVar[str] = "User"
+#Part 2- Flask Login active account check
+    @property
+    def is_active(self):
+        """Return the boolean Flask-Login uses before allowing a session."""
+        return self.accountStatus is AccountStatus.ACTIVE
+#Part 2- pw hashing
+    def set_password(self, raw_password: str):
+        """Store a Werkzeug password hash rather than a plain-text password."""
+        self.password = generate_password_hash(raw_password)
+#Part 2- lookup by email/ userID
+    @classmethod
+    def get_by_id(cls, user_id):
+        """Reload the account and role for Flask-Login's signed session ID."""
+        return cls._load("WHERE u.userId = %s", (user_id,))
+
+    @classmethod
+    def get_by_email(cls, email):
+        """Find a login account without treating email letter case as significant."""
+        return cls._load("WHERE LOWER(u.email) = LOWER(%s)", (email.strip(),))
+#Part 2- database query join users to role table + identify account role
+    @classmethod
+    def _load(cls, condition, values):
+        # Stores common account data in `user` and role membership in
+        # one of three child tables. LEFT JOIN lets this query discover that role.
+        # The CASE expression returns a role only if exactly one child row exists.
+        query = (
+            "SELECT u.userId, u.firstname, u.surname, u.email, u.password, "
+            "u.accountStatus, "
+            "CASE "
+            "WHEN ((a.userId IS NOT NULL) + (s.userId IS NOT NULL) + "
+            "(ad.userId IS NOT NULL)) = 1 THEN "
+            "CASE "
+            "WHEN a.userId IS NOT NULL THEN 'Fundraiser' "
+            "WHEN s.userId IS NOT NULL THEN 'Supporter' "
+            "WHEN ad.userId IS NOT NULL THEN 'Administrator' "
+            "END "
+            "ELSE NULL END AS role "
+            "FROM user AS u "
+            "LEFT JOIN artist AS a ON a.userId = u.userId "
+            "LEFT JOIN supporter AS s ON s.userId = u.userId "
+            "LEFT JOIN administrator AS ad ON ad.userId = u.userId "
+            f"{condition} LIMIT 1"
+        )
+        cursor = database.connection.cursor()
+        try:
+            # The condition is selected only by the fixed helper methods above
+            # actual email/ID values passed separately as parameters
+            cursor.execute(query, values)
+            row = cursor.fetchone()
+        finally:
+            cursor.close()
+
+        if not row or not row.get("role"):
+            # Missing accounts and accounts with zero/multiple role rows cannot
+            # authenticate because their role is ambiguous/invalid
+            return None
+
+        role_classes = {
+            "Fundraiser": Artist,
+            "Supporter": Supporter,
+            "Administrator": Administrator,
+        }
+        user_class = role_classes.get(row["role"])
+        if user_class is None:
+            return None
+
+        try:
+            status = AccountStatus(row["accountStatus"])
+        except ValueError:
+            # Treat an unexpected database value as blocked instead of granting access.
+            status = AccountStatus.DEACTIVATED
+
+        return user_class(
+            id=row["userId"],
+            firstname=row["firstname"],
+            surname=row["surname"],
+            email=row["email"],
+            password=row["password"],
+            accountStatus=status,
+        )
 
 
-# define class attribute for artist supporter administrator
+# fundraisers =Artist
+
 class Artist(User):
-    role = 'Artist'
+    role: ClassVar[str] = "Fundraiser"
 
 class Supporter(User):
-    role = 'Supporter'
+    role: ClassVar[str] = "Supporter"
 
 class Administrator(User):
-    role = 'Administrator'
+    role: ClassVar[str] = "Administrator"
 
 
 class ApprovalStatus(Enum):
@@ -44,14 +131,17 @@ class ProjectStatus(Enum):
     COMPLETED = 'Completed'
 
 
-# Category 
+# dataclasses describe database concepts used by later project pages
+# Part 2- names for the project schema, while Part 3-5 add their workflows
+
+# Category
 @dataclass
 class Category:
     categoryId: int
     categoryName: str
 
 
-# Project
+# A fundraising project belongs to an artist and one category.
 @dataclass
 class Project:
     projectId: int
@@ -75,7 +165,7 @@ class Project:
 
 
 
-# donation
+# A donation links a supporter to the project they choose to fund.
 
 class PaymentStatus(Enum):
     PENDING = 'Pending'
@@ -94,7 +184,7 @@ class Donation:
     paymentStatus: PaymentStatus = PaymentStatus.PENDING
 
 
-# supporterMessage
+# Supporter messages are associated with donations and can be hidden via visibility.
 
 @dataclass
 class SupporterMessage:
@@ -105,7 +195,7 @@ class SupporterMessage:
     visibility: bool = True
 
 
-# projectUpdate
+# Project updates store progress posts made by the fundraiser.
 
 @dataclass
 class ProjectUpdate:
@@ -115,7 +205,7 @@ class ProjectUpdate:
     description: Optional[str]
     publishedDate: datetime = field(default_factory=lambda: datetime.now())
 
-# Report
+# Reports record content that a user asks an administrator to review.
 
 class ReportStatus(Enum):
     PENDING = 'Pending'
@@ -135,7 +225,7 @@ class Report:
     reviewerId: Optional[int] = None    # this field can be NULL
 
 
-# Image
+# Images are attached to project updates, rather than directly to user accounts.
 
 @dataclass
 class Image:
@@ -145,7 +235,6 @@ class Image:
 
 
 # ----- Part 5. Admin Dashboard -----
-from . import database
 
 def get_campaign_stats():
     # Display the total number of campaigns including active and pending
