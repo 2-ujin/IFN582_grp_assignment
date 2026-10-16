@@ -313,6 +313,59 @@ def get_users():
     cursor.close()
     return users
 
+def get_user(user_id):
+    # Get a specific account to fill in the edit user form
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  user.userId,
+                user.firstname,
+                user.surname,
+                user.email,
+                user.accountStatus,
+                CASE
+                    WHEN artist.userId IS NOT NULL THEN 'Artist'
+                    WHEN supporter.userId IS NOT NULL THEN 'Supporter'
+                    ELSE 'Unknown'
+                END AS role
+        FROM user
+        LEFT JOIN artist ON artist.userId = user.userId
+        LEFT JOIN supporter ON supporter.userId = user.userId
+        WHERE user.userId = %s
+          AND user.accountStatus <> 'Deleted'
+          AND user.userId NOT IN (SELECT administrator.userId FROM administrator)
+    """, (user_id,))
+    user = cursor.fetchone()
+    cursor.close()
+    return user
+
+def email_in_use(email, user_id):
+    # Check if another account already uses this email address
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  user.userId
+        FROM user                 
+        WHERE user.email = %s
+          AND user.userId <> %s
+    """, (email, user_id))
+    existing_user = cursor.fetchone()
+    cursor.close()
+    return existing_user is not None
+
+def update_user_details(user_id, firstname, surname, email):
+    # Save the changes for an artist/supporter account
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        UPDATE user
+        SET firstname = %s,
+            surname = %s,
+            email = %s
+        WHERE userId = %s
+          AND accountStatus <> 'Deleted'
+          AND userId NOT IN (SELECT administrator.userId FROM administrator)
+    """, (firstname, surname, email, user_id))
+    database.connection.commit()
+    cursor.close    
+
 def change_user_status(user_id, current_status, new_status):
     # Suspend or reactivate an artist/supporter account
     cursor = database.connection.cursor()
@@ -342,6 +395,47 @@ def soft_delete_user(user_id):
     updated_rows = cursor.rowcount
     cursor.close()
     return updated_rows    
+
+def get_reports():
+    # Display all reports for the reported content table
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  report.reportId,
+                report.reportedContent,
+                report.reason,
+                CONCAT(user.firstname, ' ', user.surname) AS reporterName,
+                CASE
+                    WHEN administrator.userId IS NOT NULL THEN 'Administrator'
+                    WHEN artist.userId IS NOT NULL THEN 'Artist'
+                    WHEN supporter.userId IS NOT NULL THEN 'Supporter'
+                    ELSE 'Unknown'
+                END AS reporterRole,
+                report.submittedDate,
+                report.status
+        FROM report
+        JOIN user ON user.userId = report.reporterId
+        LEFT JOIN administrator ON administrator.userId = report.reporterId
+        LEFT JOIN artist ON artist.userId = report.reporterId
+        LEFT JOIN supporter ON supporter.userId = report.reporterId
+        ORDER BY report.submittedDate DESC
+    """)
+    reports = cursor.fetchall()
+    cursor.close()
+    return reports
+
+def review_report(report_id, new_status):
+    # Admin reviews a pending report and resolves or dismisses it
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        UPDATE report
+        SET status = %s
+        WHERE reportId = %s
+          AND status = 'Pending'
+    """, (new_status, report_id)) 
+    database.connection.commit()
+    updated_rows = cursor.rowcount
+    cursor.close()
+    return updated_rows
 
 def get_featured_projects():
     # Get projects that are currently in featured section

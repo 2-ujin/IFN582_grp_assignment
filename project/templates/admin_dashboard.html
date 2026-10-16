@@ -284,6 +284,63 @@
           </div>
         </section>
 
+        <!-- Reported Content -->
+        <section id="reported-content" class="admin-panel mb-4" aria-labelledby="reported-content-heading">
+          <div class="admin-panel-heading">
+            <h2 id="reported-content-heading">Reported Content</h2>
+
+            <div class="admin-heading-actions">
+              <span class="admin-count-badge">{{ report_stats.pendingReports }} Pending</span>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table admin-table align-middle">
+              <caption class="visually-hidden">Reported content records</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Reported content</th>
+                  <th scope="col">Report reason</th>
+                  <th scope="col">Reporter name</th>
+                  <th scope="col">Reporter role</th>
+                  <th scope="col">Submission date</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for report in reports %}
+                  <tr>
+                    <th scope="row">{{ report.reportedContent }}</th>
+                    <td>{{ report.reason }}</td>
+                    <td>{{ report.reporterName }}</td>
+                    <td>{{ report.reporterRole }}</td>
+                    <td>{{ report.submittedDate.strftime('%d %B %Y') }}</td>
+                    <td><span class="table-status status-{{ report.status|lower }}">{{ report.status }}</span></td>
+                    <td>
+                      {% if report.status == 'Pending' %}
+                        <div class="d-flex flex-wrap gap-1">
+                          <form method="post" action="{{ url_for('main.resolve_report', report_id = report.reportId) }}">
+                            {{ form.csrf_token}}
+                            <button type="submit" class="btn btn-sm btn-outline-success">Resolve</button> 
+                          </form>
+                          <form method="post" action="{{ url_for('main.dismiss_report', report_id = report.reportId) }}">
+                            {{ form.csrf_token}}
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">Dismiss</button> 
+                          </form>                          
+                        </div>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td colspan="7">There are no reports yet.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
         <!-- Featured Projects -->
         <div class="row g-4">
