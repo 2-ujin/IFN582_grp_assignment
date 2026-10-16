@@ -25,15 +25,17 @@ def index():
 
 
 # ----- Part 5. Admin Dashboard -----
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request
 from .models import (get_campaign_stats, get_creator_count, get_supporter_count, get_report_stats,
                      get_pending_projects, review_project_approval,
                      get_reviewed_projects, change_project_status, soft_delete_project,
-                     get_users, change_user_status, soft_delete_user,
+                     get_users, change_user_status, soft_delete_user, 
+                     get_user, email_in_use, update_user_details,
+                     get_reports, review_report,
                      get_featured_projects, get_feature_candidates,
                      add_to_featured, remove_from_featured)
 
-from .forms import AdminActionForm, FeatureProjectForm
+from .forms import AdminActionForm, EditUserForm, FeatureProjectForm
 
 def create_feature_form():
     # Build a dopdown with the projects that can be featured
@@ -54,6 +56,7 @@ def admin_dashboard():
     pending_projects = get_pending_projects()
     reviewed_projects = get_reviewed_projects()
     users = get_users()
+    reports = get_reports()
     fetured_projects = get_featured_projects()
     form = AdminActionForm()
     feature_form = create_feature_form()
@@ -66,6 +69,7 @@ def admin_dashboard():
                            reviewed_projects = reviewed_projects,
                            featured_projects = fetured_projects,
                            users = users,
+                           reports = reports,
                            form = form,
                            feature_form = feature_form)
 
@@ -167,6 +171,56 @@ def delete_user(user_id):
            flash('The account has been deleted.', 'success') 
         else: 
             flash('This account could not be found or cannot be deleted.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Update user details
+@main.route('/admin/users/<int:user_id>/edit', methods=['GET', 'POST'])
+def edit_user(user_id):
+    user = get_user(user_id)
+    if user is None:
+        flash('This account could not be found.', 'warning')
+        return redirect(url_for('main.admin_dashboard'))
+
+    form = EditUserForm()
+    if form.validate_on_submit():
+        if email_in_use(form.email.data, user_id):
+            flash('This email address is already used by another account.', 'danger')
+        else:
+            update_user_details(user_id, form.firstname.data, form.surname.data, form.email.data)
+            flash('The account details have been updated.', 'success')
+            return redirect(url_for('main.admin_dashboard'))
+    
+    if request.method == 'GET':
+        form.firstname.data = user['firstname']
+        form.surname.data = user['surname']
+        form.email.data = user['email']
+
+    return render_template('admin_edit_user.html', form=form, user=user)
+
+# Change report status from 'Pending' to 'Dismissed'
+@main.route('/admin/reports/<int:report_id>/dismiss', methods = ['POST'])
+def dismiss_report(report_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if review_report(report_id, 'Dismissed') == 1:
+            flash('The report has been dismissed.', 'success') 
+        else: 
+            flash('This report could not be found or has already been reviewed.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Change report status from 'Pending' to 'Resolved'
+@main.route('/admin/reports/<int:report_id>/resolve', methods = ['POST'])
+def resolve_report(report_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if review_report(report_id, 'Resolved') == 1:
+            flash('The report has been resolved.', 'success') 
+        else: 
+            flash('This report could not be found or has already been reviewed.', 'warning')
     else:
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
