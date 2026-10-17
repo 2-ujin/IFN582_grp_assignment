@@ -1,4 +1,4 @@
-"""Validated forms used by the Part 2 authentication pages."""
+#Validated forms used by the Part 2 authentication pages
 
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, SelectField, StringField, SubmitField
@@ -17,6 +17,7 @@ class LoginForm(FlaskForm):
     # The browser can help with input, but server-side validation is authoritative
     email = StringField(
         "Email address",
+        filters=[lambda value: value.strip() if value else value],
         validators=[
             DataRequired(message="Enter the email address for your account."),
             Email(message="Enter a valid email address."),
@@ -34,6 +35,7 @@ class RegisterForm(FlaskForm):
     # Registration fields mirror the personal details stored in user table
     firstname = StringField(
         "First name",
+        filters=[lambda value: value.strip() if value else value],
         validators=[
             DataRequired(message="Enter your first name."),
             Length(min=1, max=50, message="Use 1 to 50 characters."),
@@ -41,6 +43,7 @@ class RegisterForm(FlaskForm):
     )
     surname = StringField(
         "Surname",
+        filters=[lambda value: value.strip() if value else value],
         validators=[
             DataRequired(message="Enter your surname."),
             Length(min=1, max=50, message="Use 1 to 50 characters."),
@@ -48,6 +51,7 @@ class RegisterForm(FlaskForm):
     )
     email = StringField(
         "Email address",
+        filters=[lambda value: value.strip() if value else value],
         validators=[
             DataRequired(message="Enter your email address."),
             Email(message="Enter a valid email address."),
@@ -73,7 +77,7 @@ class RegisterForm(FlaskForm):
                 message="Use a password between 10 and 255 characters.",
             ),
             Regexp(
-                r"^[A-Za-z0-9]+$",
+                r"\A[A-Za-z0-9]+\Z",
                 message="Use only uppercase letters, lowercase letters, and numbers.",
             ),
         ],

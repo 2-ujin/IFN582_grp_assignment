@@ -1,15 +1,20 @@
-"""Application factory and shared Flask extensions for MakeArtsFund."""
+#Application factory and shared Flask extensions for MakeArtsFund
 
 from datetime import date
 import os
 import secrets
 
 from flask import Flask, render_template
-from flask_login import LoginManager
-import pymysql
-pymysql.install_as_MySQLdb()
+from flask_login import AnonymousUserMixin, LoginManager, current_user
+# Use mysqlclient from the supplied requirements on a clean installation.
+# Preserve compatibility with existing local environments using PyMySQL.
+try:
+    import MySQLdb
+except ModuleNotFoundError:
+    import pymysql
+    pymysql.install_as_MySQLdb()
 from flask_mysqldb import MySQL
-from flask_wtf.csrf import CSRFProtect
+from flask_wtf.csrf import CSRFError, CSRFProtect
 
 
 database = MySQL()
@@ -47,7 +52,7 @@ def create_app(test_config=None):
     app.debug = False
 
     database.init_app(app)
-    login_manager.init_app(app)
+    login_manager.init_app(app, add_context_processor=False)
     csrf.init_app(app)
 
     # Flask-Login sends anonymous users here when a protected route is opened.
@@ -64,7 +69,16 @@ def create_app(test_config=None):
     @app.context_processor
     def inject_current_year():
         # Makes the current year available to the shared footer in base.html.
-        return {"current_year": date.today().year}
+        # Keep the user lazy so the 500 handler can render without retrying a failed DB lookup.
+        return {"current_year": date.today().year, "current_user": current_user}
+
+    @app.errorhandler(CSRFError)
+    def invalid_form_token(_error):
+        return render_template(
+            "error.html", status_code=400,
+            page_title="Please reload the form",
+            page_message="The form session expired or its security token is missing. Reload the original page and submit again.",
+        ), 400
 
     # These handlers show a consistent branded page instead of a raw server page.
     @app.errorhandler(403)
@@ -96,6 +110,7 @@ def create_app(test_config=None):
         return (
             render_template(
                 "error.html",
+                current_user=AnonymousUserMixin(),  # Render even if loading the session user failed.
                 status_code=500,
                 page_title="Something went wrong",
                 page_message="Sorry, your request cannot be completed. Please try again shortly.",

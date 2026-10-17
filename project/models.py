@@ -15,6 +15,7 @@ class AccountStatus(Enum):
     ACTIVE = 'Active'
     SUSPENDED = 'Suspended'
     DEACTIVATED = 'Deactivated'
+    DELETED = 'Deleted'  # Part 5 soft-deletion value; never permits login.
 # Part 2- authentication model classes    
 @dataclass
 class User(UserMixin):
@@ -27,18 +28,23 @@ class User(UserMixin):
     role: ClassVar[str] = "User"
 #Part 2- Flask Login active account check
     @property
+    def status_value(self):
+        """Support loaded enum values and raw database status strings."""
+        return getattr(self.accountStatus, 'value', self.accountStatus)
+
+    @property
     def is_active(self):
         """Return the boolean Flask-Login uses before allowing a session."""
-        return self.accountStatus is AccountStatus.ACTIVE
+        return self.status_value == AccountStatus.ACTIVE.value
     @property
     def is_suspended(self):
         """Return True when the account is suspended."""
-        return self.accountStatus is AccountStatus.SUSPENDED
+        return self.status_value == AccountStatus.SUSPENDED.value
 
     @property
     def is_deactivated(self):
         """Return True when the account is deactivated."""
-        return self.accountStatus is AccountStatus.DEACTIVATED
+        return self.status_value in (AccountStatus.DEACTIVATED.value, AccountStatus.DELETED.value)
 
     
 #Part 2- pw hashing
