@@ -141,7 +141,10 @@
                             <div class="message-avatar">{{ (msg.donorName[:2] | upper) if msg.donorName else 'SP' }}</div>
                             <div>
                             <h3>{{ msg.donorName }}</h3>
-                            <div class="message-date">{{ msg.postedDate.strftime('%d %B %Y')|upper if msg.postedDate else '' }}</div>
+                            <div class="message-date">
+                                {{ msg.postedDate.strftime('%d %B %Y')|upper if msg.postedDate else '' }}
+                                <span class="badge bg-light text-dark ms-2">Donated ${{ "{:,.0f}".format(msg.amount) }}</span>
+                            </div>
                             <p>{{ msg.message }}</p>
                             </div>
                         </div>
@@ -179,7 +182,7 @@
 
                 <div class="mb-3">
                   <label class="form-label" for="supporter-email">Email</label>
-                  <input id="supporter-email" class="form-control" type="email" name="supporter-email" placeholder="abc@gamil.com" required
+                  <input id="supporter-email" class="form-control" type="email" name="supporter-email" placeholder="abc@gmail.com" required
                   value="{{ current_user.email if current_user.is_authenticated else '' }}">
                 </div>
 

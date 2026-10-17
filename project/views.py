@@ -270,7 +270,7 @@ def index():
             JOIN user u ON p.creatorId = u.userId
             JOIN category c ON p.categoryId = c.categoryId
             LEFT JOIN donation d ON p.projectId = d.projectId           
-            WHERE 1=1
+            WHERE p.approvalStatus = 'Approved'
         """
         params = []
         if search_query:
@@ -294,7 +294,7 @@ def index():
             JOIN user u ON p.creatorId = u.userId
             JOIN category c ON p.categoryId = c.categoryId
             LEFT JOIN donation d ON p.projectId = d.projectId           
-            WHERE p.featured = TRUE 
+            WHERE p.featured = TRUE AND p.approvalStatus = 'Approved'
             GROUP BY p.projectId
             ORDER BY p.projectId ASC           
             LIMIT 3
@@ -325,9 +325,17 @@ def index():
 def project_detail(project_id = 1):
 
     if request.method == 'POST':
+        # check log in, if not need log in first
+        if not current_user.is_authenticated:
+            flash("Please log in or register as a Supporter to make a donation.", "warning")
+            return redirect(url_for('main.login', next=url_for('main.project_detail', project_id=project_id)))
+        # check only supporter can donation
+        if getattr(current_user, 'role', None) != 'Supporter':
+            flash("Only registered Supporters can make donations.", "warning")
+            return redirect(url_for('main.project_detail', project_id=project_id))
+        
+        
         amount = request.form.get('pledge-amount')
-        donor_name = request.form.get('supporter-name', '').strip()
-        donor_email = request.form.get('supporter-email', '').strip()
         message_text = request.form.get('artist-message', '').strip()
         
         payment_method_raw = request.form.get('payment-method', 'card')
@@ -337,7 +345,8 @@ def project_detail(project_id = 1):
             'bank-transfer': 'BankTransfer'
         }
         payment_method = method_map.get(payment_method_raw, 'Card')
-        # check number>0
+        
+        # check donation number>0
         try:
             amount_num = float(amount)
             if amount_num <= 0:
@@ -348,28 +357,16 @@ def project_detail(project_id = 1):
 
         cursor = database.connection.cursor()
         try:
-            if current_user.is_authenticated:
-                supporter_id = current_user.id
-            else:
-                cursor.execute("SELECT userId FROM user WHERE email = %s", (donor_email,))
-                user_row = cursor.fetchone()
-                if user_row:
-                    supporter_id = user_row['userId'] if isinstance(user_row, dict) else user_row[0]
-                else:
-                    parts = donor_name.split(' ', 1)
-                    cursor.execute(
-                        "INSERT INTO user (firstname, surname, email, password) VALUES (%s, %s, %s, %s)",
-                        (parts[0], parts[1] if len(parts) > 1 else '', donor_email, generate_password_hash('supporter123'))
-                    )
-                    supporter_id = cursor.lastrowid
+            supporter_id = current_user.id
             
             cursor.execute("INSERT IGNORE INTO supporter (userId) VALUES (%s)", (supporter_id,))
             
             cursor.execute(
                 "INSERT INTO donation (projectId, supporterId, amount, donationDate, paymentMethod, paymentStatus) VALUES (%s, %s, %s, NOW(), %s, 'Received')",
-                (project_id, supporter_id, amount, payment_method)
+                (project_id, supporter_id, amount_num, payment_method)
             )
             donation_id = cursor.lastrowid
+            
 
             if message_text:
                 cursor.execute(
@@ -399,7 +396,7 @@ def project_detail(project_id = 1):
         JOIN user u ON p.creatorId = u.userId
         JOIN category c ON p.categoryId = c.categoryId
         LEFT JOIN donation d ON p.projectId = d.projectId           
-        WHERE p.projectId = %s
+        WHERE p.projectId = %s AND p.approvalStatus = 'Approved'
         GROUP BY p.projectId
                          
     """,(project_id,))
