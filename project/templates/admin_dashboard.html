@@ -327,7 +327,39 @@
               {% endif %}
             </section>
           </div>
-        </div>
+
+       <!-- Success Stories -->
+          <div class="col-lg-6">
+            <section id="success-stories-management" class="admin-panel h-100" aria-labelledby="success-heading">
+              <div class="admin-panel-heading">
+                <h2 id="success-heading">Success Stories</h2>
+                <div class="admin-heading-actions"><span class="admin-count-badge">{{ success_stories|length }} Published</span></div>
+              </div>
+
+              {% for project in success_stories %}
+                <div class="homepage-project-item">
+                  <div><strong>{{ project.projectName }}</strong><span>{{ project.creatorName }} · {{ project.categoryName }} · {{ project.location }}</span></div>
+                  <form method="post" action="{{ url_for('main.remove_success_story', project_id = project.projectId) }}">          
+                    {{ form.csrf_token}}
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button> 
+                  </form>      
+                </div>
+              {% else %}
+                <p>There are no success stories yet.</p>
+              {% endfor %}
+              
+              {% if success_story_form.project_id.choices %}
+                <form method="post" action="{{ url_for('main.add_success_story') }}">
+                  {{ success_story_form.csrf_token}}
+                  {{ success_story_form.project_id.label(class="visually-hidden") }}
+                  {{ success_story_form.project_id(class="form-select") }}
+                  <button type="submit" class="btn btn-coral w-100 mt-3">Add</button> 
+                </form>
+              {% else %}
+                <p>There are no completed projects available right now.</p> 
+              {% endif %}
+            </section>
+          </div>
 
       </div>
     </section>

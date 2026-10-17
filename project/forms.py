@@ -104,3 +104,7 @@ class EditUserForm(FlaskForm):
 # Dropdown for choosing a project to add to featured section
 class FeatureProjectForm(FlaskForm):
     project_id = SelectField('Select a project to feature', coerce=int)
+
+# Dropdown for choosing a completed project to show as a successful story
+class SuccessStoryForm(FlaskForm):
+    project_id = SelectField('Select a project for success stories', coerce=int)

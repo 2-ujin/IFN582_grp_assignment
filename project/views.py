@@ -23,11 +23,12 @@ from MySQLdb import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from . import database, login_manager
-from .forms import AdminActionForm, EditUserForm, FeatureProjectForm, LoginForm, RegisterForm
+from .forms import AdminActionForm, EditUserForm, FeatureProjectForm, LoginForm, RegisterForm, SuccessStoryForm
 from .models import (
     AccountStatus,
     User,
     add_to_featured,
+    add_to_success_stories,
     change_project_status,
     change_user_status,
     email_in_use,
@@ -39,10 +40,13 @@ from .models import (
     get_reports,
     get_report_stats,
     get_reviewed_projects,
+    get_success_stories,
+    get_success_story_candidates,
     get_supporter_count,
     get_user,
     get_users,
     remove_from_featured,
+    remove_from_success_stories,
     review_report,
     review_project_approval,
     soft_delete_project,
@@ -363,32 +367,47 @@ def create_feature_form():
     feature_form.project_id.choices = options
     return feature_form
 
+def create_success_story_form():
+    # Build a dropdown with the completed projects that can become success stories
+    success_story_form = SuccessStoryForm()
+    options = []
+    for project in get_success_story_candidates():
+        options.append((project['projectId'], project['projectName']))
+    success_story_form.project_id.choices = options
+    return success_story_form
+
 @main.route('/admin')
 @admin_required
 def admin_dashboard():
     campaign_stats = get_campaign_stats()
     creator_count = get_creator_count()
-    supporter_count = get_supporter_count()
-    report_stats = get_report_stats()
-    pending_projects = get_pending_projects()
-    reviewed_projects = get_reviewed_projects()
-    users = get_users()
-    reports = get_reports()
+    feature_form = create_feature_form()
     featured_projects = get_featured_projects()
     form = AdminActionForm()
-    feature_form = create_feature_form()
+    pending_projects = get_pending_projects()
+    report_stats = get_report_stats()
+    reports = get_reports()
+    reviewed_projects = get_reviewed_projects()
+    success_stories = get_success_stories()
+    success_story_form = create_success_story_form()
+    supporter_count = get_supporter_count()
+    users = get_users()
+    
     return render_template('admin_dashboard.html',
                            campaign_stats = campaign_stats,
                            creator_count = creator_count,
-                           supporter_count = supporter_count,
-                           report_stats = report_stats,
-                           pending_projects = pending_projects,
-                           reviewed_projects = reviewed_projects,
+                           feature_form = feature_form,
                            featured_projects = featured_projects,
-                           users = users,
-                           reports = reports,
                            form = form,
-                           feature_form = feature_form)
+                           pending_projects = pending_projects,
+                           report_stats = report_stats,
+                           reports = reports,
+                           reviewed_projects = reviewed_projects,
+                           success_stories = success_stories,
+                           success_story_form = success_story_form,
+                           supporter_count = supporter_count,
+                           users = users
+                           )
 
 @main.route('/admin/projects/<int:project_id>/approve', methods = ['POST'])
 @admin_required
@@ -562,7 +581,7 @@ def add_featured_project():
         if add_to_featured(feature_form.project_id.data) == 1:
             flash('This project has been added to the Featured section.', 'success')
         else:
-            flash('This project cannot be featured.', 'warning')
+            flash('This project cannot be added to the Featured section.', 'warning')
     else:
         flash('Please choose a valid project to feature.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
@@ -581,4 +600,30 @@ def remove_featured_project(project_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))        
 
-    
+# Add success stories
+@main.route('/admin/success-stories/add', methods=['POST'])
+@admin_required
+def add_success_story():
+    success_story_form = create_success_story_form()
+    if success_story_form.validate_on_submit():
+        if add_to_success_stories(success_story_form.project_id.data) == 1:
+            flash('This project has been added to the Success Stories section.', 'success')
+        else:
+            flash('This project cannot be added to the Success Stories.', 'warning')
+    else:
+        flash('Please choose a valid project.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Remove from success stories section
+@main.route('/admin/success-stories/<int:project_id>/remove', methods=['POST'])
+@admin_required
+def remove_success_story(project_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if remove_from_success_stories(project_id) == 1:
+            flash('This project has been removed from the Success Stories section.', 'success')
+        else:
+            flash('This project is not in the Success Stories section.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))       

@@ -527,7 +527,7 @@ def review_report(report_id, new_status):
     return updated_rows
 
 def get_featured_projects():
-    # Get projects that are currently in featured section
+    # Projects currently shown in featured section
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT  project.projectId,
@@ -593,4 +593,70 @@ def remove_from_featured(project_id):
     cursor.close()
     return updated_rows
 
+def get_success_stories():
+    # Projects currently shown in success stories section
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  project.projectId,
+                project.projectName,
+                CONCAT(user.firstname, ' ', user.surname) AS creatorName,
+                category.categoryName,
+                project.location
+        FROM project
+        JOIN user ON user.userId = project.creatorId
+        JOIN category ON category.categoryId = project.categoryId
+        WHERE project.successStoryFeatured = TRUE
+        ORDER BY project.projectName ASC
+    """)
+
+    success_stories = cursor.fetchall()
+    cursor.close()
+    return success_stories
+
+def get_success_story_candidates():
+    # Get projects that can be added to success stories section
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        SELECT  project.projectId,
+                project.projectName
+        FROM project
+        WHERE project.approvalStatus = 'Approved'
+        AND project.projectStatus = 'Completed'
+        AND project.successStoryFeatured = FALSE
+        ORDER BY project.projectName ASC
+    """)
+
+    success_story_candidates = cursor.fetchall()
+    cursor.close()
+    return success_story_candidates
+
+def add_to_success_stories(project_id):
+    # Show a project in success stories section
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        UPDATE project
+        SET successStoryFeatured = TRUE   
+        WHERE projectId = %s
+          And approvalStatus = 'Approved'
+          And projectStatus = 'Completed'
+          AND successStoryFeatured = FALSE
+    """, (project_id,)) 
+    database.connection.commit()
+    updated_rows = cursor.rowcount
+    cursor.close()
+    return updated_rows
+
+def remove_from_success_stories(project_id):
+    # Take a project out from success stories section
+    cursor = database.connection.cursor()
+    cursor.execute("""
+        UPDATE project
+        SET successStoryFeatured = FALSE   
+        WHERE projectId = %s
+          AND successStoryFeatured = TRUE
+    """, (project_id,)) 
+    database.connection.commit()
+    updated_rows = cursor.rowcount
+    cursor.close()
+    return updated_rows
 
