@@ -210,19 +210,19 @@
                           {% if user.accountStatus == 'Active' %}
                             <form method="post" action="{{ url_for('main.suspend_user', user_id = user.userId) }}">
                               {{ form.csrf_token}}
-                              <button type="submit" class="btn btn-sm btn-outline-danger" style="min-width: 6rem;">Suspend</button>
+                              <button type="submit" class="btn btn-sm btn-outline-danger">Suspend</button>
                             </form>
                           {% elif user.accountStatus == 'Suspended' %}
                             <form method="post" action="{{ url_for('main.reactivate_user', user_id = user.userId) }}">
                               {{ form.csrf_token}}
-                              <button type="submit" class="btn btn-sm btn-outline-coral" style="min-width: 6rem;">Reactivate</button>
+                              <button type="submit" class="btn btn-sm btn-outline-coral">Reactivate</button>
                             </form>
                           {% endif %}
                           <form method="post" action="{{ url_for('main.delete_user', user_id = user.userId) }}">
                             {{ form.csrf_token}}
-                            <button type="submit" class="btn btn-sm btn-outline-danger" style="min-width: 6rem;">Delete</button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                           </form>                          
-                           {# TODO: Edit button #}
+                          <a href="{{ url_for('main.edit_user', user_id=user.userId )}}" class="btn btn-sm btn-outline-secondary">Edit</a>
                         </div>  
                       {% endif %}
                     </td>
@@ -272,7 +272,7 @@
                     <td><span class="table-status status-{{ report.status|lower }}">{{ report.status }}</span></td>
                     <td>
                       {% if report.status == 'Pending' %}
-                        <div class="d-flex flex-wrap gap-1">
+                        <div class="d-flex gap-1">
                           <form method="post" action="{{ url_for('main.resolve_report', report_id = report.reportId) }}">
                             {{ form.csrf_token}}
                             <button type="submit" class="btn btn-sm btn-outline-success">Resolve</button> 
