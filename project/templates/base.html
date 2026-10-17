@@ -18,7 +18,7 @@
 
   {# Child pages can hide site links here while keeping the shared logo and language. #}
   <header>
-    <nav class="navbar site-navbar" aria-label="Primary navigation">
+    <nav class="navbar site-navbar{% if current_user.is_authenticated and current_user.role == 'Administrator' %} admin-navbar{% endif %}" aria-label="Primary navigation">
       <div class="container header-inner">
         <a class="navbar-brand brand-mark" href="{{ request.script_root }}/" aria-label="MakeArtsFund home">Make<span>Arts</span>Fund</a>
 
@@ -32,9 +32,15 @@
             </form>
 
             <ul class="navbar-nav align-items-lg-center header-actions">
+              {% if not (current_user.is_authenticated and current_user.role == 'Administrator') %}
               <li class="nav-item"><a class="nav-link" href="{{ request.script_root }}/#featured-projects">Explore Projects</a></li>
               <li class="nav-item"><a class="nav-link" href="{{ request.script_root }}/#how-it-works">How It Works</a></li>
-              {% block role_navigation %}{% endblock %}
+              {% endif %}
+              {% block role_navigation %}
+                {% if current_user.is_authenticated and current_user.role == 'Fundraiser' %}
+                  <li class="nav-item"><a class="nav-link" href="{{ url_for('management.management') }}">Campaign Management</a></li>
+                {% endif %}
+              {% endblock %}
               {% if current_user is defined and current_user.is_authenticated %}
                 {% if current_user.role == 'Administrator' %}
                   <li class="nav-item"><a class="nav-link" href="{{ url_for('main.admin_dashboard') }}">Admin Dashboard</a></li>
@@ -91,7 +97,7 @@
     {% block content %}{% endblock %}
   </main>
 
-  {# Shared footer follows the four links used in the Assessment 1 design. #}
+  {# Shared footer matches the Assessment 1 labels and placeholder destinations. #}
   <footer class="site-footer">
     <div class="container">
       <nav class="footer-links-only" aria-label="Footer navigation">
