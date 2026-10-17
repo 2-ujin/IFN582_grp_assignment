@@ -1181,3 +1181,63 @@ section[aria-labelledby="project-information-heading"] .btn:hover {
   font-weight: 600 !important;
   box-shadow: 0 4px 12px rgba(224, 90, 71, 0.15) !important;
 }
+
+/* Part 2: contain long account text and let shared navigation wrap on phones. */
+.header-navigation, .header-main, .auth-card { min-width: 0; }
+.header-actions { flex-wrap: wrap; }
+.account-context, .credential-table code, .field-error { overflow-wrap: anywhere; }
+@media (max-width: 575.98px) {
+  .header-inner { flex-wrap: wrap; }
+  .header-navigation { width: 100%; }
+  .search-form { min-width: 0; max-width: 100%; }
+  .search-form input { min-width: 0; }
+}
+
+/* Administrator account controls align beside English on desktop.
+   Mobile keeps the existing wrapping layout. */
+@media (min-width: 992px) {
+  .admin-navbar .header-inner {
+    flex-wrap: nowrap;
+    gap: 1rem;
+  }
+
+  .admin-navbar .header-navigation {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .admin-navbar .header-main {
+    width: 100%;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .admin-navbar .search-form {
+    flex: 0 1 310px;
+    min-width: 0;
+    margin: 0;
+  }
+
+  /* Auto margin takes up the space between search and account controls. */
+  .admin-navbar .header-actions {
+    margin-left: auto;
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .admin-navbar .nav-link,
+  .admin-navbar .sign-in-button {
+    white-space: nowrap;
+  }
+
+  .admin-navbar .account-context {
+    text-align: right;
+  }
+
+  .admin-navbar .language-option {
+    flex: 0 0 auto;
+  }
+}
