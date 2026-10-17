@@ -70,7 +70,12 @@
           <div class="section-heading mb-0">
             <h2>Featured Projects</h2>
           </div>
-          <a class="btn btn-outline-coral" href="#featured-projects">Discover More</a>
+            <!-- discover more button -->
+            {% if request.args.get('all') %}
+                <a class="btn btn-outline-coral" href="{{ url_for('main.index') }}#featured-projects">Show Featured</a>
+            {% else %}
+                <a class="btn btn-outline-coral" href="{{ url_for('main.index', all='true') }}#featured-projects">Discover More</a>
+            {% endif %}
         </div>
 
         <div class="row g-4 mt-2">

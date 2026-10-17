@@ -272,7 +272,7 @@ def index():
     cursor = database.connection.cursor()
 
 
-    if search_query or category_filter:
+    if search_query or category_filter or request.args.get('all'):
         query = """
             SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
                    c.categoryName,
