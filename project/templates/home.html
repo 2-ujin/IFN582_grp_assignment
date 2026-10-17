@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-        
+   
 
     <!-- Hero section -->
     <section class="hero-section">
@@ -20,12 +20,12 @@
     <section id="categories" class="category-strip section-padding-sm bg-white" aria-label="Creative project categories">
       <div class="container">
         <div class="category-grid">
-          <a href="#featured-projects" class="category-item"><span aria-hidden="true">✦</span>Visual Arts</a>
-          <a href="#featured-projects" class="category-item"><span aria-hidden="true">◇</span>Handicrafts</a>
-          <a href="#featured-projects" class="category-item"><span aria-hidden="true">△</span>3D Printing</a>
-          <a href="#featured-projects" class="category-item"><span aria-hidden="true">◉</span>Photography</a>
-          <a href="#featured-projects" class="category-item"><span aria-hidden="true">♫</span>Music</a>
-          <a href="#featured-projects" class="category-item"><span aria-hidden="true">✧</span>Film &amp; Performance</a>
+          <a href="{{ url_for('main.index', category='Visual Arts') }}#featured-projects" class="category-item {{ 'active' if request.args.get('category') == 'Visual Arts' else '' }}"><span aria-hidden="true">✦</span>Visual Arts</a>
+          <a href="{{ url_for('main.index', category='Handicrafts') }}#featured-projects" class="category-item {{ 'active' if request.args.get('category') == 'Handicrafts' else '' }}"><span aria-hidden="true">◇</span>Handicrafts</a>
+          <a href="{{ url_for('main.index', category='3D Printing') }}#featured-projects" class="category-item {{ 'active' if request.args.get('category') == '3D Printing' else '' }}"><span aria-hidden="true">△</span>3D Printing</a>
+          <a href="{{ url_for('main.index', category='Photography') }}#featured-projects" class="category-item {{ 'active' if request.args.get('category') == 'Photography' else '' }}"><span aria-hidden="true">◉</span>Photography</a>
+          <a href="{{ url_for('main.index', category='Music') }}#featured-projects" class="category-item {{ 'active' if request.args.get('category') == 'Music' else '' }}"><span aria-hidden="true">♫</span>Music</a>
+          <a href="{{ url_for('main.index', category='Film & Performance') }}#featured-projects" class="category-item {{ 'active' if request.args.get('category') == 'Film & Performance' else '' }}"><span aria-hidden="true">✧</span>Film &amp; Performance</a>
         </div>
       </div>
     </section>
@@ -74,7 +74,7 @@
         </div>
 
         <div class="row g-4 mt-2">
-            {% for project in projects %}
+        {% for project in projects %}
           <div class="col-md-6 col-lg-4">
             <a class="project-link" href="{{ url_for('main.project_detail', project_id=project['projectId']) }}">
               <article class="project-card h-100">
@@ -85,12 +85,16 @@
                   <p class="project-meta">{{ project['categoryName'] }} <span>•</span> {{ project['location'] }}</p>
                   <div class="progress-label"><span>${{ "{:,.0f}".format(project['totalRaised']) }} raised</span><span>{{ project['progressPercentage'] | int }}%</span></div>
                   <div class="progress" role="progressbar" aria-label="{{ project['projectName'] }} funding progress"aria-valuenow="{{ project['progressPercentage'] | int }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:{{ [project['progressPercentage'] | int, 100] | min }}%"></div></div>
-                  <div class="card-footer-info"><span>Goal: ${{ project['goal'] }}</span><strong>{{ project['daysRemaining'] }} days remaining</strong></div>
+                  <div class="card-footer-info"><span>Goal: ${{ "{:,.0f}".format(project['goal']) if project['goal'] else 0 }}</span><strong>{{ project['daysRemaining'] }} days remaining</strong></div>
                 </div>
               </article>
             </a>
           </div>
-          {% endfor %}
+        {% else %}
+          <div class="col-12 text-center py-5">
+              <p class="text-muted fs-5">No projects found matching your search.</p>
+          </div>  
+        {% endfor %}
         </div>  
       </div>   
     </section>
