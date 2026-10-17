@@ -2041,14 +2041,6 @@ body {
   transform: translateY(-4px);
 }
 
-.admin-panel th {
-  white-space: nowrap;
-}
-
-.admin-panel td .btn {
-  width: 7rem;
-}
-
 .dashboard-panel,
 .admin-panel {
   padding: 2rem;
@@ -2217,7 +2209,6 @@ body {
 }
 
 .status-active,
-.status-approved,
 .status-received,
 .status-resolved {
   color: #27623e;

@@ -773,6 +773,7 @@ h1 {
 }
 
 .status-active,
+.status-approved,
 .status-received {
   color: #27623e;
   background: #e7f4ec;
@@ -823,20 +824,31 @@ h1 {
   font-size: 0.8rem;
 }
 
-.dashboard-panel {
+.admin-panel th {
+  white-space: nowrap;
+}
+
+.admin-panel td .btn {
+  width: 7rem;
+}
+
+.dashboard-panel
+.admin-panel {
   padding: 2rem;
   background: var(--white);
   border: 1px solid var(--line);
   border-radius: 18px;
 }
 
-.dashboard-panel h2 {
+.dashboard-panel h2
+.admin-panel-heading h2 {
   margin-bottom: 0;
   font-family: "Playfair Display", Georgia, serif;
   font-size: 1.8rem;
 }
 
-.panel-heading-row {
+.panel-heading-row
+.admin-panel-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
