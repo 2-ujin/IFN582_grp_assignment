@@ -23,23 +23,35 @@ from MySQLdb import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from . import database, login_manager
-from .forms import AdminActionForm, FeatureProjectForm, LoginForm, RegisterForm
+from .forms import AdminActionForm, EditUserForm, FeatureProjectForm, LoginForm, RegisterForm, SuccessStoryForm
 from .models import (
     AccountStatus,
     User,
     add_to_featured,
+    add_to_success_stories,
     change_project_status,
+    change_user_status,
+    email_in_use,
     get_campaign_stats,
     get_creator_count,
     get_feature_candidates,
     get_featured_projects,
     get_pending_projects,
+    get_reports,
     get_report_stats,
     get_reviewed_projects,
+    get_success_stories,
+    get_success_story_candidates,
     get_supporter_count,
+    get_user,
+    get_users,
     remove_from_featured,
+    remove_from_success_stories,
+    review_report,
     review_project_approval,
     soft_delete_project,
+    soft_delete_user,
+    update_user_details,
 )
 
 # Main routes use extensions initialized by the shared app factory.
@@ -250,6 +262,7 @@ def database_check():
     return str(projects)
 
 
+
 @main.route('/')
 
 def index():
@@ -441,10 +454,11 @@ def project_detail(project_id = 1):
         supporter_count=supporter_count
     )  
 
+
 # ----- Part 5. Admin Dashboard -----
 
 def create_feature_form():
-    # Build a dopdown with the projects that can be featured
+    # Build a dropdown with the projects that can be featured
     feature_form = FeatureProjectForm()
     options = []
     for project in get_feature_candidates():
@@ -452,28 +466,47 @@ def create_feature_form():
     feature_form.project_id.choices = options
     return feature_form
 
+def create_success_story_form():
+    # Build a dropdown with the completed projects that can become success stories
+    success_story_form = SuccessStoryForm()
+    options = []
+    for project in get_success_story_candidates():
+        options.append((project['projectId'], project['projectName']))
+    success_story_form.project_id.choices = options
+    return success_story_form
+
 @main.route('/admin')
 @admin_required
 def admin_dashboard():
     campaign_stats = get_campaign_stats()
     creator_count = get_creator_count()
-    supporter_count = get_supporter_count()
-    report_stats = get_report_stats()
-    pending_projects = get_pending_projects()
-    reviewed_projects = get_reviewed_projects()
-    fetured_projects = get_featured_projects()
-    form = AdminActionForm()
     feature_form = create_feature_form()
+    featured_projects = get_featured_projects()
+    form = AdminActionForm()
+    pending_projects = get_pending_projects()
+    report_stats = get_report_stats()
+    reports = get_reports()
+    reviewed_projects = get_reviewed_projects()
+    success_stories = get_success_stories()
+    success_story_form = create_success_story_form()
+    supporter_count = get_supporter_count()
+    users = get_users()
+    
     return render_template('admin_dashboard.html',
                            campaign_stats = campaign_stats,
                            creator_count = creator_count,
-                           supporter_count = supporter_count,
-                           report_stats = report_stats,
-                           pending_projects = pending_projects,
-                           reviewed_projects = reviewed_projects,
-                           featured_projects = fetured_projects,
+                           feature_form = feature_form,
+                           featured_projects = featured_projects,
                            form = form,
-                           feature_form = feature_form)
+                           pending_projects = pending_projects,
+                           report_stats = report_stats,
+                           reports = reports,
+                           reviewed_projects = reviewed_projects,
+                           success_stories = success_stories,
+                           success_story_form = success_story_form,
+                           supporter_count = supporter_count,
+                           users = users
+                           )
 
 @main.route('/admin/projects/<int:project_id>/approve', methods = ['POST'])
 @admin_required
@@ -543,6 +576,101 @@ def delete_project(project_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
 
+# Change user account from 'Active' to 'Suspend'
+@main.route('/admin/users/<int:user_id>/suspend', methods = ['POST'])
+@admin_required
+def suspend_user(user_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if change_user_status(user_id, 'Active', 'Suspended') == 1:
+           flash('The account has been suspended.', 'success') 
+        else: 
+            flash('This account could not be suspended.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Change user account from 'Suspend' to 'Active'
+@main.route('/admin/users/<int:user_id>/reactivate', methods = ['POST'])
+@admin_required
+def reactivate_user(user_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if change_user_status(user_id, 'Suspended', 'Active') == 1:
+           flash('The account has been reactivated.', 'success') 
+        else: 
+            flash('This account could not be reactivated.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Soft delete user accounts from admin dashboard
+@main.route('/admin/users/<int:user_id>/delete', methods = ['POST'])
+@admin_required
+def delete_user(user_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if soft_delete_user(user_id) == 1:
+           flash('The account has been deleted.', 'success') 
+        else: 
+            flash('This account could not be found or cannot be deleted.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Update user details
+@main.route('/admin/users/<int:user_id>/edit', methods=['GET', 'POST'])
+@admin_required
+def edit_user(user_id):
+    user = get_user(user_id)
+    if user is None:
+        flash('This account could not be found.', 'warning')
+        return redirect(url_for('main.admin_dashboard'))
+
+    form = EditUserForm()
+    if form.validate_on_submit():
+        if email_in_use(form.email.data, user_id):
+            flash('This email address is already used by another account.', 'danger')
+        else:
+            update_user_details(user_id, form.firstname.data, form.surname.data, form.email.data)
+            flash('The account details have been updated.', 'success')
+            return redirect(url_for('main.admin_dashboard'))
+    
+    if request.method == 'GET':
+        form.firstname.data = user['firstname']
+        form.surname.data = user['surname']
+        form.email.data = user['email']
+
+    return render_template('admin_edit_user.html', form=form, user=user)
+
+# Change report status from 'Pending' to 'Dismissed'
+@main.route('/admin/reports/<int:report_id>/dismiss', methods = ['POST'])
+@admin_required
+def dismiss_report(report_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if review_report(report_id, 'Dismissed') == 1:
+            flash('The report has been dismissed.', 'success') 
+        else: 
+            flash('This report could not be found or has already been reviewed.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Change report status from 'Pending' to 'Resolved'
+@main.route('/admin/reports/<int:report_id>/resolve', methods = ['POST'])
+@admin_required
+def resolve_report(report_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if review_report(report_id, 'Resolved') == 1:
+            flash('The report has been resolved.', 'success') 
+        else: 
+            flash('This report could not be found or has already been reviewed.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
 # Add featured projects
 @main.route('/admin/featured/add', methods=['POST'])
 @admin_required
@@ -552,7 +680,7 @@ def add_featured_project():
         if add_to_featured(feature_form.project_id.data) == 1:
             flash('This project has been added to the Featured section.', 'success')
         else:
-            flash('This project cannot be featured.', 'warning')
+            flash('This project cannot be added to the Featured section.', 'warning')
     else:
         flash('Please choose a valid project to feature.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
@@ -571,4 +699,30 @@ def remove_featured_project(project_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))        
 
-    
+# Add success stories
+@main.route('/admin/success-stories/add', methods=['POST'])
+@admin_required
+def add_success_story():
+    success_story_form = create_success_story_form()
+    if success_story_form.validate_on_submit():
+        if add_to_success_stories(success_story_form.project_id.data) == 1:
+            flash('This project has been added to the Success Stories section.', 'success')
+        else:
+            flash('This project cannot be added to the Success Stories.', 'warning')
+    else:
+        flash('Please choose a valid project.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Remove from success stories section
+@main.route('/admin/success-stories/<int:project_id>/remove', methods=['POST'])
+@admin_required
+def remove_success_story(project_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if remove_from_success_stories(project_id) == 1:
+            flash('This project has been removed from the Success Stories section.', 'success')
+        else:
+            flash('This project is not in the Success Stories section.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))       

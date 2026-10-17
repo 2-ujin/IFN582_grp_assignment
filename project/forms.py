@@ -6,6 +6,7 @@ from wtforms.validators import (
     DataRequired,
     Email,
     EqualTo,
+    InputRequired,
     Length,
     Regexp,
 )
@@ -88,9 +89,22 @@ class RegisterForm(FlaskForm):
 
 
 # ----- Part 5. Admin Dashboard -----
+
 # Empty form used by admin for action such as approve, delete, etc.
 class AdminActionForm(FlaskForm):
     pass
+
+# Form for admin to edit user details
+class EditUserForm(FlaskForm):
+    firstname = StringField("First name", validators=[InputRequired()])
+    surname = StringField("Surname", validators=[InputRequired()])
+    email = StringField("Email address", validators=[InputRequired(), Regexp('^..*@..*[.]..*$')])
+    submit = SubmitField("Save changes")
+
 # Dropdown for choosing a project to add to featured section
 class FeatureProjectForm(FlaskForm):
     project_id = SelectField('Select a project to feature', coerce=int)
+
+# Dropdown for choosing a completed project to show as a successful story
+class SuccessStoryForm(FlaskForm):
+    project_id = SelectField('Select a project for success stories', coerce=int)
