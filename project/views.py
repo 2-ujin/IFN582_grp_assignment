@@ -1,4 +1,4 @@
-"""Application routes for authentication, fundraising pages, and administration."""
+#Application routes for authentication, fundraising pages, and administration
 
 from functools import wraps
 from urllib.parse import urlsplit
@@ -58,16 +58,16 @@ from .models import (
 main = Blueprint("main", __name__)
 
 
-# ----- Part 2: Authentication and shared access control -----
+# Part 2: Authentication and shared access control
 
 @login_manager.user_loader
 def load_user(user_id):
-    """Reload the account on each request so role and status changes take effect."""
+    #Reload account on each request so role and status changes take effect
     return User.get_by_id(user_id)
 
 
 def _safe_local_url(target):
-    """Only allow same-site redirects after successful authentication."""
+    #Only allow same-site redirects after successful authentication
     if not target:
         return False
     parsed = urlsplit(target)
@@ -82,14 +82,14 @@ def _safe_local_url(target):
 
 
 def _role_required(required_role):
-    """Require authentication and the single role assigned to the account."""
+    #Require authentication & single role assigned to the account
 
     def decorator(view_function):
         @wraps(view_function)
         @login_required
         def wrapped_view(*args, **kwargs):
-            # Treat a missing role as unauthorized instead of raising an error.
-            if getattr(current_user, "role", None) != required_role:
+            # Treat a missing role as unauthorized instead of raising an error
+            if not current_user.is_active or getattr(current_user, "role", None) != required_role:
                 abort(403)
             return view_function(*args, **kwargs)
 
@@ -105,7 +105,7 @@ supporter_required = _role_required("Supporter")
 
 @main.before_app_request
 def end_inactive_sessions():
-    """End an existing session if the account was suspended or deactivated."""
+    #End existing session if the account was suspended or deactivated
     if current_user.is_authenticated and not current_user.is_active:
         # Flask-Login reloads the user's current status before this hook runs.
         was_suspended = current_user.is_suspended
@@ -122,21 +122,21 @@ def end_inactive_sessions():
             )
 
 
-# These six assessment credentials are displayed on the login page. Their
-# matching password hashes are assigned to the same email addresses in database.sql.
+# Assessment passwords verified against the unchanged database.sql hashes.
+# Their numbers follow SQL user-row order, not the order of this display table.
 TEST_LOGIN_ACCOUNTS = (
-    {"role": "Fundraiser", "email": "queenie.work@gmail.com", "password": "artistone"},
-    {"role": "Fundraiser", "email": "marcokhc22@gmail.com", "password": "artisttwo"},
-    {"role": "Supporter", "email": "m.brant@gmail.com", "password": "supporterone"},
-    {"role": "Supporter", "email": "ebao@hotmail.com", "password": "supportertwo"},
-    {"role": "Administrator", "email": "admin2@makeartsfund.com", "password": "adminone"},
-    {"role": "Administrator", "email": "admin23@makeartsfund.com", "password": "admintwo"},
+    {"role": "Fundraiser", "email": "queenie.work@gmail.com", "password": "Password1"},
+    {"role": "Fundraiser", "email": "marcokhc22@gmail.com", "password": "Password3"},
+    {"role": "Supporter", "email": "m.brant@gmail.com", "password": "Password2"},
+    {"role": "Supporter", "email": "ebao@hotmail.com", "password": "Password7"},
+    {"role": "Administrator", "email": "admin2@makeartsfund.com", "password": "Password9"},
+    {"role": "Administrator", "email": "admin23@makeartsfund.com", "password": "Password10"},
 )
 
 
 @main.route("/login", methods=["GET", "POST"])
 def login():
-    """Authenticate with email/password and reject inactive account statuses."""
+    #Authenticate with email/password & reject inactive account statuses
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
 
@@ -177,7 +177,7 @@ def login():
 
 @main.route("/register", methods=["GET", "POST"])
 def register():
-    """Create one shared user row and exactly one selected role row."""
+    #Create one shared user row & exactly one selected role row
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
 
@@ -241,10 +241,11 @@ def register():
 @main.route("/logout", methods=["POST"])
 @login_required
 def logout():
-    """End the current session; POST plus CSRF protects the action."""
+    #End the current session; POST plus CSRF protects the action
     logout_user()
     flash("You have signed out.", "info")
     return redirect(url_for("main.index"))
+
 
 
 # ----- Part 3. Home page -----
