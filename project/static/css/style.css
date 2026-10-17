@@ -544,6 +544,14 @@ body {
   .footer-links-only {
     gap: 1rem 1.25rem;
   }
+
+  .category-item.active {
+    border-color: #e05a47;
+    background-color: #fff4f2;
+    color: #e05a47;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(224, 90, 71, 0.15);
+    }
 }
 
 
