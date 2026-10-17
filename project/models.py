@@ -30,6 +30,17 @@ class User(UserMixin):
     def is_active(self):
         """Return the boolean Flask-Login uses before allowing a session."""
         return self.accountStatus is AccountStatus.ACTIVE
+    @property
+    def is_suspended(self):
+        """Return True when the account is suspended."""
+        return self.accountStatus is AccountStatus.SUSPENDED
+
+    @property
+    def is_deactivated(self):
+        """Return True when the account is deactivated."""
+        return self.accountStatus is AccountStatus.DEACTIVATED
+
+    
 #Part 2- pw hashing
     def set_password(self, raw_password: str):
         """Store a Werkzeug password hash rather than a plain-text password."""

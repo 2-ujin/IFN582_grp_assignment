@@ -36,11 +36,14 @@ def create_app(test_config=None):
         WTF_CSRF_TIME_LIMIT=3600,
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
+        MAX_CONTENT_LENGTH=5* 1024 *1024,
     )
     if test_config:
         # A caller can override settings before extensions are initialised.
         app.config.update(test_config)
 
+    
+    # Debug mode is off so detailed error pages are never shown to users
     app.debug = False
 
     database.init_app(app)
@@ -53,8 +56,10 @@ def create_app(test_config=None):
     login_manager.login_message_category = "info"
 
     from .views import main
+    from .management import management_bp
 
     app.register_blueprint(main)
+    app.register_blueprint(management_bp)
 
     @app.context_processor
     def inject_current_year():
