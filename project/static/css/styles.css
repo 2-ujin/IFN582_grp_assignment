@@ -169,6 +169,10 @@ h1 {
   gap: 0.45rem;
 }
 
+.navbar-nav.header-actions {
+  gap: 1.25rem;
+}
+
 .site-navbar .nav-link {
   color: var(--charcoal);
   font-weight: 600;
