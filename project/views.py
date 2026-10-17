@@ -264,30 +264,60 @@ def database_check():
 
 
 @main.route('/')
+
 def index():
+    search_query = (request.args.get('q') or request.args.get('search', '')).strip()
+    category_filter = request.args.get('category', '').strip()
     # Load the featured projects and success stories for the home page.
     cursor = database.connection.cursor()
-    cursor.execute("""
-        SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
-        c.categoryName,
-        IFNULL(SUM(d.amount), 0) AS totalRaised,
-        ROUND(IFNULL(SUM(d.amount), 0) / p.goal * 100) AS progressPercentage,
-        GREATEST(DATEDIFF(p.deadline, CURDATE()), 0) AS daysRemaining         
-        FROM project p
-        JOIN user u ON p.creatorId = u.userId
-        JOIN category c ON p.categoryId = c.categoryId
-        LEFT JOIN donation d ON p.projectId = d.projectId           
-        WHERE p.featured = TRUE 
-        GROUP BY p.projectId
-        ORDER BY p.projectId ASC           
-        LIMIT 3
-                         
-    """)
-    projects = cursor.fetchall()
+
+
+    if search_query or category_filter:
+        query = """
+            SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
+                   c.categoryName,
+                   IFNULL(SUM(d.amount), 0) AS totalRaised,
+                   ROUND(IFNULL(SUM(d.amount), 0) / p.goal * 100) AS progressPercentage,
+                   GREATEST(DATEDIFF(p.deadline, CURDATE()), 0) AS daysRemaining         
+            FROM project p
+            JOIN user u ON p.creatorId = u.userId
+            JOIN category c ON p.categoryId = c.categoryId
+            LEFT JOIN donation d ON p.projectId = d.projectId           
+            WHERE p.approvalStatus = 'Approved'
+        """
+        params = []
+        if search_query:
+            query += " AND (p.projectName LIKE %s OR p.projectDescription LIKE %s)"
+            params.extend([f"%{search_query}%", f"%{search_query}%"])
+        if category_filter:
+            query += " AND c.categoryName = %s"
+            params.append(category_filter)
+
+        query += " GROUP BY p.projectId ORDER BY p.projectId ASC"
+        cursor.execute(query, tuple(params))
+        projects = cursor.fetchall()
+    else:
+        cursor.execute("""
+            SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
+            c.categoryName,
+            IFNULL(SUM(d.amount), 0) AS totalRaised,
+            ROUND(IFNULL(SUM(d.amount), 0) / p.goal * 100) AS progressPercentage,
+            GREATEST(DATEDIFF(p.deadline, CURDATE()), 0) AS daysRemaining         
+            FROM project p
+            JOIN user u ON p.creatorId = u.userId
+            JOIN category c ON p.categoryId = c.categoryId
+            LEFT JOIN donation d ON p.projectId = d.projectId           
+            WHERE p.featured = TRUE AND p.approvalStatus = 'Approved'
+            GROUP BY p.projectId
+            ORDER BY p.projectId ASC           
+            LIMIT 3
+                            
+        """)
+        projects = cursor.fetchall()
 
     cursor.execute("""
         SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
-               c.categoryName
+            c.categoryName
         FROM project p
         JOIN user u ON p.creatorId = u.userId
         JOIN category c ON p.categoryId = c.categoryId
@@ -303,9 +333,71 @@ def index():
     
 
 # ----- Part 3. Fundraiser details and donation page -----
-@main.route('/donation')
-@main.route('/donation/<int:project_id>')
+@main.route('/donation', methods=['GET', 'POST'])
+@main.route('/donation/<int:project_id>', methods=['GET', 'POST'])
 def project_detail(project_id = 1):
+
+    if request.method == 'POST':
+        # check log in, if not need log in first
+        if not current_user.is_authenticated:
+            flash("Please log in or register as a Supporter to make a donation.", "warning")
+            return redirect(url_for('main.login', next=url_for('main.project_detail', project_id=project_id)))
+        # check only supporter can donation
+        if getattr(current_user, 'role', None) != 'Supporter':
+            flash("Only registered Supporters can make donations.", "warning")
+            return redirect(url_for('main.project_detail', project_id=project_id))
+        
+        
+        amount = request.form.get('pledge-amount')
+        message_text = request.form.get('artist-message', '').strip()
+        
+        payment_method_raw = request.form.get('payment-method', 'card')
+        method_map = {
+            'card': 'Card',
+            'paypal': 'PayPal',
+            'bank-transfer': 'BankTransfer'
+        }
+        payment_method = method_map.get(payment_method_raw, 'Card')
+        
+        # check donation number>0
+        try:
+            amount_num = float(amount)
+            if amount_num <= 0:
+                raise ValueError
+        except (ValueError, TypeError):
+            flash("Please enter a valid donation amount greater than 0.", "danger")
+            return redirect(url_for('main.project_detail', project_id=project_id))
+
+        cursor = database.connection.cursor()
+        try:
+            supporter_id = current_user.id
+            
+            cursor.execute("INSERT IGNORE INTO supporter (userId) VALUES (%s)", (supporter_id,))
+            
+            cursor.execute(
+                "INSERT INTO donation (projectId, supporterId, amount, donationDate, paymentMethod, paymentStatus) VALUES (%s, %s, %s, NOW(), %s, 'Received')",
+                (project_id, supporter_id, amount_num, payment_method)
+            )
+            donation_id = cursor.lastrowid
+            
+
+            if message_text:
+                cursor.execute(
+                    "INSERT INTO supporterMessage (donationId, postedDate, message, visibility) VALUES (%s, NOW(), %s, TRUE)",
+                    (donation_id, message_text)
+                )
+
+            database.connection.commit()
+            flash('Thank you for your generous support!', 'success')
+        except Exception:
+            database.connection.rollback()
+            flash('Donation failed, please try again.', 'danger')
+        finally:
+            cursor.close()
+
+        return redirect(url_for('main.project_detail', project_id=project_id))
+    
+
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
@@ -317,11 +409,15 @@ def project_detail(project_id = 1):
         JOIN user u ON p.creatorId = u.userId
         JOIN category c ON p.categoryId = c.categoryId
         LEFT JOIN donation d ON p.projectId = d.projectId           
-        WHERE p.projectId = %s
+        WHERE p.projectId = %s AND p.approvalStatus = 'Approved'
         GROUP BY p.projectId
                          
     """,(project_id,))
     project_data = cursor.fetchone()
+
+    if not project_data:
+        cursor.close()
+        abort(404)
 # update project
     cursor.execute("""
         SELECT pu.*, MIN(im.imagePath) AS imagePath
@@ -343,9 +439,12 @@ def project_detail(project_id = 1):
             ORDER BY sm.postedDate DESC
         """, (project_id,))
     donations = cursor.fetchall()
+    cursor.execute("SELECT COUNT(donationId) AS count FROM donation WHERE projectId = %s", (project_id,))
+    count_res = cursor.fetchone()
+    supporter_count = count_res['count'] if isinstance(count_res, dict) else (count_res[0] if count_res else 0)
     cursor.close()
 
-    supporter_count = len(donations)
+    
 
     return render_template(
         'donation.html',

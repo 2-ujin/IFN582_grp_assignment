@@ -6,6 +6,8 @@ import secrets
 
 from flask import Flask, render_template
 from flask_login import LoginManager
+import pymysql
+pymysql.install_as_MySQLdb()
 from flask_mysqldb import MySQL
 from flask_wtf.csrf import CSRFProtect
 
@@ -28,17 +30,20 @@ def create_app(test_config=None):
         SECRET_KEY=os.environ.get("FLASK_SECRET_KEY") or secrets.token_hex(32),
         MYSQL_HOST=os.environ.get("MYSQL_HOST", "localhost"),
         MYSQL_USER=os.environ.get("MYSQL_USER", "root"),
-        MYSQL_PASSWORD=os.environ.get("MYSQL_PASSWORD", ""),
+        MYSQL_PASSWORD=os.environ.get("MYSQL_PASSWORD", "123456"),
         MYSQL_DB=os.environ.get("MYSQL_DB", "maf"),
         MYSQL_CURSORCLASS="DictCursor",
         WTF_CSRF_TIME_LIMIT=3600,
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
+        MAX_CONTENT_LENGTH=5* 1024 *1024,
     )
     if test_config:
         # A caller can override settings before extensions are initialised.
         app.config.update(test_config)
 
+    
+    # Debug mode is off so detailed error pages are never shown to users
     app.debug = False
 
     database.init_app(app)
@@ -51,8 +56,10 @@ def create_app(test_config=None):
     login_manager.login_message_category = "info"
 
     from .views import main
+    from .management import management_bp
 
     app.register_blueprint(main)
+    app.register_blueprint(management_bp)
 
     @app.context_processor
     def inject_current_year():
