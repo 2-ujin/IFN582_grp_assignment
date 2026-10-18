@@ -1,4 +1,4 @@
-"""Application routes for authentication, fundraising pages, and administration."""
+#Application routes for authentication, fundraising pages, and administration
 
 from functools import wraps
 from urllib.parse import urlsplit
@@ -23,39 +23,51 @@ from MySQLdb import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from . import database, login_manager
-from .forms import AdminActionForm, FeatureProjectForm, LoginForm, RegisterForm
+from .forms import AdminActionForm, EditUserForm, FeatureProjectForm, LoginForm, RegisterForm, SuccessStoryForm
 from .models import (
     AccountStatus,
     User,
     add_to_featured,
+    add_to_success_stories,
     change_project_status,
+    change_user_status,
+    email_in_use,
     get_campaign_stats,
     get_creator_count,
     get_feature_candidates,
     get_featured_projects,
     get_pending_projects,
+    get_reports,
     get_report_stats,
     get_reviewed_projects,
+    get_success_stories,
+    get_success_story_candidates,
     get_supporter_count,
+    get_user,
+    get_users,
     remove_from_featured,
+    remove_from_success_stories,
+    review_report,
     review_project_approval,
     soft_delete_project,
+    soft_delete_user,
+    update_user_details,
 )
 
 # Main routes use extensions initialized by the shared app factory.
 main = Blueprint("main", __name__)
 
 
-# ----- Part 2: Authentication and shared access control -----
+# Part 2: Authentication and shared access control
 
 @login_manager.user_loader
 def load_user(user_id):
-    """Reload the account on each request so role and status changes take effect."""
+    #Reload account on each request so role and status changes take effect
     return User.get_by_id(user_id)
 
 
 def _safe_local_url(target):
-    """Only allow same-site redirects after successful authentication."""
+    #Only allow same-site redirects after successful authentication
     if not target:
         return False
     parsed = urlsplit(target)
@@ -70,14 +82,14 @@ def _safe_local_url(target):
 
 
 def _role_required(required_role):
-    """Require authentication and the single role assigned to the account."""
+    #Require authentication & single role assigned to the account
 
     def decorator(view_function):
         @wraps(view_function)
         @login_required
         def wrapped_view(*args, **kwargs):
-            # Treat a missing role as unauthorized instead of raising an error.
-            if getattr(current_user, "role", None) != required_role:
+            # Treat a missing role as unauthorized instead of raising an error
+            if not current_user.is_active or getattr(current_user, "role", None) != required_role:
                 abort(403)
             return view_function(*args, **kwargs)
 
@@ -93,7 +105,7 @@ supporter_required = _role_required("Supporter")
 
 @main.before_app_request
 def end_inactive_sessions():
-    """End an existing session if the account was suspended or deactivated."""
+    #End existing session if the account was suspended or deactivated
     if current_user.is_authenticated and not current_user.is_active:
         # Flask-Login reloads the user's current status before this hook runs.
         was_suspended = current_user.is_suspended
@@ -110,21 +122,21 @@ def end_inactive_sessions():
             )
 
 
-# These six assessment credentials are displayed on the login page. Their
-# matching password hashes are assigned to the same email addresses in database.sql.
+# Assessment passwords verified against the unchanged database.sql hashes.
+# Their numbers follow SQL user-row order, not the order of this display table.
 TEST_LOGIN_ACCOUNTS = (
-    {"role": "Fundraiser", "email": "queenie.work@gmail.com", "password": "artistone"},
-    {"role": "Fundraiser", "email": "marcokhc22@gmail.com", "password": "artisttwo"},
-    {"role": "Supporter", "email": "m.brant@gmail.com", "password": "supporterone"},
-    {"role": "Supporter", "email": "ebao@hotmail.com", "password": "supportertwo"},
-    {"role": "Administrator", "email": "admin2@makeartsfund.com", "password": "adminone"},
-    {"role": "Administrator", "email": "admin23@makeartsfund.com", "password": "admintwo"},
+    {"role": "Fundraiser", "email": "queenie.work@gmail.com", "password": "Password1"},
+    {"role": "Fundraiser", "email": "marcokhc22@gmail.com", "password": "Password3"},
+    {"role": "Supporter", "email": "m.brant@gmail.com", "password": "Password2"},
+    {"role": "Supporter", "email": "ebao@hotmail.com", "password": "Password7"},
+    {"role": "Administrator", "email": "admin2@makeartsfund.com", "password": "Password9"},
+    {"role": "Administrator", "email": "admin23@makeartsfund.com", "password": "Password10"},
 )
 
 
 @main.route("/login", methods=["GET", "POST"])
 def login():
-    """Authenticate with email/password and reject inactive account statuses."""
+    #Authenticate with email/password & reject inactive account statuses
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
 
@@ -165,7 +177,7 @@ def login():
 
 @main.route("/register", methods=["GET", "POST"])
 def register():
-    """Create one shared user row and exactly one selected role row."""
+    #Create one shared user row & exactly one selected role row
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
 
@@ -229,10 +241,11 @@ def register():
 @main.route("/logout", methods=["POST"])
 @login_required
 def logout():
-    """End the current session; POST plus CSRF protects the action."""
+    #End the current session; POST plus CSRF protects the action
     logout_user()
     flash("You have signed out.", "info")
     return redirect(url_for("main.index"))
+
 
 
 # ----- Part 3. Home page -----
@@ -250,31 +263,62 @@ def database_check():
     return str(projects)
 
 
+
 @main.route('/')
+
 def index():
+    search_query = (request.args.get('q') or request.args.get('search', '')).strip()
+    category_filter = request.args.get('category', '').strip()
     # Load the featured projects and success stories for the home page.
     cursor = database.connection.cursor()
-    cursor.execute("""
-        SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
-        c.categoryName,
-        IFNULL(SUM(d.amount), 0) AS totalRaised,
-        ROUND(IFNULL(SUM(d.amount), 0) / p.goal * 100) AS progressPercentage,
-        GREATEST(DATEDIFF(p.deadline, CURDATE()), 0) AS daysRemaining         
-        FROM project p
-        JOIN user u ON p.creatorId = u.userId
-        JOIN category c ON p.categoryId = c.categoryId
-        LEFT JOIN donation d ON p.projectId = d.projectId           
-        WHERE p.featured = TRUE 
-        GROUP BY p.projectId
-        ORDER BY p.projectId ASC           
-        LIMIT 3
-                         
-    """)
-    projects = cursor.fetchall()
+
+
+    if search_query or category_filter or request.args.get('all'):
+        query = """
+            SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
+                   c.categoryName,
+                   IFNULL(SUM(d.amount), 0) AS totalRaised,
+                   ROUND(IFNULL(SUM(d.amount), 0) / p.goal * 100) AS progressPercentage,
+                   GREATEST(DATEDIFF(p.deadline, CURDATE()), 0) AS daysRemaining         
+            FROM project p
+            JOIN user u ON p.creatorId = u.userId
+            JOIN category c ON p.categoryId = c.categoryId
+            LEFT JOIN donation d ON p.projectId = d.projectId           
+            WHERE p.approvalStatus = 'Approved'
+        """
+        params = []
+        if search_query:
+            query += " AND (p.projectName LIKE %s OR p.projectDescription LIKE %s)"
+            params.extend([f"%{search_query}%", f"%{search_query}%"])
+        if category_filter:
+            query += " AND c.categoryName = %s"
+            params.append(category_filter)
+
+        query += " GROUP BY p.projectId ORDER BY p.projectId ASC"
+        cursor.execute(query, tuple(params))
+        projects = cursor.fetchall()
+    else:
+        cursor.execute("""
+            SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
+            c.categoryName,
+            IFNULL(SUM(d.amount), 0) AS totalRaised,
+            ROUND(IFNULL(SUM(d.amount), 0) / p.goal * 100) AS progressPercentage,
+            GREATEST(DATEDIFF(p.deadline, CURDATE()), 0) AS daysRemaining         
+            FROM project p
+            JOIN user u ON p.creatorId = u.userId
+            JOIN category c ON p.categoryId = c.categoryId
+            LEFT JOIN donation d ON p.projectId = d.projectId           
+            WHERE p.featured = TRUE AND p.approvalStatus = 'Approved'
+            GROUP BY p.projectId
+            ORDER BY p.projectId ASC           
+            LIMIT 3
+                            
+        """)
+        projects = cursor.fetchall()
 
     cursor.execute("""
         SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
-               c.categoryName
+            c.categoryName
         FROM project p
         JOIN user u ON p.creatorId = u.userId
         JOIN category c ON p.categoryId = c.categoryId
@@ -290,9 +334,71 @@ def index():
     
 
 # ----- Part 3. Fundraiser details and donation page -----
-@main.route('/donation')
-@main.route('/donation/<int:project_id>')
+@main.route('/donation', methods=['GET', 'POST'])
+@main.route('/donation/<int:project_id>', methods=['GET', 'POST'])
 def project_detail(project_id = 1):
+
+    if request.method == 'POST':
+        # check log in, if not need log in first
+        if not current_user.is_authenticated:
+            flash("Please log in or register as a Supporter to make a donation.", "warning")
+            return redirect(url_for('main.login', next=url_for('main.project_detail', project_id=project_id)))
+        # check only supporter can donation
+        if getattr(current_user, 'role', None) != 'Supporter':
+            flash("Only registered Supporters can make donations.", "warning")
+            return redirect(url_for('main.project_detail', project_id=project_id))
+        
+        
+        amount = request.form.get('pledge-amount')
+        message_text = request.form.get('artist-message', '').strip()
+        
+        payment_method_raw = request.form.get('payment-method', 'card')
+        method_map = {
+            'card': 'Card',
+            'paypal': 'PayPal',
+            'bank-transfer': 'BankTransfer'
+        }
+        payment_method = method_map.get(payment_method_raw, 'Card')
+        
+        # check donation number>0
+        try:
+            amount_num = float(amount)
+            if amount_num <= 0:
+                raise ValueError
+        except (ValueError, TypeError):
+            flash("Please enter a valid donation amount greater than 0.", "danger")
+            return redirect(url_for('main.project_detail', project_id=project_id))
+
+        cursor = database.connection.cursor()
+        try:
+            supporter_id = current_user.id
+            
+            cursor.execute("INSERT IGNORE INTO supporter (userId) VALUES (%s)", (supporter_id,))
+            
+            cursor.execute(
+                "INSERT INTO donation (projectId, supporterId, amount, donationDate, paymentMethod, paymentStatus) VALUES (%s, %s, %s, NOW(), %s, 'Received')",
+                (project_id, supporter_id, amount_num, payment_method)
+            )
+            donation_id = cursor.lastrowid
+            
+
+            if message_text:
+                cursor.execute(
+                    "INSERT INTO supporterMessage (donationId, postedDate, message, visibility) VALUES (%s, NOW(), %s, TRUE)",
+                    (donation_id, message_text)
+                )
+
+            database.connection.commit()
+            flash('Thank you for your generous support!', 'success')
+        except Exception:
+            database.connection.rollback()
+            flash('Donation failed, please try again.', 'danger')
+        finally:
+            cursor.close()
+
+        return redirect(url_for('main.project_detail', project_id=project_id))
+    
+
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
@@ -304,11 +410,15 @@ def project_detail(project_id = 1):
         JOIN user u ON p.creatorId = u.userId
         JOIN category c ON p.categoryId = c.categoryId
         LEFT JOIN donation d ON p.projectId = d.projectId           
-        WHERE p.projectId = %s
+        WHERE p.projectId = %s AND p.approvalStatus = 'Approved'
         GROUP BY p.projectId
                          
     """,(project_id,))
     project_data = cursor.fetchone()
+
+    if not project_data:
+        cursor.close()
+        abort(404)
 # update project
     cursor.execute("""
         SELECT pu.*, MIN(im.imagePath) AS imagePath
@@ -330,9 +440,12 @@ def project_detail(project_id = 1):
             ORDER BY sm.postedDate DESC
         """, (project_id,))
     donations = cursor.fetchall()
+    cursor.execute("SELECT COUNT(donationId) AS count FROM donation WHERE projectId = %s", (project_id,))
+    count_res = cursor.fetchone()
+    supporter_count = count_res['count'] if isinstance(count_res, dict) else (count_res[0] if count_res else 0)
     cursor.close()
 
-    supporter_count = len(donations)
+    
 
     return render_template(
         'donation.html',
@@ -342,10 +455,11 @@ def project_detail(project_id = 1):
         supporter_count=supporter_count
     )  
 
+
 # ----- Part 5. Admin Dashboard -----
 
 def create_feature_form():
-    # Build a dopdown with the projects that can be featured
+    # Build a dropdown with the projects that can be featured
     feature_form = FeatureProjectForm()
     options = []
     for project in get_feature_candidates():
@@ -353,28 +467,47 @@ def create_feature_form():
     feature_form.project_id.choices = options
     return feature_form
 
+def create_success_story_form():
+    # Build a dropdown with the completed projects that can become success stories
+    success_story_form = SuccessStoryForm()
+    options = []
+    for project in get_success_story_candidates():
+        options.append((project['projectId'], project['projectName']))
+    success_story_form.project_id.choices = options
+    return success_story_form
+
 @main.route('/admin')
 @admin_required
 def admin_dashboard():
     campaign_stats = get_campaign_stats()
     creator_count = get_creator_count()
-    supporter_count = get_supporter_count()
-    report_stats = get_report_stats()
-    pending_projects = get_pending_projects()
-    reviewed_projects = get_reviewed_projects()
-    fetured_projects = get_featured_projects()
-    form = AdminActionForm()
     feature_form = create_feature_form()
+    featured_projects = get_featured_projects()
+    form = AdminActionForm()
+    pending_projects = get_pending_projects()
+    report_stats = get_report_stats()
+    reports = get_reports()
+    reviewed_projects = get_reviewed_projects()
+    success_stories = get_success_stories()
+    success_story_form = create_success_story_form()
+    supporter_count = get_supporter_count()
+    users = get_users()
+    
     return render_template('admin_dashboard.html',
                            campaign_stats = campaign_stats,
                            creator_count = creator_count,
-                           supporter_count = supporter_count,
-                           report_stats = report_stats,
-                           pending_projects = pending_projects,
-                           reviewed_projects = reviewed_projects,
-                           featured_projects = fetured_projects,
+                           feature_form = feature_form,
+                           featured_projects = featured_projects,
                            form = form,
-                           feature_form = feature_form)
+                           pending_projects = pending_projects,
+                           report_stats = report_stats,
+                           reports = reports,
+                           reviewed_projects = reviewed_projects,
+                           success_stories = success_stories,
+                           success_story_form = success_story_form,
+                           supporter_count = supporter_count,
+                           users = users
+                           )
 
 @main.route('/admin/projects/<int:project_id>/approve', methods = ['POST'])
 @admin_required
@@ -444,6 +577,101 @@ def delete_project(project_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
 
+# Change user account from 'Active' to 'Suspend'
+@main.route('/admin/users/<int:user_id>/suspend', methods = ['POST'])
+@admin_required
+def suspend_user(user_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if change_user_status(user_id, 'Active', 'Suspended') == 1:
+           flash('The account has been suspended.', 'success') 
+        else: 
+            flash('This account could not be suspended.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Change user account from 'Suspend' to 'Active'
+@main.route('/admin/users/<int:user_id>/reactivate', methods = ['POST'])
+@admin_required
+def reactivate_user(user_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if change_user_status(user_id, 'Suspended', 'Active') == 1:
+           flash('The account has been reactivated.', 'success') 
+        else: 
+            flash('This account could not be reactivated.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Soft delete user accounts from admin dashboard
+@main.route('/admin/users/<int:user_id>/delete', methods = ['POST'])
+@admin_required
+def delete_user(user_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if soft_delete_user(user_id) == 1:
+           flash('The account has been deleted.', 'success') 
+        else: 
+            flash('This account could not be found or cannot be deleted.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Update user details
+@main.route('/admin/users/<int:user_id>/edit', methods=['GET', 'POST'])
+@admin_required
+def edit_user(user_id):
+    user = get_user(user_id)
+    if user is None:
+        flash('This account could not be found.', 'warning')
+        return redirect(url_for('main.admin_dashboard'))
+
+    form = EditUserForm()
+    if form.validate_on_submit():
+        if email_in_use(form.email.data, user_id):
+            flash('This email address is already used by another account.', 'danger')
+        else:
+            update_user_details(user_id, form.firstname.data, form.surname.data, form.email.data)
+            flash('The account details have been updated.', 'success')
+            return redirect(url_for('main.admin_dashboard'))
+    
+    if request.method == 'GET':
+        form.firstname.data = user['firstname']
+        form.surname.data = user['surname']
+        form.email.data = user['email']
+
+    return render_template('admin_edit_user.html', form=form, user=user)
+
+# Change report status from 'Pending' to 'Dismissed'
+@main.route('/admin/reports/<int:report_id>/dismiss', methods = ['POST'])
+@admin_required
+def dismiss_report(report_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if review_report(report_id, 'Dismissed') == 1:
+            flash('The report has been dismissed.', 'success') 
+        else: 
+            flash('This report could not be found or has already been reviewed.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Change report status from 'Pending' to 'Resolved'
+@main.route('/admin/reports/<int:report_id>/resolve', methods = ['POST'])
+@admin_required
+def resolve_report(report_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if review_report(report_id, 'Resolved') == 1:
+            flash('The report has been resolved.', 'success') 
+        else: 
+            flash('This report could not be found or has already been reviewed.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
 # Add featured projects
 @main.route('/admin/featured/add', methods=['POST'])
 @admin_required
@@ -453,7 +681,7 @@ def add_featured_project():
         if add_to_featured(feature_form.project_id.data) == 1:
             flash('This project has been added to the Featured section.', 'success')
         else:
-            flash('This project cannot be featured.', 'warning')
+            flash('This project cannot be added to the Featured section.', 'warning')
     else:
         flash('Please choose a valid project to feature.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
@@ -472,4 +700,30 @@ def remove_featured_project(project_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))        
 
-    
+# Add success stories
+@main.route('/admin/success-stories/add', methods=['POST'])
+@admin_required
+def add_success_story():
+    success_story_form = create_success_story_form()
+    if success_story_form.validate_on_submit():
+        if add_to_success_stories(success_story_form.project_id.data) == 1:
+            flash('This project has been added to the Success Stories section.', 'success')
+        else:
+            flash('This project cannot be added to the Success Stories.', 'warning')
+    else:
+        flash('Please choose a valid project.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))
+
+# Remove from success stories section
+@main.route('/admin/success-stories/<int:project_id>/remove', methods=['POST'])
+@admin_required
+def remove_success_story(project_id):
+    form = AdminActionForm()
+    if form.validate_on_submit():
+        if remove_from_success_stories(project_id) == 1:
+            flash('This project has been removed from the Success Stories section.', 'success')
+        else:
+            flash('This project is not in the Success Stories section.', 'warning')
+    else:
+        flash('Something went wrong. Please try again.', 'danger')
+    return redirect(url_for('main.admin_dashboard'))       
