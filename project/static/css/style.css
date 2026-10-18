@@ -1,0 +1,2419 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap");
+
+/* =========================
+   Colour variables
+   ========================= */
+
+:root {
+  --charcoal: #25242a;
+  --coral: #e76f51;
+  --coral-dark: #c9553b;
+  --cream: #fffaf5;
+  --tint: #f7f0ea;
+  --ash: #727078;
+  --line: #eadfd6;
+  --white: #ffffff;
+}
+
+/* =========================
+   General styles
+   ========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--charcoal);
+  background: var(--cream);
+  font-family: "DM Sans", Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.skip-link {
+  position: absolute;
+  top: 10px;
+  left: -9999px;
+  z-index: 1000;
+  padding: 0.6rem 1rem;
+  color: var(--white);
+  background: var(--charcoal);
+}
+
+.skip-link:focus {
+  left: 10px;
+}
+
+/* =========================
+   Navigation bar
+   ========================= */
+
+.site-navbar {
+  padding: 1rem 0;
+  background: rgba(255, 250, 245, 0.96);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand-mark {
+  color: var(--charcoal);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.brand-mark span {
+  color: var(--coral);
+}
+
+.navbar-toggler {
+  border-color: var(--line);
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgb(37,36,42)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.search-form {
+  display: flex;
+  max-width: 310px;
+}
+
+.search-form .form-control {
+  padding: 0.65rem 1rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-right: 0;
+  border-radius: 999px 0 0 999px;
+}
+
+.search-form .form-control:focus,
+.form-control:focus {
+  border-color: var(--coral);
+  box-shadow: 0 0 0 0.2rem rgba(231, 111, 81, 0.18);
+}
+
+.btn-search {
+  padding: 0.65rem 1rem;
+  color: var(--white);
+  background: var(--charcoal);
+  border-radius: 0 999px 999px 0;
+}
+
+.btn-search:hover {
+  color: var(--white);
+  background: var(--coral);
+}
+
+.header-actions {
+  gap: 0.55rem;
+}
+
+.header-select {
+  padding: 0.55rem 0.75rem;
+  color: var(--charcoal);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.header-select:focus {
+  border-color: var(--coral);
+  outline: 2px solid rgba(231, 111, 81, 0.35);
+}
+
+.sign-in-button {
+  white-space: nowrap;
+}
+
+/* =========================
+   Buttons
+   ========================= */
+
+.btn {
+  padding: 0.7rem 1.25rem;
+  font-weight: 700;
+  border-radius: 999px;
+}
+
+.btn-outline-coral {
+  color: var(--coral);
+  border: 1px solid var(--coral);
+}
+
+.btn-outline-coral:hover {
+  color: var(--white);
+  background: var(--coral);
+}
+
+/* =========================
+   Hero and sections
+   ========================= */
+
+.hero-section {
+  padding: 6rem 0 5.5rem;
+  overflow: hidden;
+  background: var(--cream);
+}
+
+.hero-section h1 {
+  max-width: 100%;
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(2.8rem, 6vw, 5.2rem);
+  line-height: 1.06;
+  letter-spacing: -0.045em;
+  white-space: nowrap;
+}
+
+.hero-copy {
+  max-width: 680px;
+  margin: 1.45rem 0 0;
+  color: var(--ash);
+  font-size: 1.15rem;
+}
+
+.section-padding {
+  padding: 5.5rem 0;
+}
+
+.section-padding-sm {
+  padding: 2.4rem 0;
+}
+
+.section-tint {
+  background: var(--tint);
+}
+
+.section-heading h2 {
+  margin-bottom: 0.6rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  letter-spacing: -0.035em;
+}
+
+/* =========================
+   Category buttons
+   ========================= */
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+
+.category-item {
+  display: flex;
+  min-height: 125px;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  color: var(--charcoal);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  flex-direction: column;
+  gap: 0.65rem;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.category-item span {
+  color: var(--coral);
+  font-family: Georgia, serif;
+  font-size: 2rem;
+}
+
+.category-item:hover {
+  color: var(--white);
+  background: var(--coral);
+  transform: translateY(-4px);
+}
+
+.category-item:hover span {
+  color: var(--white);
+}
+
+/* =========================
+   How It Works
+   ========================= */
+
+.step-card {
+  height: 100%;
+  padding: 2rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.step-number {
+  color: var(--coral);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.7rem;
+}
+
+.step-card h3 {
+  margin: 0.9rem 0 0.5rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.65rem;
+}
+
+.step-card p {
+  margin-bottom: 0;
+  color: var(--ash);
+}
+
+/* =========================
+   Featured projects
+   ========================= */
+
+.featured-heading-row {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.project-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.project-card {
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-card:hover {
+  box-shadow: 0 14px 30px rgba(37, 36, 42, 0.1);
+  transform: translateY(-5px);
+}
+
+.project-image {
+  display: block;
+  width: 100%;
+  height: 230px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 1.4rem;
+}
+
+.card-body h3,
+.success-card h3 {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.45rem;
+}
+
+.artist-name {
+  margin: 0.2rem 0 0.8rem;
+  color: var(--coral);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.project-meta {
+  margin-bottom: 1.3rem;
+  color: var(--ash);
+  font-size: 0.82rem;
+}
+
+.project-meta span {
+  padding: 0 0.35rem;
+  color: var(--coral);
+}
+
+.progress-label,
+.card-footer-info {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.progress-label {
+  margin-bottom: 0.45rem;
+}
+
+.progress {
+  height: 8px;
+  background: #eee3dc;
+  border-radius: 999px;
+}
+
+.progress-bar {
+  background: var(--coral);
+  border-radius: 999px;
+}
+
+.card-footer-info {
+  margin-top: 1rem;
+  color: var(--ash);
+}
+
+.card-footer-info strong {
+  color: var(--coral);
+}
+
+/* =========================
+   Success Stories
+   ========================= */
+
+.success-section {
+  color: var(--white);
+  background: var(--charcoal);
+}
+
+.success-section h2,
+.success-card h3 {
+  color: var(--white) !important;
+}
+
+.success-content p,
+.success-card > p {
+  color: #d7d0cb !important;
+}
+
+.success-card {
+  height: 100%;
+  padding-bottom: 1.5rem;
+  overflow: hidden;
+  background: #302f36;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 18px;
+}
+
+.success-image {
+  display: block;
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+}
+
+.success-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem 0.8rem;
+}
+
+.success-content p {
+  margin: 0;
+  color: #d7d0cb;
+}
+
+.success-card > p {
+  padding: 0 1.5rem;
+  color: #d7d0cb;
+}
+
+.completed-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.75rem;
+  color: #27623e;
+  background: #b7e0c4;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* =========================
+   Footer
+   ========================= */
+
+.site-footer {
+  padding: 3rem 0 2rem;
+  color: #d7d0cb;
+  background: #1d1c21;
+}
+
+.footer-links-only {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.footer-links-only a {
+  color: var(--white);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.footer-links-only a:hover {
+  color: var(--coral);
+}
+
+.site-footer hr {
+  margin: 2rem 0 1.5rem;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.copyright {
+  color: #9d9793 !important;
+  font-size: 0.8rem;
+}
+
+/* =========================
+   Responsive layout
+   ========================= */
+
+@media (max-width: 991.98px) {
+  .search-form {
+    max-width: none;
+  }
+
+  .header-actions {
+    align-items: flex-start !important;
+  }
+
+  .header-select {
+    margin: 0.35rem 0;
+  }
+
+  .sign-in-button {
+    display: inline-block;
+    margin-top: 0.35rem;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .hero-section {
+    padding: 4rem 0;
+  }
+
+  .hero-section h1 {
+    font-size: 2.8rem;
+    white-space: normal;
+  }
+
+  .section-padding {
+    padding: 4rem 0;
+  }
+
+  .featured-heading-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .category-item {
+    min-height: 112px;
+    font-size: 0.9rem;
+  }
+
+  .project-image {
+    height: 200px;
+  }
+
+  .success-image {
+    height: 220px;
+  }
+
+  .success-content {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .footer-links-only {
+    gap: 1rem 1.25rem;
+  }
+
+  .category-item.active {
+    border-color: #e05a47;
+    background-color: #fff4f2;
+    color: #e05a47;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(224, 90, 71, 0.15);
+    }
+}
+
+
+/* =========================
+   Donation Page
+   ========================= */
+
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap");
+
+/* =========================
+   Shared colour variables
+   ========================= */
+
+:root {
+  --charcoal: #25242a;
+  --coral: #e76f51;
+  --coral-dark: #c9553b;
+  --cream: #fffaf5;
+  --tint: #f7f0ea;
+  --ash: #727078;
+  --line: #eadfd6;
+  --white: #ffffff;
+}
+
+/* =========================
+   General styles
+   ========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--charcoal);
+  background: var(--cream);
+  font-family: "DM Sans", Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.skip-link {
+  position: absolute;
+  top: 10px;
+  left: -9999px;
+  z-index: 1000;
+  padding: 0.6rem 1rem;
+  color: var(--white);
+  background: var(--charcoal);
+}
+
+.skip-link:focus {
+  left: 10px;
+}
+
+/* =========================
+   Shared navigation
+   ========================= */
+
+.site-navbar {
+  padding: 1rem 0;
+  background: rgba(255, 250, 245, 0.96);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand-mark {
+  color: var(--charcoal);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.brand-mark span {
+  color: var(--coral);
+}
+
+.navbar-toggler {
+  border-color: var(--line);
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgb(37,36,42)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.search-form {
+  display: flex;
+  max-width: 310px;
+}
+
+.search-form .form-control {
+  padding: 0.65rem 1rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-right: 0;
+  border-radius: 999px 0 0 999px;
+}
+
+.search-form .form-control:focus,
+.form-control:focus {
+  border-color: var(--coral);
+  box-shadow: 0 0 0 0.2rem rgba(231, 111, 81, 0.18);
+}
+
+.btn-search {
+  padding: 0.65rem 1rem;
+  color: var(--white);
+  background: var(--charcoal);
+  border-radius: 0 999px 999px 0;
+}
+
+.btn-search:hover {
+  color: var(--white);
+  background: var(--coral);
+}
+
+.header-actions {
+  gap: 0.55rem;
+}
+
+.header-select {
+  padding: 0.55rem 0.75rem;
+  color: var(--charcoal);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.header-select:focus {
+  border-color: var(--coral);
+  outline: 2px solid rgba(231, 111, 81, 0.35);
+}
+
+.sign-in-button {
+  white-space: nowrap;
+}
+
+/* =========================
+   Shared buttons
+   ========================= */
+
+.btn {
+  padding: 0.7rem 1.25rem;
+  font-weight: 700;
+  border-radius: 999px;
+}
+
+.btn-coral {
+  color: var(--white);
+  background: var(--coral);
+  border: 1px solid var(--coral);
+}
+
+.btn-coral:hover {
+  color: var(--white);
+  background: var(--coral-dark);
+  border-color: var(--coral-dark);
+}
+
+.btn-outline-coral {
+  color: var(--coral);
+  border: 1px solid var(--coral);
+}
+
+.btn-outline-coral:hover {
+  color: var(--white);
+  background: var(--coral);
+}
+
+/* =========================
+   Fundraiser details page
+   ========================= */
+
+.details-breadcrumb {
+  padding: 1rem 0;
+  background: var(--tint);
+  border-bottom: 1px solid var(--line);
+}
+
+.details-breadcrumb a {
+  color: var(--coral);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.details-breadcrumb .breadcrumb-item.active {
+  color: var(--ash);
+}
+
+.details-hero {
+  background: var(--cream);
+}
+
+.details-project-image {
+  display: block;
+  width: 100%;
+  min-height: 390px;
+  object-fit: cover;
+  border-radius: 22px;
+}
+
+.project-heading h1 {
+  margin-bottom: 1rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  letter-spacing: -0.045em;
+}
+
+.project-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1.5rem;
+  color: var(--ash);
+  font-size: 1rem;
+}
+
+.detail-artist-name {
+  color: var(--coral);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.meta-separator {
+  padding: 0 0.35rem;
+  color: var(--coral);
+  font-weight: 700;
+}
+
+.funding-card,
+.donation-card,
+.content-panel {
+  padding: 2rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.funding-card,
+.donation-card {
+  position: sticky;
+  top: 2rem;
+}
+
+.funding-card h2,
+.donation-card h2,
+.content-panel h2 {
+  margin-bottom: 1.25rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.8rem;
+}
+
+.funding-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 1.4rem;
+}
+
+.funding-amount strong {
+  font-size: 2.2rem;
+}
+
+.funding-amount span {
+  color: var(--ash);
+  font-size: 0.85rem;
+}
+
+.funding-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.funding-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.funding-stats strong {
+  font-size: 1.45rem;
+}
+
+.funding-stats span {
+  color: var(--ash);
+  font-size: 0.78rem;
+}
+
+.details-content-section {
+  background: var(--tint);
+}
+
+.content-panel h2 {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.content-panel p {
+  color: var(--ash);
+}
+
+.artist-profile {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.artist-avatar,
+.message-avatar {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--white);
+  background: var(--coral);
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.artist-avatar {
+  width: 64px;
+  height: 64px;
+  background: var(--charcoal);
+}
+
+.message-avatar {
+  width: 46px;
+  height: 46px;
+}
+
+.artist-profile h3,
+.supporter-message h3,
+.update-item h3 {
+  margin-bottom: 0.45rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.25rem;
+}
+
+.panel-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.update-count {
+  color: var(--coral);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.update-item {
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.update-item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.update-date {
+  margin-bottom: 0.3rem;
+  color: var(--coral);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.update-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  margin-top: 1.25rem;
+  object-fit: contain;
+  object-position: center;
+  background: var(--tint);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.supporter-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.message-date {
+  margin-bottom: 0.4rem;
+  color: var(--coral);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.donation-intro {
+  color: var(--ash);
+  font-size: 0.9rem;
+}
+
+.donation-card .form-label {
+  color: var(--charcoal);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.donation-card .form-control,
+.donation-card .form-select,
+.donation-card .input-group-text {
+  min-height: 48px;
+  border-color: var(--line);
+}
+
+.donation-card textarea.form-control {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.donation-card .input-group-text {
+  color: var(--ash);
+  background: var(--tint);
+}
+
+/* =========================
+   Responsive layout
+   ========================= */
+
+@media (max-width: 991.98px) {
+  .search-form {
+    max-width: none;
+  }
+
+  .header-actions {
+    align-items: flex-start !important;
+  }
+
+  .header-select {
+    margin: 0.35rem 0;
+  }
+
+  .funding-card,
+  .donation-card {
+    position: static;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .details-project-image {
+    min-height: 260px;
+  }
+
+  .funding-card,
+  .donation-card,
+  .content-panel {
+    padding: 1.4rem;
+  }
+
+  .funding-amount {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .update-image {
+    max-height: 260px;
+  }
+
+  .panel-heading-row,
+  .artist-profile,
+  .supporter-message {
+    align-items: flex-start;
+  }
+
+  .panel-heading-row {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+
+
+
+
+/* =========================
+   Campaign Page
+   ========================= */
+
+.dashboard-section {
+  padding: 3rem 0 5.5rem;
+  background: var(--tint);
+}
+
+.dashboard-role {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  color: var(--charcoal);
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dashboard-toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.campaign-selection .form-label {
+  margin-bottom: 0.5rem;
+  color: var(--charcoal);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.campaign-selector {
+  min-width: 300px;
+  border-color: var(--line);
+}
+
+.status-badge,
+.table-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-active,
+.status-received {
+  color: #27623e;
+  background: #e7f4ec;
+}
+
+.status-pending {
+  color: #886116;
+  background: #fff4d7;
+}
+
+.stat-card {
+  display: flex;
+  height: 100%;
+  min-height: 155px;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.5rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.stat-card-emphasis .stat-label {
+  margin-bottom: 0.7rem;
+  font-size: 1rem;
+}
+
+.stat-card-emphasis .stat-value {
+  font-size: 2.35rem;
+}
+
+.stat-label {
+  color: var(--ash);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  display: block;
+  font-family: "Playfair Display", Georgia, serif;
+  line-height: 1.1;
+}
+
+.stat-note {
+  margin-top: 0.35rem;
+  color: var(--ash);
+  font-size: 0.8rem;
+}
+
+.dashboard-panel {
+  padding: 2rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.dashboard-panel h2 {
+  margin-bottom: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.8rem;
+}
+
+.panel-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.percentage-label {
+  color: var(--coral);
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.campaign-progress {
+  height: 14px;
+  margin-bottom: 1.5rem;
+}
+
+.funding-breakdown {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.funding-breakdown div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.funding-breakdown span {
+  color: var(--ash);
+  font-size: 0.78rem;
+}
+
+.funding-breakdown strong {
+  font-size: 1.1rem;
+}
+
+.campaign-message {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  background: var(--tint);
+  border-left: 4px solid var(--coral);
+  border-radius: 0 10px 10px 0;
+}
+
+.campaign-message strong {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.campaign-message p {
+  margin: 0;
+  color: var(--ash);
+}
+
+.campaign-details-list {
+  margin: 0 0 1.5rem;
+}
+
+.campaign-details-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.campaign-details-list div:last-child {
+  border-bottom: 0;
+}
+
+.campaign-details-list dt {
+  color: var(--ash);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.campaign-details-list dd {
+  margin: 0;
+  color: var(--charcoal);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.panel-note {
+  color: var(--ash);
+  font-size: 0.8rem;
+}
+
+.dashboard-table {
+  min-width: 650px;
+  margin-bottom: 0;
+  color: var(--charcoal);
+  vertical-align: middle;
+}
+
+.dashboard-table thead th {
+  padding: 0.8rem 1rem;
+  color: var(--ash);
+  background: var(--tint);
+  border-bottom: 1px solid var(--line);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.dashboard-table tbody th,
+.dashboard-table tbody td {
+  padding: 1rem;
+  border-color: var(--line);
+  font-size: 0.86rem;
+}
+
+.dashboard-table tbody th {
+  font-weight: 700;
+}
+
+.dashboard-panel .form-label {
+  color: var(--charcoal);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.dashboard-panel .form-control,
+.dashboard-panel .form-select,
+.dashboard-panel .input-group-text {
+  min-height: 48px;
+  border-color: var(--line);
+}
+
+.dashboard-panel textarea.form-control {
+  min-height: auto;
+  white-space: pre-wrap;
+}
+
+.dashboard-panel .input-group-text {
+  color: var(--ash);
+  background: var(--tint);
+}
+
+.update-editor {
+  padding: 1.25rem;
+  background: var(--tint);
+  border-radius: 14px;
+}
+
+.update-editor .form-label {
+  margin-bottom: 0.6rem;
+}
+
+.updates-list {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.update-item {
+  width: 100%;
+  max-width: 100%;
+  padding: 1.3rem 0;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--line);
+}
+
+.update-item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.update-date,
+.message-date {
+  margin-bottom: 0.35rem;
+  color: var(--coral);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.update-item h3,
+.supporter-message h3 {
+  margin-bottom: 0.45rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.25rem;
+}
+
+.update-item p,
+.supporter-message p {
+  max-width: 100%;
+  margin-bottom: 0.85rem;
+  color: var(--ash);
+  overflow-wrap: anywhere;
+}
+
+.update-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  margin-top: 1.25rem;
+  object-fit: contain;
+  object-position: center;
+  background: var(--tint);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.supporter-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.message-avatar {
+  display: grid;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  color: var(--white);
+  background: var(--coral);
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+@media (max-width: 767.98px) {
+  .dashboard-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .campaign-selector {
+    min-width: 100%;
+  }
+
+  .funding-breakdown {
+    grid-template-columns: 1fr;
+  }
+
+  .campaign-details-list div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .campaign-details-list dd {
+    text-align: left;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .dashboard-section {
+    padding: 2rem 0 4rem;
+  }
+
+  .dashboard-panel,
+  .dashboard-toolbar {
+    padding: 1.4rem;
+  }
+
+  .panel-heading-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .stat-card-emphasis .stat-value {
+    font-size: 2rem;
+  }
+
+  .update-image {
+    max-height: 260px;
+  }
+}
+
+
+/* =========================
+   Campaign page 2.0
+   ========================= */
+
+.campaign-overview-heading {
+  margin-bottom: 1.5rem;
+}
+
+.campaign-overview-heading h1 {
+  margin-bottom: 0.6rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  letter-spacing: -0.035em;
+}
+
+/* Match the Save Changes button styling */
+#project-information-heading + .status-badge {
+  flex-shrink: 0;
+}
+
+#project-information-heading ~ .btn,
+section[aria-labelledby="project-information-heading"] .btn {
+  color: var(--white);
+  background: var(--coral);
+  border: 1px solid var(--coral);
+}
+
+section[aria-labelledby="project-information-heading"] .btn:hover {
+  color: var(--white);
+  background: var(--coral-dark);
+  border-color: var(--coral-dark);
+}
+
+/* =========================
+   Admin Dashboard Page
+   ========================= */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap");
+
+/* =========================
+   Shared colour variables
+   ========================= */
+
+:root {
+  --charcoal: #25242a;
+  --coral: #e76f51;
+  --coral-dark: #c9553b;
+  --cream: #fffaf5;
+  --tint: #f7f0ea;
+  --ash: #727078;
+  --line: #eadfd6;
+  --white: #ffffff;
+}
+
+/* =========================
+   General styles
+   ========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--charcoal);
+  background: var(--cream);
+  font-family: "DM Sans", Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.skip-link {
+  position: absolute;
+  top: 10px;
+  left: -9999px;
+  z-index: 1000;
+  padding: 0.6rem 1rem;
+  color: var(--white);
+  background: var(--charcoal);
+}
+
+.skip-link:focus {
+  left: 10px;
+}
+
+/* =========================
+   Shared navigation
+   ========================= */
+
+.site-navbar {
+  padding: 1rem 0;
+  background: rgba(255, 250, 245, 0.96);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand-mark {
+  color: var(--charcoal);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.brand-mark span {
+  color: var(--coral);
+}
+
+.navbar-toggler {
+  border-color: var(--line);
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgb(37,36,42)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.search-form {
+  display: flex;
+  max-width: 310px;
+}
+
+.search-form .form-control {
+  padding: 0.65rem 1rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-right: 0;
+  border-radius: 999px 0 0 999px;
+}
+
+.search-form .form-control:focus,
+.form-control:focus {
+  border-color: var(--coral);
+  box-shadow: 0 0 0 0.2rem rgba(231, 111, 81, 0.18);
+}
+
+.btn-search {
+  padding: 0.65rem 1rem;
+  color: var(--white);
+  background: var(--charcoal);
+  border-radius: 0 999px 999px 0;
+}
+
+.btn-search:hover {
+  color: var(--white);
+  background: var(--coral);
+}
+
+.header-actions {
+  gap: 0.55rem;
+}
+
+.header-select {
+  padding: 0.55rem 0.75rem;
+  color: var(--charcoal);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.header-select:focus {
+  border-color: var(--coral);
+  outline: 2px solid rgba(231, 111, 81, 0.35);
+}
+
+.sign-in-button {
+  white-space: nowrap;
+}
+
+/* =========================
+   Shared buttons
+   ========================= */
+
+.btn {
+  padding: 0.7rem 1.25rem;
+  font-weight: 700;
+  border-radius: 999px;
+}
+
+.btn-coral {
+  color: var(--white);
+  background: var(--coral);
+  border: 1px solid var(--coral);
+}
+
+.btn-coral:hover {
+  color: var(--white);
+  background: var(--coral-dark);
+  border-color: var(--coral-dark);
+}
+
+.btn-outline-coral {
+  color: var(--coral);
+  border: 1px solid var(--coral);
+}
+
+.btn-outline-coral:hover {
+  color: var(--white);
+  background: var(--coral);
+}
+
+/* =========================
+   Homepage shared sections
+   ========================= */
+
+.hero-section {
+  padding: 6rem 0 5.5rem;
+  overflow: hidden;
+  background: var(--cream);
+}
+
+.hero-section h1 {
+  max-width: 100%;
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(2.8rem, 6vw, 5.2rem);
+  line-height: 1.06;
+  letter-spacing: -0.045em;
+  white-space: nowrap;
+}
+
+.hero-copy {
+  max-width: 680px;
+  margin: 1.45rem 0 0;
+  color: var(--ash);
+  font-size: 1.15rem;
+}
+
+.section-padding {
+  padding: 5.5rem 0;
+}
+
+.section-padding-sm {
+  padding: 2.4rem 0;
+}
+
+.section-tint {
+  background: var(--tint);
+}
+
+.section-heading h1,
+.section-heading h2 {
+  margin-bottom: 0.6rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  letter-spacing: -0.035em;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+
+.category-item {
+  display: flex;
+  min-height: 125px;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  color: var(--charcoal);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  flex-direction: column;
+  gap: 0.65rem;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.category-item span {
+  color: var(--coral);
+  font-family: Georgia, serif;
+  font-size: 2rem;
+}
+
+.category-item:hover {
+  color: var(--white);
+  background: var(--coral);
+  transform: translateY(-4px);
+}
+
+.category-item:hover span {
+  color: var(--white);
+}
+
+.step-card {
+  height: 100%;
+  padding: 2rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.step-number {
+  color: var(--coral);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.7rem;
+}
+
+.step-card h3 {
+  margin: 0.9rem 0 0.5rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.65rem;
+}
+
+.step-card p {
+  margin-bottom: 0;
+  color: var(--ash);
+}
+
+.featured-heading-row {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.project-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.project-card {
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-card:hover {
+  box-shadow: 0 14px 30px rgba(37, 36, 42, 0.1);
+  transform: translateY(-5px);
+}
+
+.project-image {
+  display: block;
+  width: 100%;
+  height: 230px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 1.4rem;
+}
+
+.card-body h3,
+.success-card h3 {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.45rem;
+}
+
+.artist-name {
+  margin: 0.2rem 0 0.8rem;
+  color: var(--coral);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.project-meta {
+  margin-bottom: 1.3rem;
+  color: var(--ash);
+  font-size: 0.82rem;
+}
+
+.project-meta span {
+  padding: 0 0.35rem;
+  color: var(--coral);
+}
+
+.progress-label,
+.card-footer-info {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.progress-label {
+  margin-bottom: 0.45rem;
+}
+
+.progress {
+  height: 8px;
+  background: #eee3dc;
+  border-radius: 999px;
+}
+
+.progress-bar {
+  background: var(--coral);
+  border-radius: 999px;
+}
+
+.card-footer-info {
+  margin-top: 1rem;
+  color: var(--ash);
+}
+
+.card-footer-info strong {
+  color: var(--coral);
+}
+
+.success-section {
+  color: var(--white);
+  background: var(--charcoal);
+}
+
+.success-card {
+  height: 100%;
+  padding-bottom: 1.5rem;
+  overflow: hidden;
+  background: #302f36;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 18px;
+}
+
+.success-image {
+  display: block;
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+}
+
+.success-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem 0.8rem;
+}
+
+.success-content p,
+.success-card > p {
+  color: #d7d0cb;
+}
+
+.success-content p {
+  margin: 0;
+}
+
+.success-card > p {
+  padding: 0 1.5rem;
+}
+
+.completed-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.75rem;
+  color: #27623e;
+  background: #b7e0c4;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* =========================
+   Shared footer
+   ========================= */
+
+.site-footer {
+  padding: 3rem 0 2rem;
+  color: #d7d0cb;
+  background: #1d1c21;
+}
+
+.footer-links-only {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.footer-links-only a {
+  color: var(--white);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.footer-links-only a:hover {
+  color: var(--coral);
+}
+
+.site-footer hr {
+  margin: 2rem 0 1.5rem;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.copyright {
+  color: #9d9793 !important;
+  font-size: 0.8rem;
+}
+
+/* =========================
+   Campaign and admin dashboard
+   ========================= */
+
+.dashboard-role {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  color: var(--charcoal);
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dashboard-section,
+.admin-dashboard-section {
+  padding: 3rem 0 5.5rem;
+  background: var(--tint);
+}
+
+.dashboard-toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.campaign-selection .form-label {
+  margin-bottom: 0.5rem;
+  color: var(--charcoal);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.campaign-selector {
+  min-width: 300px;
+  border-color: var(--line);
+}
+
+.stat-card,
+.admin-stat-card {
+  display: flex;
+  height: 100%;
+  min-height: 150px;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.5rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.stat-card-emphasis .stat-label {
+  margin-bottom: 0.7rem;
+  font-size: 1rem;
+}
+
+.stat-card-emphasis .stat-value,
+.admin-stat-value {
+  display: block;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 2.35rem;
+  line-height: 1.1;
+}
+
+.stat-label,
+.admin-stat-label {
+  color: var(--ash);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.stat-note,
+.admin-stat-note {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--ash);
+  font-size: 0.8rem;
+}
+
+.admin-stat-link {
+  display: block;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.admin-stat-link:hover .admin-stat-card {
+  box-shadow: 0 12px 26px rgba(37, 36, 42, 0.1);
+  transform: translateY(-4px);
+}
+
+.dashboard-panel,
+.admin-panel {
+  padding: 2rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.dashboard-panel h2,
+.admin-panel-heading h2 {
+  margin-bottom: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.8rem;
+}
+
+.panel-heading-row,
+.admin-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-count-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.7rem;
+  color: var(--coral);
+  background: #fff0eb;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.percentage-label {
+  color: var(--coral);
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.campaign-progress {
+  height: 14px;
+  margin-bottom: 1.5rem;
+}
+
+.funding-breakdown {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.funding-breakdown div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.funding-breakdown span {
+  color: var(--ash);
+  font-size: 0.78rem;
+}
+
+.funding-breakdown strong {
+  font-size: 1.1rem;
+}
+
+.campaign-message {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  background: var(--tint);
+  border-left: 4px solid var(--coral);
+  border-radius: 0 10px 10px 0;
+}
+
+.campaign-message strong {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.campaign-message p {
+  margin: 0;
+  color: var(--ash);
+}
+
+.campaign-details-list {
+  margin: 0 0 1.5rem;
+}
+
+.campaign-details-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.campaign-details-list div:last-child {
+  border-bottom: 0;
+}
+
+.campaign-details-list dt {
+  color: var(--ash);
+  font-size: 0.85rem;
+}
+
+.campaign-details-list dd {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.admin-table,
+.dashboard-table {
+  min-width: 650px;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.admin-table thead th,
+.dashboard-table thead th {
+  padding: 0.85rem 1rem;
+  color: var(--ash);
+  background: var(--tint);
+  border-bottom: 1px solid var(--line);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.admin-table tbody th,
+.admin-table tbody td,
+.dashboard-table tbody th,
+.dashboard-table tbody td {
+  padding: 1rem;
+  border-color: var(--line);
+  font-size: 0.84rem;
+}
+
+.sort-indicator {
+  margin-left: 0.25rem;
+  color: var(--coral);
+  font-size: 0.95rem;
+}
+
+.table-status,
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-active,
+.status-received,
+.status-resolved {
+  color: #27623e;
+  background: #e7f4ec;
+}
+
+.status-pending {
+  color: #886116;
+  background: #fff4d7;
+}
+
+.status-suspended {
+  color: #963e34;
+  background: #fde8e5;
+}
+
+.updates-list {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.update-item {
+  width: 100%;
+  max-width: 100%;
+  padding: 1.3rem 0;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--line);
+}
+
+.update-item:last-child {
+  border-bottom: 0;
+}
+
+.update-date,
+.message-date {
+  margin-bottom: 0.35rem;
+  color: var(--coral);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.update-item h3,
+.supporter-message h3 {
+  margin-bottom: 0.45rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.25rem;
+}
+
+.update-item p,
+.supporter-message p {
+  max-width: 100%;
+  color: var(--ash);
+  overflow-wrap: anywhere;
+}
+
+.update-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  margin-top: 1.25rem;
+  object-fit: contain;
+  object-position: center;
+  background: var(--tint);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.homepage-project-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.homepage-project-item:last-of-type {
+  border-bottom: 0;
+}
+
+.homepage-project-item strong,
+.homepage-project-item span {
+  display: block;
+}
+
+.homepage-project-item strong {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.05rem;
+}
+
+.homepage-project-item span {
+  color: var(--ash);
+  font-size: 0.8rem;
+}
+
+/* =========================
+   Responsive layout
+   ========================= */
+
+@media (max-width: 991.98px) {
+  .search-form {
+    max-width: none;
+  }
+
+  .header-actions {
+    align-items: flex-start !important;
+  }
+
+  .header-select {
+    margin: 0.35rem 0;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 767.98px) {
+  .dashboard-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .campaign-selector {
+    min-width: 100%;
+  }
+
+  .funding-breakdown {
+    grid-template-columns: 1fr;
+  }
+
+  .campaign-details-list div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .campaign-details-list dd {
+    text-align: left;
+  }
+
+  .admin-panel-heading,
+  .panel-heading-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-heading-actions {
+    flex-wrap: wrap;
+  }
+
+  .homepage-project-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .hero-section h1 {
+    font-size: 2.8rem;
+    white-space: normal;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .category-item {
+    min-height: 112px;
+    font-size: 0.9rem;
+  }
+
+  .project-image {
+    height: 200px;
+  }
+
+  .success-image {
+    height: 220px;
+  }
+
+  .dashboard-section,
+  .admin-dashboard-section {
+    padding: 2rem 0 4rem;
+  }
+
+  .dashboard-panel,
+  .admin-panel,
+  .dashboard-toolbar {
+    padding: 1.4rem;
+  }
+
+  .stat-card-emphasis .stat-value,
+  .admin-stat-value {
+    font-size: 2rem;
+  }
+
+  .update-image {
+    max-height: 260px;
+  }
+
+  .footer-links-only {
+    gap: 1rem 1.25rem;
+  }
+}
