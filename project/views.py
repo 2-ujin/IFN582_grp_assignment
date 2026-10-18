@@ -760,3 +760,9 @@ def remove_success_story(project_id):
     else:
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))       
+
+
+# ---- Testing only: shows the 500 error page. Remove before final submission if not documented in README ----
+@main.route('/error-eg-500')
+def error_eg_500():
+    abort(500)
