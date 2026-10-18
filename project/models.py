@@ -252,9 +252,22 @@ class Image:
 
 
 # ----- Part 5. Admin Dashboard -----
+"""All function below follow the same pattern:
+1. cursor = database.connection.cursor() open a cursor to send SQL to MySQL
+2. cursor.execute() run the SQL (%s placeholders prevent SQL injection)
+3. SELECT: fetchone() returns one row, fetchall() returns a list of rows
+4. cursor.close() and return the result to views.py
+
+UPDATE functions return rowcount (1 = success, 0 = nothing changed), so the view can show a success or error message.
+Extra WHERE conditions make sure an action only runs on rows in the right state. 
+"""
+
+# ----- Administration Overview -----
 
 def get_campaign_stats():
-    # Display the total number of campaigns including active and pending
+    """Count campaigns for the overview cards: total, active, and pending.
+    SUM(condition) adds 1 for each row where the condition is true, so it counts matching rows.
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT  COUNT(*) AS totalCampaigns,
@@ -268,7 +281,9 @@ def get_campaign_stats():
     return campaign_stats
 
 def get_creator_count():
-    # Display the total number of active creators
+    """Count active creators (artists) for the overview card.
+    JOIN with user to check the account status, which is stored in the user table.
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT  COUNT(*) AS activeCreators
@@ -281,7 +296,7 @@ def get_creator_count():
     return creator_count
 
 def get_supporter_count():
-    # Display the total number of active supporters
+    """Count active supporters for the overview card (same approach as get_creator_count)."""
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT  COUNT(*) AS activeSupporters
@@ -294,7 +309,7 @@ def get_supporter_count():
     return supporter_count
 
 def get_report_stats():
-    # Display the total number of reports including pending
+    """Count all reports and pending reports.""" 
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT  COUNT(*) AS totalReports,
@@ -305,9 +320,13 @@ def get_report_stats():
     cursor.close()
     return report_stats
 
-def get_pending_projects():
-    # Projects waiting for admin to approve or reject
 
+# ----- Pending Project Approvals -----
+
+def get_pending_projects():
+    """Get projects waiting for an admin to approve or reject them.
+    JOIN user (on creatorId) to get the creator's name, and JOIN category to get the category name. 
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT  project.projectId,
@@ -328,7 +347,10 @@ def get_pending_projects():
     return pending_projects
 
 def review_project_approval(project_id, new_status):
-    # Admin reviews a pending project and approves or rejects it
+    """Approve or reject a pending project. The update only runs if the project is still 'Pending',
+    so a project that was already reviewed is not changed again. 
+    Return rowcount(1 = updated, 0 = not updated)
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         UPDATE project
@@ -342,8 +364,10 @@ def review_project_approval(project_id, new_status):
     return updated_rows
 
 def get_reviewed_projects():
-    # Projects that have already been reviewed (not Pending or Removed)
-    
+    """Get projects that have already been reviewed for the project management table.
+    Includes approved, suspended and rejected projects.
+    Pending projects are in the approval table, and deleted projects are hidden but remain in the database.
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT  project.projectId,
@@ -365,12 +389,16 @@ def get_reviewed_projects():
     return reviewed_projects
 
 def change_project_status(project_id, current_status, new_status):
-    # Update project approval status (approved -> suspended or suspended -> approved)
+    """Suspend or restore a project (approved -> suspended or suspended -> approved).
+       The update only runs if the project currently has current_status.
+       It also sets featured = False, so a suspended project is removed from the featured section.
+       If it is restored, an admin can feature it again.     
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         UPDATE project
         SET approvalStatus = %s,
-            featured = FALSE  # Remove suspended projects from featured projects 
+            featured = FALSE 
         WHERE projectId = %s
           AND approvalStatus = %s
     """, (new_status, project_id, current_status)) 
@@ -380,7 +408,11 @@ def change_project_status(project_id, current_status, new_status):
     return updated_rows
 
 def soft_delete_project(project_id):
-    # Hide reviewed projects by setting their approval status to 'Deleted'
+    """Soft delete a reviewed project by setting its approval status to 'Deleted'.
+    The data stays in the database, so related donations and reports are kept, 
+    but the project is hidden from the table.
+    It is also removed from featured project.
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         UPDATE project
@@ -394,8 +426,15 @@ def soft_delete_project(project_id):
     cursor.close()
     return updated_rows
 
+
+# ----- User Management -----
+
 def get_users():
-    # Display all accounts for the user management table
+    """Get all accounts (except deleted ones) for the user management table.
+    The role is stored in separate tables (administrator, artist, supporter).
+    LEFT JOIN keeps every user even if they have no row in a role table,
+    and CASE picks the role from whichever table has a matching row.
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT  user.userId,
@@ -420,7 +459,9 @@ def get_users():
     return users
 
 def get_user(user_id):
-    # Get a specific account to fill in the edit user form
+    """Get one artist/supporter account to fill in the edit user form.
+    Returns None if the account does not exist, is deleted, or is an administrator.
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT  user.userId,
@@ -445,7 +486,10 @@ def get_user(user_id):
     return user
 
 def email_in_use(email, user_id):
-    # Check if another account already uses this email address
+    """Check if another account already uses this email address.
+    userId <> %s skips the account being edited, so keeping the same email is allowed.
+    Returns True if another account was found, otherwise False.
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT  user.userId
@@ -458,7 +502,10 @@ def email_in_use(email, user_id):
     return existing_user is not None
 
 def update_user_details(user_id, firstname, surname, email):
-    # Save the changes for an artist/supporter account
+    """Save the edited names and email for an artist/supporter account.
+    Admin and deleted accounts are protected by the WHERE conditions.
+    No rowcount is returned, because saving without any changes also gives 0 rows.
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         UPDATE user
@@ -470,10 +517,12 @@ def update_user_details(user_id, firstname, surname, email):
           AND userId NOT IN (SELECT administrator.userId FROM administrator)
     """, (firstname, surname, email, user_id))
     database.connection.commit()
-    cursor.close    
+    cursor.close()    
 
 def change_user_status(user_id, current_status, new_status):
-    # Suspend or reactivate an artist/supporter account
+    """Suspend or reactivate an artist/supporter account (Active <-> Suspended).
+    The update only runs if the account currently has current_status, and administrator accounts cannot be changed.
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         UPDATE user
@@ -488,11 +537,14 @@ def change_user_status(user_id, current_status, new_status):
     return updated_rows
 
 def soft_delete_user(user_id):
-    # Hide an artist/supporter account and keep the record in database
+    """Soft delete an artist/supporter account by setting its status to 'Deleted'. (Admins cannot be deleted)
+    The data stays in the database, so the user's projects, donations and reports are kept, 
+    but the account is hidden from the table.
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         UPDATE user
-        SET approvalStatus = 'Deleted'   
+        SET accountStatus = 'Deleted'   
         WHERE userId = %s
           AND accountStatus IN ('Active', 'Suspended')
           AND userId NOT IN (SELECT administrator.userId FROM administrator)
@@ -502,8 +554,14 @@ def soft_delete_user(user_id):
     cursor.close()
     return updated_rows    
 
+
+# ----- Reported Content -----
+
 def get_reports():
-    # Display all reports for the reported content table
+    """Get all reports for the reported content table, newest first.
+    JOIN user gives the reporter's name. 
+    LEFT JOIN + CASE finds the reporter's role, the same way as get_users().
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT  report.reportId,
@@ -530,7 +588,9 @@ def get_reports():
     return reports
 
 def review_report(report_id, new_status):
-    # Admin reviews a pending report and resolves or dismisses it
+    """Resolve or dismiss a pending report.
+    Only pending reports can be reviewed, so a report isn't reviewed twice. (new_status = 'Resolved' or 'Dismissed')
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         UPDATE report
@@ -543,8 +603,14 @@ def review_report(report_id, new_status):
     cursor.close()
     return updated_rows
 
+
+# ----- Featured Projects -----
+
 def get_featured_projects():
-    # Projects currently shown in featured section
+    """Get all projects currently marked as featured for the featured panel.
+    The featured column (TRUE/FALSE) decides if a project is featured.
+    The home page reads the same column and shows up to 3 projects, but admin can monitor all featured projects in the dashboard.
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT  project.projectId,
@@ -564,7 +630,10 @@ def get_featured_projects():
     return featured_projects
 
 def get_feature_candidates():
-    # Get projects that can be added to featured section
+    """Get projects that can be added to featured section (fills the dropdown).
+    Only applicable for approved, active projects that aren't featured yet.
+    Completed projects belong in success stories instead.
+    """    
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT  project.projectId,
@@ -581,14 +650,16 @@ def get_feature_candidates():
     return feature_candidates
 
 def add_to_featured(project_id):
-    # Show a project in featured section
+    """Mark a project as featured.
+    The same conditions as get_feature_candidates are checked again here.
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         UPDATE project
         SET featured = TRUE   
         WHERE projectId = %s
-          And approvalStatus = 'Approved'
-          And projectStatus = 'Active'
+          AND approvalStatus = 'Approved'
+          AND projectStatus = 'Active'
           AND featured = FALSE
     """, (project_id,)) 
     database.connection.commit()
@@ -597,7 +668,7 @@ def add_to_featured(project_id):
     return updated_rows
 
 def remove_from_featured(project_id):
-    # Take a project out from featured section
+    """Take a project out from featured section (featured = FALSE)."""
     cursor = database.connection.cursor()
     cursor.execute("""
         UPDATE project
@@ -610,8 +681,14 @@ def remove_from_featured(project_id):
     cursor.close()
     return updated_rows
 
+
+# ----- Success Stories -----
+
 def get_success_stories():
-    # Projects currently shown in success stories section
+    """Get all projects currently shown as success stories.
+    The successStoryFeatured column (TRUE/FALSE) decides if a project is success story.
+    The home page reads the same column and shows up to 2 projects, but admin can monitor all of them in the dashboard.
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT  project.projectId,
@@ -631,7 +708,9 @@ def get_success_stories():
     return success_stories
 
 def get_success_story_candidates():
-    # Get projects that can be added to success stories section
+    """Get projects that can be added to success stories section (fills the dropdown).
+    Only applicable for approved, completed projects that aren't success stories yet.
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         SELECT  project.projectId,
@@ -648,14 +727,16 @@ def get_success_story_candidates():
     return success_story_candidates
 
 def add_to_success_stories(project_id):
-    # Show a project in success stories section
+    """Show a project in success stories.
+    Conditions are checked again, like add_to_featured.    
+    """
     cursor = database.connection.cursor()
     cursor.execute("""
         UPDATE project
         SET successStoryFeatured = TRUE   
         WHERE projectId = %s
-          And approvalStatus = 'Approved'
-          And projectStatus = 'Completed'
+          AND approvalStatus = 'Approved'
+          AND projectStatus = 'Completed'
           AND successStoryFeatured = FALSE
     """, (project_id,)) 
     database.connection.commit()
@@ -664,7 +745,7 @@ def add_to_success_stories(project_id):
     return updated_rows
 
 def remove_from_success_stories(project_id):
-    # Take a project out from success stories section
+    """Take a project out of success stories (successStoryFeatured = FALSE)."""
     cursor = database.connection.cursor()
     cursor.execute("""
         UPDATE project

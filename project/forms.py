@@ -6,7 +6,6 @@ from wtforms.validators import (
     DataRequired,
     Email,
     EqualTo,
-    InputRequired,
     Length,
     Regexp,
 )
@@ -94,21 +93,25 @@ class RegisterForm(FlaskForm):
 
 # ----- Part 5. Admin Dashboard -----
 
-# Empty form used by admin for action such as approve, delete, etc.
+
 class AdminActionForm(FlaskForm):
+    """Empty form used for admin actions such as 'Approve' and 'Delete'.
+    It provides the CSRF token, so we can check each action really came from our site."""
     pass
 
-# Form for admin to edit user details
 class EditUserForm(FlaskForm):
-    firstname = StringField("First name", validators=[InputRequired()])
-    surname = StringField("Surname", validators=[InputRequired()])
-    email = StringField("Email address", validators=[InputRequired(), Regexp('^..*@..*[.]..*$')])
+    # Form for admin to edit user details on the Edit User page.
+    firstname = StringField("First name", validators=[DataRequired()])
+    surname = StringField("Surname", validators=[DataRequired()])
+    email = StringField("Email address", validators=[DataRequired(), Email()])
     submit = SubmitField("Save changes")
 
-# Dropdown for choosing a project to add to featured section
 class FeatureProjectForm(FlaskForm):
+    """Dropdown for adding a project to add to featured section.
+    Choices are filled in the view (approved, active, not yet featured)."""
     project_id = SelectField('Select a project to feature', coerce=int)
 
-# Dropdown for choosing a completed project to show as a successful story
 class SuccessStoryForm(FlaskForm):
+    """Dropdown for adding a project to show as a successful story.
+    Choices are filled in the view (approved, completed, not yet added)."""
     project_id = SelectField('Select a project for success stories', coerce=int)
