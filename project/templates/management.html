@@ -13,7 +13,7 @@ Campaign Management | MakeArtsFund
 {# Add a campaign-management link for authenticated fundraiser. #}
 {% block role_navigation %}
 <li class="nav-item">
-    <a class="nav-link" href="{{ url_for('management.management') }}">
+    <a class="nav-link" href="{{ url_for('main.management') }}">
         Campaign Management
     </a>
 </li>
@@ -55,7 +55,7 @@ Campaign Management | MakeArtsFund
 
                             <form
                                 method="POST"
-                                action="{{ url_for('management.management') }}"
+                                action="{{ url_for('main.management') }}"
                             >
                                 <input
                                     type="hidden"
@@ -201,7 +201,7 @@ Campaign Management | MakeArtsFund
                 <!-- Allow the fundraiser to switch between campaigns they own. -->
                 <div class="dashboard-toolbar mb-4">
                     <div class="campaign-selection">
-                        <form method="get" action="{{ url_for('management.management')}}">
+                        <form method="get" action="{{ url_for('main.management')}}">
                             <label class="form-label" for="campaign-selector">Selected campaign</label>
                             <select id="campaign-selector" name="project_id" class="form-select campaign-selector"
                                 onchange="this.form.submit()">
@@ -276,7 +276,7 @@ Campaign Management | MakeArtsFund
                                     class="status-badge status-active">{{ selected_campaign.projectStatus }}</span>
                             </div>
                             {% if selected_campaign.approvalStatus == "Approved" %}
-                            <form method="POST" action="{{ url_for('management.management') }}" class="mb-4">
+                            <form method="POST" action="{{ url_for('main.management') }}" class="mb-4">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <input type="hidden" name="form_action" value="update_status">
 
@@ -380,7 +380,7 @@ Campaign Management | MakeArtsFund
                     </div>
                 {% if selected_campaign %}
                     <form method="POST"
-                        action="{{ url_for('management.management') }}">
+                        action="{{ url_for('main.management') }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">                     
                         <input type="hidden" name="form_action" value="update_project">
                         <input type="hidden" name="project_id" value="{{ selected_campaign.projectId }}">
@@ -429,7 +429,7 @@ Campaign Management | MakeArtsFund
                         <h2 id="updates-heading">Project Updates</h2><span class="update-count">{{ project_updates|length }} Updates</span>
                     </div>
                     <!-- Form for publishing a new update with an optional image. -->
-                    <form method="POST" action="{{ url_for('management.management') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ url_for('main.management') }}" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="form_action" value="post_update">
                         <input type="hidden" name="project_id" value="{{ selected_campaign.projectId }}">
@@ -446,7 +446,7 @@ Campaign Management | MakeArtsFund
                             Update image (optional)
                         </label>
                         <div class="d-flex align-items-lg-center gap-3 mb-3">
-                            <input id="update-image" class="visually-hidden" type="file" name="update_image" accept="image/*">
+                            <input id="update-image" class="visually-hidden" type="file" name="update_image" accept=".png,.jpg,.jpeg,.gif,.webp">
                             <label class="btn btn-coral choose-image-btn mb-0" for="update-image">
                             Choose Image
                             </label>
@@ -483,7 +483,7 @@ Campaign Management | MakeArtsFund
                                         <summary class="btn btn-outline-secondary">
                                             Edit
                                         </summary>
-                                        <form method="POST" action="{{ url_for('management.management') }}" class="mt-3">
+                                        <form method="POST" action="{{ url_for('main.management') }}" class="mt-3">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             <input type="hidden" name="form_action" value="edit_update">
                                             <input type="hidden" name="project_id" value="{{ selected_campaign.projectId }}">
@@ -504,7 +504,7 @@ Campaign Management | MakeArtsFund
                                         </form>
                                     </details>
 
-                                    <form method="POST" action="{{ url_for('management.management') }}" class="mt-3">
+                                    <form method="POST" action="{{ url_for('main.management') }}" class="mt-3">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                         <input type="hidden" name="form_action" value="delete_update">
                                         <input type="hidden" name="project_id" value="{{ selected_campaign.projectId }}">
