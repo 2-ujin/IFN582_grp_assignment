@@ -72,9 +72,9 @@
           </div>
             <!-- discover more button -->
             {% if request.args.get('all') %}
-                <a class="btn btn-outline-coral" href="{{ url_for('main.index') }}#featured-projects">Show Featured</a>
+                <a class="btn btn-outline-coral" href="{{ url_for('main.index', all_stories=request.args.get('all_stories'), category=request.args.get('category'), q=request.args.get('q')) }}#featured-projects">Show Less</a>
             {% else %}
-                <a class="btn btn-outline-coral" href="{{ url_for('main.index', all='true') }}#featured-projects">Discover More</a>
+                <a class="btn btn-outline-coral" href="{{ url_for('main.index', all='true', all_stories=request.args.get('all_stories'), category=request.args.get('category'), q=request.args.get('q')) }}#featured-projects">Discover More</a>
             {% endif %}
         </div>
 
@@ -89,7 +89,7 @@
                   <p class="artist-name">{{ project['artistName'] }}</p>
                   <p class="project-meta">{{ project['categoryName'] }} <span>•</span> {{ project['location'] }}</p>
                   <div class="progress-label"><span>${{ "{:,.0f}".format(project['totalRaised']) }} raised</span><span>{{ project['progressPercentage'] | int }}%</span></div>
-                  <div class="progress" role="progressbar" aria-label="{{ project['projectName'] }} funding progress"aria-valuenow="{{ project['progressPercentage'] | int }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:{{ [project['progressPercentage'] | int, 100] | min }}%"></div></div>
+                  <div class="progress" role="progressbar" aria-label="{{ project['projectName'] }} funding progress" aria-valuenow="{{ project['progressPercentage'] | int }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:{{ [project['progressPercentage'] | int, 100] | min }}%"></div></div>
                   <div class="card-footer-info"><span>Goal: ${{ "{:,.0f}".format(project['goal']) if project['goal'] else 0 }}</span><strong>{{ project['daysRemaining'] }} days remaining</strong></div>
                 </div>
               </article>
@@ -107,8 +107,17 @@
     <!-- Success Stories -->
     <section id="success-stories" class="section-padding success-section">
       <div class="container">
-        <div class="section-heading mb-4">
-          <h2>Success Stories</h2>
+        
+        <!-- button in success stories -->
+        <div class="featured-heading-row mb-4">
+            <div class="section-heading mb-0">
+            <h2>Success Stories</h2>
+            </div>
+            {% if request.args.get('all_stories') %}
+            <a class="btn btn-outline-coral" href="{{ url_for('main.index', all=request.args.get('all'), category=request.args.get('category'), q=request.args.get('q')) }}#success-stories">Show Less</a>
+            {% else %}
+            <a class="btn btn-outline-coral" href="{{ url_for('main.index', all=request.args.get('all'), category=request.args.get('category'), q=request.args.get('q'), all_stories='true') }}#success-stories">Discover More</a>
+            {% endif %}
         </div>
 
         <div class="row g-4">
