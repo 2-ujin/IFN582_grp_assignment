@@ -1,5 +1,17 @@
-{% block role_navigatiob %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/stylesheet.css') }}">
+{% extends "base.html" %}
+
+{% block title %}
+Campaign Management | MakeArtsFund
+{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
+
+{% block role_navigation %}
 <li class="nav-item">
     <a class="nav-link" href="{{ url_for('management.management') }}">
         Campaign Management
@@ -8,20 +20,20 @@
 {% endblock %}
 
 {% block content %}
-        <section class="dashboard-section">
-            <div class="container">
+<section class="dashboard-section">
+    <div class="container">
 
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                                </button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
                 <!-- Campaign Overview -->
                  <section class="dashboard-panel mb-4"
