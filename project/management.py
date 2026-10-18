@@ -6,18 +6,24 @@ from .views import fundraiser_required
 from datetime import date
 import os
 import uuid
+#File types accepted for optional project update images.
 ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
-
+#Blueprint containing all fundaraiser campaign-management
 management_bp = Blueprint("management", __name__)
 
 
 @management_bp.route("/management", methods=["GET", "POST"])
 @fundraiser_required
 def management():
+    """Display and process the logged-in fundraiser"s campaign dashboard."""
+
+    #Use the authenticated user ID instead of a hard-coded creator ID.
     creator_id = current_user.id
 
     cursor = database.connection.cursor()
 
+    #Load only the campaigns owned by the logged-in fundraiser.
+    #This is to prevent fundraiser from viewing another fundraiser's campaigns.
     project_query = """
         SELECT 
             p.projectId, p.categoryId, p.projectName, p.approvalStatus, p.projectStatus, p.location, p.imagePath, p.goal, p.deadline, p.projectDescription, p.artistIntro, p.updateDt, c.categoryName
@@ -30,6 +36,7 @@ def management():
     cursor.execute(project_query, (creator_id,))
     campaigns = cursor.fetchall()
 
+    #Load categories for the create and edit campaign dropdowns.
     category_query = """
         SELECT 
             categoryId, categoryName
@@ -40,11 +47,14 @@ def management():
     cursor.execute(category_query)
     categories = cursor.fetchall()
 
+    #Used to reject category IDs that were manually altered in the browser.
     valid_category_ids = {
         category["categoryId"]
         for category in categories
     }
 
+    #Select the campaign requested in the URL.
+    #Fall back to the fundraiser's first campaign when no valid ID is supplied.
     selected_id = request.args.get("project_id", type=int)
 
     selected_campaign = None
@@ -68,14 +78,16 @@ def management():
             (selected_campaign["deadline"] - date.today()).days,0
         )
 
+    #Initialise campaign statistics so the page also works with no campaign.
     fund_raised = 0
     supporter_count = 0
     donation_count = 0
     progress = 0
     average_donation = 0
-    progress = 0
+
 
     if selected_campaign:
+        #Calculate statistics dynamically from received donation only.
         donation_query = """
             SELECT 
                 COALESCE(SUM(amount),0) AS fundRaised,
@@ -120,6 +132,7 @@ def management():
     elif progress > 0:
         campaign_message = "Your campaign is gaining support. Keep sharing project updates."
 
+    #Display the five most recent donations for the selected campaign.
     recent_donation = []
 
     if selected_campaign:
@@ -138,6 +151,7 @@ def management():
         )
         recent_donation = cursor.fetchall()
 
+    #Load campaign posts and the first image attached to each post.
     project_updates = []
 
     if selected_campaign:
@@ -160,17 +174,27 @@ def management():
         )
         project_updates = cursor.fetchall()
 
+    
+    #Process create, edit, status and project-update from submissions.
     if request.method == "POST":
         form_action = request.form.get("form_action")
         project_id = request.form.get("project_id", type=int)
 
+        #Stored the IDs of camapigns owned by the logged-in fundraiser.
         owned_project_ids = {
             campaign["projectId"]
             for campaign in campaigns
         }
+
+        #Never rely only on the campaigns shown in the UI.
+        #Verify ownership again before changing existing campaign data.
+        #Creating a campaign is excluded because it does not have a project ID yet.
         if(
-            project_id is None
-            or project_id not in owned_project_ids
+            form_action != "create_campaign"
+            and(
+                project_id is None
+                or project_id not in owned_project_ids
+            )
         ):
             flash(
                 "You are not authorised to manage this campaign.","danger"
@@ -180,6 +204,7 @@ def management():
             )
 
         try:
+            #Create a new campaign with pending administrator approval.
             if form_action == "create_campaign":
                 project_name = request.form.get(
                     "project_name",
@@ -288,7 +313,8 @@ def management():
                         "The deadline cannot be in the past.",
                         "danger"
                     )
-                                
+            
+            #Update the selected campaign's editable information.                    
             elif form_action == "update_project":
                 project_name = request.form.get(
                 "project_name",""
@@ -338,6 +364,7 @@ def management():
                         "Please complete all project information correctly.","danger"
                     )
 
+            #Allow operational status changes only for approved campaigns.
             elif form_action == "update_status":
                 new_status = request.form.get("project_status", "").strip()
             
@@ -386,6 +413,7 @@ def management():
                         "Campaign status updated successfully.","success"
                     )
 
+            #Publish a campaign update with an optional validated image.
             elif form_action == "post_update":
                 update_title = request.form.get("update_title","").strip()
                 update_description = request.form.get("update_description", "").strip()
@@ -443,7 +471,6 @@ def management():
                                 project_id, update_title, update_description
                             )
                         )
-                        new_update_id = cursor.lastrowid
 
                         new_update_id = cursor.lastrowid
                         if update_image and update_image.filename:
@@ -485,7 +512,7 @@ def management():
                             "You are not authorised to update this campaign.","danger"
                         )
 
-
+            #Edit an existing update after confirming campaign ownership.
             elif form_action == "edit_update":
                 update_id = request.form.get(
                     "update_id",type=int
@@ -526,7 +553,7 @@ def management():
                         "Please enter a valid update title and description.","danger"
                     )
 
-
+            #Delete the update, its database image records and stored files.
             elif form_action == "delete_update":
                 update_id = request.form.get(
                     "update_id",type=int
@@ -592,7 +619,7 @@ def management():
                                     os.remove(full_image_path)
                     
                         flash(
-                            "Project updated deleted successfully.","success"
+                            "Project update deleted successfully.","success"
                         )
                     else:
                         flash(
@@ -603,9 +630,12 @@ def management():
                     flash(
                         "Invalid update information.", "danger"
                     )
+
+        #Roll back the transaction so a failed operation does not leave
+        #Partially saved database changes.
         except Exception:
             database.connection.rollback()
-            current_app.logger.exceptional(
+            current_app.logger.exception(
                 "Management database operation failed"
             )
             flash(
@@ -617,7 +647,8 @@ def management():
                 "management.management",project_id=project_id
             )
         )
-    
+
+    #Load visible supporter messages linked to donations for this campaign.
     supporter_messages = []
 
     if selected_campaign:
@@ -638,10 +669,11 @@ def management():
         )
         supporter_messages = cursor.fetchall()
 
+    #Close the cursor after all database reads are complete.
     cursor.close()
 
 
-
+    #Pass database results and calculated statistics to the template.
     return render_template(
         "management.html",
         campaigns=campaigns,

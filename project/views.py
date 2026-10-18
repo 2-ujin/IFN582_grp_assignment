@@ -251,72 +251,51 @@ def logout():
 # ----- Part 3. Home page -----
 # Keep the temporary Part 2 database check at its own path. The Part 3 home
 # page owns `/`, so both pieces remain available without a duplicate route.
-@main.route("/db-check")
-def database_check():
-    """Return a small query result for checking the local database connection."""
-    cursor = database.connection.cursor()
-    try:
-        cursor.execute("SELECT projectName FROM project")
-        projects = cursor.fetchall()
-    finally:
-        cursor.close()
-    return str(projects)
-
-
 
 @main.route('/')
 
 def index():
     search_query = (request.args.get('q') or request.args.get('search', '')).strip()
     category_filter = request.args.get('category', '').strip()
+    show_all = request.args.get('all') == 'true'
     # Load the featured projects and success stories for the home page.
     cursor = database.connection.cursor()
 
+    query = """
+        SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
+                c.categoryName,
+                IFNULL(SUM(d.amount), 0) AS totalRaised,
+                ROUND(IFNULL(SUM(d.amount), 0) / p.goal * 100) AS progressPercentage,
+                GREATEST(DATEDIFF(p.deadline, CURDATE()), 0) AS daysRemaining         
+        FROM project p
+        JOIN user u ON p.creatorId = u.userId
+        JOIN category c ON p.categoryId = c.categoryId
+        LEFT JOIN donation d ON p.projectId = d.projectId           
+        WHERE p.approvalStatus = 'Approved'
+    """
+    params = []
+    if search_query:
+        query += " AND (p.projectName LIKE %s OR p.projectDescription LIKE %s)"
+        params.extend([f"%{search_query}%", f"%{search_query}%"])
+    elif category_filter:
+        query += " AND c.categoryName = %s"
+        params.append(category_filter)
 
-    if search_query or category_filter or request.args.get('all'):
-        query = """
-            SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
-                   c.categoryName,
-                   IFNULL(SUM(d.amount), 0) AS totalRaised,
-                   ROUND(IFNULL(SUM(d.amount), 0) / p.goal * 100) AS progressPercentage,
-                   GREATEST(DATEDIFF(p.deadline, CURDATE()), 0) AS daysRemaining         
-            FROM project p
-            JOIN user u ON p.creatorId = u.userId
-            JOIN category c ON p.categoryId = c.categoryId
-            LEFT JOIN donation d ON p.projectId = d.projectId           
-            WHERE p.approvalStatus = 'Approved'
-        """
-        params = []
-        if search_query:
-            query += " AND (p.projectName LIKE %s OR p.projectDescription LIKE %s)"
-            params.extend([f"%{search_query}%", f"%{search_query}%"])
-        if category_filter:
-            query += " AND c.categoryName = %s"
-            params.append(category_filter)
-
-        query += " GROUP BY p.projectId ORDER BY p.projectId ASC"
-        cursor.execute(query, tuple(params))
-        projects = cursor.fetchall()
     else:
-        cursor.execute("""
-            SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
-            c.categoryName,
-            IFNULL(SUM(d.amount), 0) AS totalRaised,
-            ROUND(IFNULL(SUM(d.amount), 0) / p.goal * 100) AS progressPercentage,
-            GREATEST(DATEDIFF(p.deadline, CURDATE()), 0) AS daysRemaining         
-            FROM project p
-            JOIN user u ON p.creatorId = u.userId
-            JOIN category c ON p.categoryId = c.categoryId
-            LEFT JOIN donation d ON p.projectId = d.projectId           
-            WHERE p.featured = TRUE AND p.approvalStatus = 'Approved'
-            GROUP BY p.projectId
-            ORDER BY p.projectId ASC           
-            LIMIT 3
-                            
-        """)
-        projects = cursor.fetchall()
+        query += " AND p.featured = TRUE"
+    query += " GROUP BY p.projectId ORDER BY p.projectId ASC"
+    
+    if not search_query and not category_filter and not show_all:
+        query += " LIMIT 3"
+    
+    
+    cursor.execute(query, tuple(params))
+    projects = cursor.fetchall()
 
-    cursor.execute("""
+    # show success stories with botton
+    show_all_stories = request.args.get('all_stories') == 'true'
+
+    stories_query="""
         SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
             c.categoryName
         FROM project p
@@ -324,19 +303,27 @@ def index():
         JOIN category c ON p.categoryId = c.categoryId
         WHERE p.successStoryFeatured = TRUE
         ORDER BY p.projectId ASC
-        LIMIT 2
-    """)
+    """
+    if not show_all_stories:
+        stories_query += " LIMIT 2"
+
+    cursor.execute(stories_query)
     success_stories = cursor.fetchall()
     cursor.close()
 
     # Keep the existing Part 3 home page and its template intact.
-    return render_template('home.html', projects=projects, success_stories=success_stories)
+    return render_template(
+        'home.html', 
+        projects=projects, 
+        success_stories=success_stories,
+        selected_category_filter=category_filter,
+        search_query=search_query
+        )
     
 
 # ----- Part 3. Fundraiser details and donation page -----
-@main.route('/donation', methods=['GET', 'POST'])
 @main.route('/donation/<int:project_id>', methods=['GET', 'POST'])
-def project_detail(project_id = 1):
+def project_detail(project_id):
 
     if request.method == 'POST':
         # check log in, if not need log in first
