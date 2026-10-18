@@ -2,7 +2,7 @@
 
 /* Design tokens keep colours consistent and make later theme changes local. */
 /* =========================
-   MakeArtsFund colour palette
+   1. MakeArtsFund colour palette
    ========================= */
 
 :root {
@@ -16,9 +16,10 @@
   --white: #ffffff;
 }
 
-/* =========================
-   General styles
-   ========================= */
+
+/* ==========================================================================
+   2. General & Reset Styles
+   ========================================================================== */
 
 *,
 *::before,
@@ -101,11 +102,9 @@ h1 {
   color: var(--white);
 }
 
-/* Keep a visible outline for keyboard focus so controls are easier to locate. */
-
-/* =========================
-   Shared navigation
-   ========================= */
+/* ==========================================================================
+   3. Shared Navigation & Header
+   ========================================================================== */
 
 .site-navbar {
   padding: 1rem 0;
@@ -126,6 +125,7 @@ h1 {
   font-size: 1.55rem;
   font-weight: 700;
   letter-spacing: -0.04em;
+  text-decoration: none;
   white-space: nowrap;
 }
 
@@ -163,6 +163,11 @@ h1 {
   font-weight: 600;
 }
 
+.header-select:focus {
+  border-color: var(--coral-dark);
+  outline: 2px solid rgba(231, 111, 81, 0.35);
+}
+
 .site-navbar .navbar-nav {
   flex-direction: row;
   align-items: center;
@@ -183,6 +188,14 @@ h1 {
   color: var(--coral-dark);
 }
 
+.navbar-toggler {
+  border-color: var(--line);
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgb(37,36,42)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
 .header-actions {
   gap: 0.55rem;
 }
@@ -191,6 +204,7 @@ h1 {
   color: var(--charcoal);
   font-size: 0.9rem;
   font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .account-role {
@@ -242,9 +256,9 @@ h1 {
   border-color: var(--coral-dark);
 }
 
-/* =========================
-   Shared buttons and forms
-   ========================= */
+/* ==========================================================================
+   4. Shared Buttons, Forms & Feedback Components
+   ========================================================================== */
 
 .btn {
   padding: 0.7rem 1.25rem;
@@ -297,9 +311,20 @@ h1 {
   color: #625f67 !important;
 }
 
-/* =========================
-   Shared page spacing and feedback
-   ========================= */
+.flash-messages {
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 1rem;
+}
+
+.flash-messages .alert {
+  margin: 0;
+  border-radius: 0.75rem;
+}
+
+/* ==========================================================================
+   5. Shared Sections & Spacing
+   ========================================================================== */
 
 .section-padding {
   padding: 5.5rem 0;
@@ -313,72 +338,566 @@ h1 {
   background: var(--tint);
 }
 
-.flash-messages {
-  /* Stack multiple status messages with breathing room between them. */
-  display: grid;
-  gap: 0.75rem;
-  padding-top: 1rem;
+.section-heading h1,
+.section-heading h2 {
+  margin-bottom: 0.6rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  letter-spacing: -0.035em;
 }
 
-.flash-messages .alert {
-  margin: 0;
-  border-radius: 0.75rem;
-}
+/* ==========================================================================
+   6. Homepage Sections
+   ========================================================================== */
 
-/* =========================
-   Shared error page
-   ========================= */
-
-.error-section {
-  /* Vertically centre the shared 403/404/500 card when there is room. */
-  min-height: 55vh;
-  display: flex;
-  align-items: center;
+/* Hero */
+.hero-section {
+  padding: 6rem 0 5.5rem;
+  overflow: hidden;
   background: var(--cream);
 }
 
-.error-card {
-  width: min(100%, 760px);
-  margin: 0 auto;
-  padding: clamp(2rem, 6vw, 4.5rem);
+.hero-section h1 {
+  max-width: 100%;
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(2.8rem, 6vw, 5.2rem);
+  line-height: 1.06;
+  letter-spacing: -0.045em;
+  white-space: nowrap;
+}
+
+.hero-copy {
+  max-width: 680px;
+  margin: 1.45rem 0 0;
+  color: var(--ash);
+  font-size: 1.15rem;
+}
+
+/* Categories */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+
+.category-item {
+  display: flex;
+  min-height: 125px;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  color: var(--charcoal);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  flex-direction: column;
+  gap: 0.65rem;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.category-item span {
+  color: var(--coral);
+  font-family: Georgia, serif;
+  font-size: 2rem;
+}
+
+.category-item:hover {
+  color: var(--white);
+  background: var(--coral);
+  transform: translateY(-4px);
+}
+
+.category-item:hover span {
+  color: var(--white);
+}
+
+.category-item.active {
+  border-color: #e05a47 !important;
+  background-color: #fff4f2 !important;
+  color: #e05a47 !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 12px rgba(224, 90, 71, 0.15) !important;
+}
+
+/* How It Works */
+.step-card {
+  height: 100%;
+  padding: 2rem;
   background: var(--white);
   border: 1px solid var(--line);
-  border-radius: 22px;
-  box-shadow: 0 0.5rem 1.8rem rgba(37, 36, 42, 0.07);
+  border-radius: 18px;
 }
 
-.error-code {
-  margin-bottom: 0.6rem;
-  color: var(--coral-dark);
-  font-size: clamp(1.35rem, 3vw, 1.9rem);
-  font-weight: 800;
-  letter-spacing: 0.01em;
+.step-number {
+  color: var(--coral);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.7rem;
 }
 
-.error-card h1 {
-  margin-bottom: 1rem;
+.step-card h3 {
+  margin: 0.9rem 0 0.5rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.65rem;
 }
 
-.error-message {
-  max-width: 55ch;
-  margin-bottom: 1.75rem;
+.step-card p {
+  margin-bottom: 0;
   color: var(--ash);
-  font-size: 1.08rem;
 }
 
-/* =========================
-   Authentication pages
-   ========================= */
+/* Featured Projects */
+.featured-heading-row {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.project-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.project-card {
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-card:hover {
+  box-shadow: 0 14px 30px rgba(37, 36, 42, 0.1);
+  transform: translateY(-5px);
+}
+
+.project-image {
+  display: block;
+  width: 100%;
+  height: 230px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 1.4rem;
+}
+
+.card-body h3,
+.success-card h3 {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.45rem;
+}
+
+.artist-name {
+  margin: 0.2rem 0 0.8rem;
+  color: var(--coral);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.project-meta {
+  margin-bottom: 1.3rem;
+  color: var(--ash);
+  font-size: 0.82rem;
+}
+
+.project-meta span {
+  padding: 0 0.35rem;
+  color: var(--coral);
+}
+
+.progress-label,
+.card-footer-info {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.progress-label {
+  margin-bottom: 0.45rem;
+}
+
+.progress {
+  height: 8px;
+  background: #eee3dc;
+  border-radius: 999px;
+}
+
+.progress-bar {
+  background: var(--coral);
+  border-radius: 999px;
+}
+
+.card-footer-info {
+  margin-top: 1rem;
+  color: var(--ash);
+}
+
+.card-footer-info strong {
+  color: var(--coral);
+}
+
+/* Success Stories */
+.success-section {
+  color: var(--white);
+  background: var(--charcoal);
+}
+
+.success-section h2 {
+  color: var(--white) !important;
+}
+
+.success-card {
+  height: 100%;
+  padding-bottom: 1.5rem;
+  overflow: hidden;
+  background: #302f36;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 18px;
+}
+
+.success-card h3 {
+  color: var(--white) !important;
+}
+
+.success-image {
+  display: block;
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+}
+
+.success-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem 0.8rem;
+}
+
+.success-content p,
+.success-card > p {
+  color: #d7d0cb !important;
+}
+
+.success-content p {
+  margin: 0;
+}
+
+.success-card > p {
+  padding: 0 1.5rem;
+}
+
+.completed-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.75rem;
+  color: #27623e;
+  background: #b7e0c4;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   7. Fundraiser Details & Donation Page
+   ========================================================================== */
+
+.details-breadcrumb {
+  padding: 1rem 0;
+  background: var(--tint);
+  border-bottom: 1px solid var(--line);
+}
+
+.details-breadcrumb a {
+  color: var(--coral);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.details-breadcrumb .breadcrumb-item.active {
+  color: var(--ash);
+}
+
+.details-hero {
+  background: var(--cream);
+}
+
+.details-project-image {
+  display: block;
+  width: 100%;
+  min-height: 390px;
+  object-fit: cover;
+  border-radius: 22px;
+}
+
+.project-heading h1 {
+  margin-bottom: 1rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  letter-spacing: -0.045em;
+}
+
+.project-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1.5rem;
+  color: var(--ash);
+  font-size: 1rem;
+}
+
+.detail-artist-name {
+  color: var(--coral);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.meta-separator {
+  padding: 0 0.35rem;
+  color: var(--coral);
+  font-weight: 700;
+}
+
+.funding-card,
+.donation-card,
+.content-panel {
+  padding: 2rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.funding-card,
+.donation-card {
+  position: sticky;
+  top: 2rem;
+}
+
+.funding-card h2,
+.donation-card h2,
+.content-panel h2 {
+  margin-bottom: 1.25rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.8rem;
+}
+
+.funding-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 1.4rem;
+}
+
+.funding-amount strong {
+  font-size: 2.2rem;
+}
+
+.funding-amount span {
+  color: var(--ash);
+  font-size: 0.85rem;
+}
+
+.funding-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.funding-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.funding-stats strong {
+  font-size: 1.45rem;
+}
+
+.funding-stats span {
+  color: var(--ash);
+  font-size: 0.78rem;
+}
+
+.details-content-section {
+  background: var(--tint);
+}
+
+.content-panel h2 {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.content-panel p {
+  color: var(--ash);
+}
+
+.artist-profile {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.artist-avatar,
+.message-avatar {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--white);
+  background: var(--coral);
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.artist-avatar {
+  width: 64px;
+  height: 64px;
+  background: var(--charcoal);
+}
+
+.message-avatar {
+  width: 46px;
+  height: 46px;
+}
+
+.artist-profile h3,
+.supporter-message h3,
+.update-item h3 {
+  margin-bottom: 0.45rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.25rem;
+}
+
+.panel-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.update-count {
+  color: var(--coral);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.update-editor {
+  padding: 1.25rem;
+  background: var(--tint);
+  border-radius: 14px;
+}
+
+.update-editor .form-label {
+  margin-bottom: 0.6rem;
+}
+
+.updates-list {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.update-item {
+  width: 100%;
+  max-width: 100%;
+  padding: 1.3rem 0;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--line);
+}
+
+.update-item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.update-date,
+.message-date {
+  margin-bottom: 0.35rem;
+  color: var(--coral);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.update-item p,
+.supporter-message p {
+  max-width: 100%;
+  margin-bottom: 0.85rem;
+  color: var(--ash);
+  overflow-wrap: anywhere;
+}
+
+.update-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  margin-top: 1.25rem;
+  object-fit: contain;
+  object-position: center;
+  background: var(--tint);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.supporter-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.donation-intro {
+  color: var(--ash);
+  font-size: 0.9rem;
+}
+
+.donation-card .form-label {
+  color: var(--charcoal);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.donation-card .form-control,
+.donation-card .form-select,
+.donation-card .input-group-text {
+  min-height: 48px;
+  border-color: var(--line);
+}
+
+.donation-card textarea.form-control {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.donation-card .input-group-text {
+  color: var(--ash);
+  background: var(--tint);
+}
+
+/* ==========================================================================
+   8. Authentication Pages (Login & Register)
+   ========================================================================== */
 
 .auth-section {
-  /* A subtle coral glow ties account pages to the assessment design palette. */
   background:
     radial-gradient(circle at 4% 8%, rgba(231, 111, 81, 0.08), transparent 24rem),
     var(--cream);
 }
 
 .auth-layout {
-  /* The form and explanatory panel sit side by side on wider screens. */
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
   align-items: stretch;
@@ -407,12 +926,7 @@ h1 {
   font-size: clamp(2rem, 4vw, 3.25rem);
 }
 
-.auth-layout-login .auth-card h1 {
-  margin-bottom: 1.5rem;
-  font-size: clamp(2.4rem, 5vw, 3.5rem);
-  font-weight: 700;
-}
-
+.auth-layout-login .auth-card h1,
 .auth-layout-register .auth-card h1 {
   margin-bottom: 1.5rem;
 }
@@ -439,10 +953,10 @@ h1 {
   margin: 0.35rem 0 0;
   color: #9f3026;
   font-size: 0.9rem;
+  overflow-wrap: anywhere;
 }
 
 .test-credentials {
-  /* Keep marker login details grouped visually below the form fields. */
   margin-top: 1.25rem;
   padding: 1.15rem;
   background: var(--tint);
@@ -502,7 +1016,6 @@ h1 {
 }
 
 .auth-aside {
-  /* The dark panel provides a visual counterweight to the white form card. */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -593,139 +1106,12 @@ h1 {
   color: var(--ash);
 }
 
-/* =========================
-   Shared footer
-   ========================= */
+/* ==========================================================================
+   9. Dashboard & Campaign Pages
+   ========================================================================== */
 
-.site-footer {
-  margin-top: auto;
-  padding: 3rem 0 2rem;
-  color: #d7d0cb;
-  background: #1d1c21;
-}
-
-.footer-links-only {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-}
-
-.footer-links-only a {
-  color: var(--white);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.footer-links-only a:hover {
-  color: var(--coral);
-}
-
-.site-footer hr {
-  margin: 2rem 0 1.5rem;
-  border-color: rgba(255, 255, 255, 0.16);
-}
-
-.copyright {
-  color: #9d9793;
-  font-size: 0.8rem;
-}
-
-/* =========================
-   Responsive layout
-   ========================= */
-
-/* At tablet width, reduce large page spacing and let the two-column cards stack. */
-@media (max-width: 991.98px) {
-  .header-inner {
-    flex-wrap: wrap;
-  }
-
-  .header-navigation {
-    order: 3;
-    flex-basis: 100%;
-  }
-
-  .header-main {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-    padding-top: 0.75rem;
-  }
-
-  .search-form {
-    width: 100%;
-    max-width: none;
-    margin: 0;
-  }
-
-  .header-actions {
-    align-items: flex-start !important;
-    flex-wrap: wrap;
-    padding-top: 0.25rem;
-  }
-
-  .auth-layout {
-    grid-template-columns: 1fr;
-    max-width: 760px;
-  }
-
-  .auth-aside {
-    min-height: 300px;
-  }
-}
-
-/* Small-phone adjustments keep buttons, cards, and credentials readable. */
-@media (max-width: 575.98px) {
-  .section-padding {
-    padding: 4rem 0;
-  }
-
-  .error-card {
-    padding: 1.6rem;
-  }
-
-  .auth-card,
-  .auth-aside {
-    padding: 1.4rem;
-    border-radius: 17px;
-  }
-
-  .test-credentials {
-    padding: 0.85rem;
-  }
-
-  .credential-table {
-    font-size: 0.8rem;
-  }
-
-  .credential-table td,
-  .credential-table th {
-    padding: 0.45rem 0.3rem;
-  }
-
-  .site-footer {
-    padding: 2.25rem 0 1.5rem;
-  }
-
-  .footer-links-only {
-    gap: 0.85rem 1.15rem;
-  }
-}
-
-/* Honour the user's operating-system preference to reduce animated scrolling. */
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-}
-
-
-/* =========================
-   Campaign Page
-   ========================= */
-
-.dashboard-section {
+.dashboard-section,
+.admin-dashboard-section {
   padding: 3rem 0 5.5rem;
   background: var(--tint);
 }
@@ -778,7 +1164,8 @@ h1 {
 
 .status-active,
 .status-approved,
-.status-received {
+.status-received,
+.status-resolved {
   color: #27623e;
   background: #e7f4ec;
 }
@@ -788,7 +1175,13 @@ h1 {
   background: #fff4d7;
 }
 
-.stat-card {
+.status-suspended {
+  color: #963e34;
+  background: #fde8e5;
+}
+
+.stat-card,
+.admin-stat-card {
   display: flex;
   height: 100%;
   min-height: 155px;
@@ -805,38 +1198,43 @@ h1 {
   font-size: 1rem;
 }
 
-.stat-card-emphasis .stat-value {
+.stat-card-emphasis .stat-value,
+.admin-stat-value {
+  display: block;
+  font-family: "Playfair Display", Georgia, serif;
   font-size: 2.35rem;
+  line-height: 1.1;
 }
 
-.stat-label {
+.stat-label,
+.admin-stat-label {
   color: var(--ash);
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
-.stat-value {
+.stat-note,
+.admin-stat-note {
   display: block;
-  font-family: "Playfair Display", Georgia, serif;
-  line-height: 1.1;
-}
-
-.stat-note {
   margin-top: 0.35rem;
   color: var(--ash);
   font-size: 0.8rem;
 }
 
-.admin-panel th {
-  white-space: nowrap;
+.admin-stat-link {
+  display: block;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
 }
 
-.admin-panel td .btn {
-  width: 7rem;
+.admin-stat-link:hover .admin-stat-card {
+  box-shadow: 0 12px 26px rgba(37, 36, 42, 0.1);
+  transform: translateY(-4px);
 }
 
-.dashboard-panel
+.dashboard-panel,
 .admin-panel {
   padding: 2rem;
   background: var(--white);
@@ -844,20 +1242,38 @@ h1 {
   border-radius: 18px;
 }
 
-.dashboard-panel h2
+.dashboard-panel h2,
 .admin-panel-heading h2 {
   margin-bottom: 0;
   font-family: "Playfair Display", Georgia, serif;
   font-size: 1.8rem;
 }
 
-.panel-heading-row
+.panel-heading-row,
 .admin-panel-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1.5rem;
+}
+
+.admin-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-count-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.7rem;
+  color: var(--coral);
+  background: #fff0eb;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .percentage-label {
@@ -948,6 +1364,7 @@ h1 {
   font-size: 0.8rem;
 }
 
+.admin-table,
 .dashboard-table {
   min-width: 650px;
   margin-bottom: 0;
@@ -955,8 +1372,9 @@ h1 {
   vertical-align: middle;
 }
 
+.admin-table thead th,
 .dashboard-table thead th {
-  padding: 0.8rem 1rem;
+  padding: 0.85rem 1rem;
   color: var(--ash);
   background: var(--tint);
   border-bottom: 1px solid var(--line);
@@ -964,15 +1382,32 @@ h1 {
   text-transform: uppercase;
 }
 
+.admin-table tbody th,
+.admin-table tbody td,
 .dashboard-table tbody th,
 .dashboard-table tbody td {
   padding: 1rem;
   border-color: var(--line);
-  font-size: 0.86rem;
+  font-size: 0.84rem;
 }
 
+.admin-table tbody th,
 .dashboard-table tbody th {
   font-weight: 700;
+}
+
+.admin-panel th {
+  white-space: nowrap;
+}
+
+.admin-panel td .btn {
+  width: 7rem;
+}
+
+.sort-indicator {
+  margin-left: 0.25rem;
+  color: var(--coral);
+  font-size: 0.95rem;
 }
 
 .dashboard-panel .form-label {
@@ -998,144 +1433,6 @@ h1 {
   background: var(--tint);
 }
 
-.update-editor {
-  padding: 1.25rem;
-  background: var(--tint);
-  border-radius: 14px;
-}
-
-.update-editor .form-label {
-  margin-bottom: 0.6rem;
-}
-
-.updates-list {
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
-}
-
-.update-item {
-  width: 100%;
-  max-width: 100%;
-  padding: 1.3rem 0;
-  overflow-wrap: anywhere;
-  border-bottom: 1px solid var(--line);
-}
-
-.update-item:last-child {
-  padding-bottom: 0;
-  border-bottom: 0;
-}
-
-.update-date,
-.message-date {
-  margin-bottom: 0.35rem;
-  color: var(--coral);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.update-item h3,
-.supporter-message h3 {
-  margin-bottom: 0.45rem;
-  font-family: "Playfair Display", Georgia, serif;
-  font-size: 1.25rem;
-}
-
-.update-item p,
-.supporter-message p {
-  max-width: 100%;
-  margin-bottom: 0.85rem;
-  color: var(--ash);
-  overflow-wrap: anywhere;
-}
-
-.update-image {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 360px;
-  margin-top: 1.25rem;
-  object-fit: contain;
-  object-position: center;
-  background: var(--tint);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-}
-
-.supporter-message {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-}
-
-.message-avatar {
-  display: grid;
-  flex: 0 0 auto;
-  width: 46px;
-  height: 46px;
-  place-items: center;
-  color: var(--white);
-  background: var(--coral);
-  border-radius: 50%;
-  font-weight: 700;
-}
-
-@media (max-width: 767.98px) {
-  .dashboard-toolbar {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .campaign-selector {
-    min-width: 100%;
-  }
-
-  .funding-breakdown {
-    grid-template-columns: 1fr;
-  }
-
-  .campaign-details-list div {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .campaign-details-list dd {
-    text-align: left;
-  }
-}
-
-@media (max-width: 575.98px) {
-  .dashboard-section {
-    padding: 2rem 0 4rem;
-  }
-
-  .dashboard-panel,
-  .dashboard-toolbar {
-    padding: 1.4rem;
-  }
-
-  .panel-heading-row {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .stat-card-emphasis .stat-value {
-    font-size: 2rem;
-  }
-
-  .update-image {
-    max-height: 260px;
-  }
-}
-
-
-/* =========================
-   Campaign page 2.0
-   ========================= */
-
 .campaign-overview-heading {
   margin-bottom: 1.5rem;
 }
@@ -1147,7 +1444,6 @@ h1 {
   letter-spacing: -0.035em;
 }
 
-/* Match the Save Changes button styling */
 #project-information-heading + .status-badge {
   flex-shrink: 0;
 }
@@ -1164,37 +1460,185 @@ section[aria-labelledby="project-information-heading"] .btn:hover {
   background: var(--coral-dark);
   border-color: var(--coral-dark);
 }
+
 .choose-image-btn {
+  display: inline-block;
+  width: 160px;
+  min-width: 0;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.homepage-project-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.homepage-project-item:last-of-type {
+  border-bottom: 0;
+}
+
+.homepage-project-item strong,
+.homepage-project-item span {
+  display: block;
+}
+
+.homepage-project-item strong {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.05rem;
+}
+
+.homepage-project-item span {
+  color: var(--ash);
+  font-size: 0.8rem;
+}
+
+/* ==========================================================================
+   10. Shared Error Page
+   ========================================================================== */
+
+.error-section {
+  min-height: 55vh;
+  display: flex;
+  align-items: center;
+  background: var(--cream);
+}
+
+.error-card {
+  width: min(100%, 760px);
+  margin: 0 auto;
+  padding: clamp(2rem, 6vw, 4.5rem);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: 0 0.5rem 1.8rem rgba(37, 36, 42, 0.07);
+}
+
+.error-code {
+  margin-bottom: 0.6rem;
+  color: var(--coral-dark);
+  font-size: clamp(1.35rem, 3vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.error-card h1 {
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  max-width: 55ch;
+  margin-bottom: 1.75rem;
+  color: var(--ash);
+  font-size: 1.08rem;
+}
+
+/* ==========================================================================
+   11. Shared Footer
+   ========================================================================== */
+
+.site-footer {
+  margin-top: auto;
+  padding: 3rem 0 2rem;
+  color: #d7d0cb;
+  background: #1d1c21;
+}
+
+.footer-links-only {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.footer-links-only a {
+  color: var(--white);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.footer-links-only a:hover {
+  color: var(--coral);
+}
+
+.site-footer hr {
+  margin: 2rem 0 1.5rem;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.copyright {
+  color: #9d9793 !important;
+  font-size: 0.8rem;
+}
+
+/* ==========================================================================
+   12. Responsive Media Queries
+   ========================================================================== */
+
+/* Large Tablets / Collapsed Menus */
+@media (max-width: 991.98px) {
+  .header-inner {
+    flex-wrap: wrap;
+  }
+
+  .header-navigation {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .header-main {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+  }
+
+  .search-form {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
+  .header-actions {
+    align-items: flex-start !important;
+    flex-wrap: wrap;
+    padding-top: 0.25rem;
+  }
+
+  .header-select {
+    margin: 0.35rem 0;
+  }
+
+  .sign-in-button {
     display: inline-block;
-    width: 160px;
-    min-width: 0;
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    line-height: 1.2;
+    margin-top: 0.35rem;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .funding-card,
+  .donation-card {
+    position: static;
+  }
+
+  .auth-layout {
+    grid-template-columns: 1fr;
+    max-width: 760px;
+  }
+
+  .auth-aside {
+    min-height: 300px;
+  }
 }
 
-/* donation active box*/
-.category-item.active {
-  border-color: #e05a47 !important;
-  background-color: #fff4f2 !important;
-  color: #e05a47 !important;
-  font-weight: 600 !important;
-  box-shadow: 0 4px 12px rgba(224, 90, 71, 0.15) !important;
-}
-
-/* Part 2: contain long account text and let shared navigation wrap on phones. */
-.header-navigation, .header-main, .auth-card { min-width: 0; }
-.header-actions { flex-wrap: wrap; }
-.account-context, .credential-table code, .field-error { overflow-wrap: anywhere; }
-@media (max-width: 575.98px) {
-  .header-inner { flex-wrap: wrap; }
-  .header-navigation { width: 100%; }
-  .search-form { min-width: 0; max-width: 100%; }
-  .search-form input { min-width: 0; }
-}
-
-/* Administrator account controls align beside English on desktop.
-   Mobile keeps the existing wrapping layout. */
+/* Desktop Admin Navigation */
 @media (min-width: 992px) {
   .admin-navbar .header-inner {
     flex-wrap: nowrap;
@@ -1219,7 +1663,6 @@ section[aria-labelledby="project-information-heading"] .btn:hover {
     margin: 0;
   }
 
-  /* Auto margin takes up the space between search and account controls. */
   .admin-navbar .header-actions {
     margin-left: auto;
     flex: 0 0 auto;
@@ -1239,5 +1682,192 @@ section[aria-labelledby="project-information-heading"] .btn:hover {
 
   .admin-navbar .language-option {
     flex: 0 0 auto;
+  }
+}
+
+/* Medium Tablets & Mobile Landscape */
+@media (max-width: 767.98px) {
+  .dashboard-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .campaign-selector {
+    min-width: 100%;
+  }
+
+  .funding-breakdown {
+    grid-template-columns: 1fr;
+  }
+
+  .campaign-details-list div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .campaign-details-list dd {
+    text-align: left;
+  }
+
+  .admin-panel-heading,
+  .panel-heading-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-heading-actions {
+    flex-wrap: wrap;
+  }
+
+  .homepage-project-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* Phones */
+@media (max-width: 575.98px) {
+  .hero-section {
+    padding: 4rem 0;
+  }
+
+  .hero-section h1 {
+    font-size: 2.8rem;
+    white-space: normal;
+  }
+
+  .section-padding {
+    padding: 4rem 0;
+  }
+
+  .featured-heading-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .category-item {
+    min-height: 112px;
+    font-size: 0.9rem;
+  }
+
+  .project-image {
+    height: 200px;
+  }
+
+  .success-image {
+    height: 220px;
+  }
+
+  .success-content {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .details-project-image {
+    min-height: 260px;
+  }
+
+  .funding-card,
+  .donation-card,
+  .content-panel {
+    padding: 1.4rem;
+  }
+
+  .funding-amount {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .panel-heading-row,
+  .artist-profile,
+  .supporter-message {
+    align-items: flex-start;
+  }
+
+  .panel-heading-row {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .dashboard-section,
+  .admin-dashboard-section {
+    padding: 2rem 0 4rem;
+  }
+
+  .dashboard-panel,
+  .admin-panel,
+  .dashboard-toolbar {
+    padding: 1.4rem;
+  }
+
+  .stat-card-emphasis .stat-value,
+  .admin-stat-value {
+    font-size: 2rem;
+  }
+
+  .update-image {
+    max-height: 260px;
+  }
+
+  .error-card {
+    padding: 1.6rem;
+  }
+
+  .auth-card,
+  .auth-aside {
+    padding: 1.4rem;
+    border-radius: 17px;
+  }
+
+  .test-credentials {
+    padding: 0.85rem;
+  }
+
+  .credential-table {
+    font-size: 0.8rem;
+  }
+
+  .credential-table td,
+  .credential-table th {
+    padding: 0.45rem 0.3rem;
+  }
+
+  .site-footer {
+    padding: 2.25rem 0 1.5rem;
+  }
+
+  .footer-links-only {
+    gap: 0.85rem 1.15rem;
+  }
+
+  .header-inner {
+    flex-wrap: wrap;
+  }
+
+  .header-navigation {
+    width: 100%;
+  }
+
+  .search-form {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .search-form input {
+    min-width: 0;
+  }
+}
+
+/* Reduced Motion Preference */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
