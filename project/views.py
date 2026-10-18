@@ -444,9 +444,18 @@ def project_detail(project_id):
 
 
 # ----- Part 5. Admin Dashboard -----
+"""Every route has @admin_required, so only administrators can open it.
+Action routes (approve, suspend, delete, etc.) all follow the same pattern:
+1. The button in admin_dashboard.html sends a POST request with a CSRF token.
+2. form.validate_on_submit() checks it is a POST request with a valid token.
+3. The model function runs the UPDATE and returns rowcount (1 = success, 0 = nothing changed).
+4. flash() stores the message and redirect() sends the admin back to the dashboard.
+"""
 
 def create_feature_form():
-    # Build a dropdown with the projects that can be featured
+    """Build a dropdown with the projects that can be featured.
+    The dropdown shows the name, but sends the project ID. 
+    """
     feature_form = FeatureProjectForm()
     options = []
     for project in get_feature_candidates():
@@ -455,7 +464,8 @@ def create_feature_form():
     return feature_form
 
 def create_success_story_form():
-    # Build a dropdown with the completed projects that can become success stories
+    """Build a dropdown with the completed projects (same approach as above).
+    """
     success_story_form = SuccessStoryForm()
     options = []
     for project in get_success_story_candidates():
@@ -466,6 +476,10 @@ def create_success_story_form():
 @main.route('/admin')
 @admin_required
 def admin_dashboard():
+    """Show the admin dashboard.
+    Get every list and statistic from the model functions, then pass them to the template.
+    AdminActionForm provides the CSRF token for all action buttons.
+    """
     campaign_stats = get_campaign_stats()
     creator_count = get_creator_count()
     feature_form = create_feature_form()
@@ -496,9 +510,13 @@ def admin_dashboard():
                            users = users
                            )
 
+
+# ----- Pending Project Approvals -----
+
 @main.route('/admin/projects/<int:project_id>/approve', methods = ['POST'])
 @admin_required
 def approve_project(project_id):
+    """Approve a pending project (Pending -> Approved)."""
     form = AdminActionForm()
     if form.validate_on_submit():
         if review_project_approval(project_id, 'Approved') == 1:
@@ -512,6 +530,7 @@ def approve_project(project_id):
 @main.route('/admin/projects/<int:project_id>/reject', methods = ['POST'])
 @admin_required
 def reject_project(project_id):
+    """Reject a pending project (Pending -> Rejected)."""
     form = AdminActionForm()
     if form.validate_on_submit():
         if review_project_approval(project_id, 'Rejected') == 1:
@@ -522,10 +541,15 @@ def reject_project(project_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
 
-# Change project status from 'Approved' to 'Suspended'
+
+# ----- Project Management -----
+
 @main.route('/admin/projects/<int:project_id>/suspend', methods = ['POST'])
 @admin_required
 def suspend_project(project_id):
+    """Suspend an approved project (Approved -> Suspended). 
+    It is also removed from featured.
+    """
     form = AdminActionForm()
     if form.validate_on_submit():
         if change_project_status(project_id, 'Approved', 'Suspended') == 1:
@@ -536,10 +560,10 @@ def suspend_project(project_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
 
-# Change project status from 'Suspended' to 'Approved'
 @main.route('/admin/projects/<int:project_id>/restore', methods = ['POST'])
 @admin_required
 def restore_project(project_id):
+    """Restore a suspended project (Suspended -> Approved)."""
     form = AdminActionForm()
     if form.validate_on_submit():
         if change_project_status(project_id, 'Suspended', 'Approved') == 1:
@@ -550,10 +574,11 @@ def restore_project(project_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
 
-# Soft delete projects from admin dashboard
 @main.route('/admin/projects/<int:project_id>/delete', methods = ['POST'])
 @admin_required
 def delete_project(project_id):
+    """Soft delete a reviewed project.
+    Project status becomes 'Deleted', but the data stays in the database."""
     form = AdminActionForm()
     if form.validate_on_submit():
         if soft_delete_project(project_id) == 1:
@@ -564,10 +589,13 @@ def delete_project(project_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
 
-# Change user account from 'Active' to 'Suspend'
+
+# ----- User Management -----
+
 @main.route('/admin/users/<int:user_id>/suspend', methods = ['POST'])
 @admin_required
 def suspend_user(user_id):
+    """Suspend an active artist/supporter account (Active -> Suspended)."""
     form = AdminActionForm()
     if form.validate_on_submit():
         if change_user_status(user_id, 'Active', 'Suspended') == 1:
@@ -578,10 +606,10 @@ def suspend_user(user_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
 
-# Change user account from 'Suspend' to 'Active'
 @main.route('/admin/users/<int:user_id>/reactivate', methods = ['POST'])
 @admin_required
 def reactivate_user(user_id):
+    """Reactivate a suspended account (Suspended -> Active)."""
     form = AdminActionForm()
     if form.validate_on_submit():
         if change_user_status(user_id, 'Suspended', 'Active') == 1:
@@ -592,10 +620,11 @@ def reactivate_user(user_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
 
-# Soft delete user accounts from admin dashboard
 @main.route('/admin/users/<int:user_id>/delete', methods = ['POST'])
 @admin_required
 def delete_user(user_id):
+    """Soft delete an artist/supporter account.
+    Account status becomes 'Deleted', but the data stays in the database."""
     form = AdminActionForm()
     if form.validate_on_submit():
         if soft_delete_user(user_id) == 1:
@@ -606,10 +635,17 @@ def delete_user(user_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
 
-# Update user details
 @main.route('/admin/users/<int:user_id>/edit', methods=['GET', 'POST'])
 @admin_required
 def edit_user(user_id):
+    """Show and save the edit user form.
+    GET: fill the form with the user's current details.
+    POST: validate the form, check the email isn't used by another account, 
+    then save the changes and go back to the dashboard.
+    If validation fails, the form is shown again with error messages.
+    """
+
+    # First, check the account exists and is not deleted or an admin
     user = get_user(user_id)
     if user is None:
         flash('This account could not be found.', 'warning')
@@ -623,7 +659,8 @@ def edit_user(user_id):
             update_user_details(user_id, form.firstname.data, form.surname.data, form.email.data)
             flash('The account details have been updated.', 'success')
             return redirect(url_for('main.admin_dashboard'))
-    
+        
+    # Input fields are prefilled with the current details 
     if request.method == 'GET':
         form.firstname.data = user['firstname']
         form.surname.data = user['surname']
@@ -631,10 +668,13 @@ def edit_user(user_id):
 
     return render_template('admin_edit_user.html', form=form, user=user)
 
-# Change report status from 'Pending' to 'Dismissed'
+
+# ----- Reported Content -----
+
 @main.route('/admin/reports/<int:report_id>/dismiss', methods = ['POST'])
 @admin_required
 def dismiss_report(report_id):
+    """Dismiss a pending report (Pending -> Dismissed)."""
     form = AdminActionForm()
     if form.validate_on_submit():
         if review_report(report_id, 'Dismissed') == 1:
@@ -645,10 +685,10 @@ def dismiss_report(report_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
 
-# Change report status from 'Pending' to 'Resolved'
 @main.route('/admin/reports/<int:report_id>/resolve', methods = ['POST'])
 @admin_required
 def resolve_report(report_id):
+    """Resolve a pending report (Pending -> Resolved)."""
     form = AdminActionForm()
     if form.validate_on_submit():
         if review_report(report_id, 'Resolved') == 1:
@@ -659,10 +699,12 @@ def resolve_report(report_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
 
-# Add featured projects
+
+# ----- Featured Projects -----
 @main.route('/admin/featured/add', methods=['POST'])
 @admin_required
 def add_featured_project():
+    """Add the project chosen in the dropdown to the featured section."""
     feature_form = create_feature_form()
     if feature_form.validate_on_submit():
         if add_to_featured(feature_form.project_id.data) == 1:
@@ -673,10 +715,10 @@ def add_featured_project():
         flash('Please choose a valid project to feature.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
 
-# Remove from featured section
 @main.route('/admin/featured/<int:project_id>/remove', methods=['POST'])
 @admin_required
 def remove_featured_project(project_id):
+    """Remove a project from the featured section"""
     form = AdminActionForm()
     if form.validate_on_submit():
         if remove_from_featured(project_id) == 1:
@@ -687,10 +729,13 @@ def remove_featured_project(project_id):
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))        
 
-# Add success stories
+
+# ----- Success Stories -----
+
 @main.route('/admin/success-stories/add', methods=['POST'])
 @admin_required
 def add_success_story():
+    """Add the project chosen in the dropdown to success stories (same approach as featured)."""
     success_story_form = create_success_story_form()
     if success_story_form.validate_on_submit():
         if add_to_success_stories(success_story_form.project_id.data) == 1:
@@ -701,10 +746,11 @@ def add_success_story():
         flash('Please choose a valid project.', 'danger')
     return redirect(url_for('main.admin_dashboard'))
 
-# Remove from success stories section
+
 @main.route('/admin/success-stories/<int:project_id>/remove', methods=['POST'])
 @admin_required
 def remove_success_story(project_id):
+    """Remove a project from success stories section."""
     form = AdminActionForm()
     if form.validate_on_submit():
         if remove_from_success_stories(project_id) == 1:

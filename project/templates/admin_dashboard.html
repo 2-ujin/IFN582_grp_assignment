@@ -1,4 +1,10 @@
 {% extends "base.html" %}
+{# 
+  Admin dashboard uses base.html for the header, footer, and flash messages.
+  Data comes from admin_dashboard() in views.py. 
+  Every action button is a small POST form with {{ form.csrf_token }} (AdminActionForm), 
+  so each request is checked for a valid CSRF token. 
+#}
 
 {% block title %}Administrator Dashboard | MakeArtsFund{% endblock %}
 
@@ -9,6 +15,7 @@
 
 
         <!-- Admin Overview -->
+        {# Four statistic cards. Each card links to the section below it (#id anchors) #}
         <section id="administration-overview" class="mb-4" aria-labelledby="overview-heading">
           <div class="section-heading mb-4">
             <h1 id="overview-heading">Administration Overview</h1>
@@ -59,6 +66,7 @@
         </section>
 
         <!-- Pending Project Approvals -->
+        {# This table lists projects waiting for review, and |length counts the items in a list #}
         <section id="pending-approvals" class="admin-panel mb-4" aria-labelledby="approvals-heading">
           <div class="admin-panel-heading">
             <h2 id="approvals-heading">Pending Project Approvals</h2>
@@ -92,6 +100,7 @@
                     <td>{{ project.submittedDate.strftime('%d %B %Y') }}</td>
                     <td><span class="table-status status-pending">Pending</span></td>
                     <td>
+                        {# url_for builds the action URL with this project's ID #}
                         <form method="post" action="{{ url_for('main.approve_project', project_id=project.projectId) }}" class="d-inline">
                             {{ form.csrf_token }}
                             <button type="submit" class="btn btn-sm btn-coral">Approve</button>
@@ -113,6 +122,7 @@
         </section>
 
         <!-- Project Management -->
+        {# Approved, suspended, and rejected projects. Buttons change with the approval status. #}
         <section id="project-management" class="admin-panel mb-4" aria-labelledby="project-management-heading">
           <div class="admin-panel-heading">
             <h2 id="project-management-heading">Project Management</h2>
@@ -144,18 +154,20 @@
                     <td>{{ project.categoryName }}</td>
                     <td>{{ project.location }}</td>
                     <td>{{ project.projectStatus }}</td>
+                    {# |lower turns 'Approved' into 'approved' to match the CSS class status-approved. #}
                     <td><span class="table-status status-{{ project.approvalStatus|lower }}">{{ project.approvalStatus }}</span></td>
                     <td>
                       <div class="d-flex flex-wrap gap-1"> 
+                      {# Approved -> Suspend button, Suspended -> Restore button. Delete is always shown. #}  
                       {% if project.approvalStatus == 'Approved' %}
                         <form method="post" action="{{ url_for('main.suspend_project', project_id = project.projectId) }}">
                           {{ form.csrf_token}}
-                          <button type="submit" class="btn btn-sm btn-outline-danger" style="min-width: 5rem;">Suspend</button>  {# style > css 파일로 옮길 것#}
+                          <button type="submit" class="btn btn-sm btn-outline-danger">Suspend</button>
                         </form>      
                       {% elif project.approvalStatus == 'Suspended' %}
                         <form method="post" action="{{ url_for('main.restore_project', project_id = project.projectId) }}">
                           {{ form.csrf_token}}
-                          <button type="submit" class="btn btn-sm btn-outline-coral" style="min-width: 5rem;">Restore</button>
+                          <button type="submit" class="btn btn-sm btn-outline-coral">Restore</button>
                         </form>                           
                       {% endif %}
                       <form method="post" action="{{ url_for('main.delete_project', project_id = project.projectId) }}">
@@ -205,8 +217,10 @@
                     <td>{{ user.role }}</td>
                     <td><span class="table-status status-{{ user.accountStatus|lower }}">{{ user.accountStatus }}</span></td>
                     <td>
+                      {# No buttons for administrator accounts (they are protected in models.py) #}
                       {% if user.role != 'Administrator' %}
                         <div class="d-flex flex-wrap gap-1">
+                          {# Active -> Suspend button, Suspended -> Reactivate button #}
                           {% if user.accountStatus == 'Active' %}
                             <form method="post" action="{{ url_for('main.suspend_user', user_id = user.userId) }}">
                               {{ form.csrf_token}}
@@ -221,7 +235,8 @@
                           <form method="post" action="{{ url_for('main.delete_user', user_id = user.userId) }}">
                             {{ form.csrf_token}}
                             <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                          </form>                          
+                          </form>
+                          {# Edit button is a link, not a form: it only opens the Edit user page (GET) #}                          
                           <a href="{{ url_for('main.edit_user', user_id=user.userId )}}" class="btn btn-sm btn-outline-secondary">Edit</a>
                         </div>  
                       {% endif %}
@@ -238,6 +253,7 @@
         </section>
 
         <!-- Reported Content -->
+        {# Resolve and dismiss buttons are only available for pending reports #} 
         <section id="reported-content" class="admin-panel mb-4" aria-labelledby="reported-content-heading">
           <div class="admin-panel-heading">
             <h2 id="reported-content-heading">Reported Content</h2>
@@ -296,6 +312,7 @@
         </section>
 
         <!-- Featured Projects -->
+        {# Featured projects and success stories sit side by side (two half-width columns) #}
         <div class="row g-4">
           <div class="col-lg-6">
             <section id="featured-projects-management" class="admin-panel h-100" aria-labelledby="featured-heading">
@@ -303,6 +320,7 @@
                 <h2 id="featured-heading">Featured Projects</h2>
                 <div class="admin-heading-actions"><span class="admin-count-badge">{{ featured_projects|length }} Selected</span></div>
               </div>
+              {# Current featured projects, each with a remove button #}
               {% for project in featured_projects %}
                 <div class="homepage-project-item">
                   <div><strong>{{ project.projectName }}</strong><span>{{ project.creatorName }} · {{ project.categoryName }} · {{ project.location }}</span></div>
@@ -315,6 +333,7 @@
                 <p>There are no featured projects yet.</p>
               {% endfor %}
               
+              {# Dropdown to add a project. It is only shown when there are projects to choose from #}
               {% if feature_form.project_id.choices %}
                 <form method="post" action="{{ url_for('main.add_featured_project') }}">
                   {{ feature_form.csrf_token}}
@@ -329,6 +348,7 @@
           </div>
 
        <!-- Success Stories -->
+          {# Works the same way as featured project #}
           <div class="col-lg-6">
             <section id="success-stories-management" class="admin-panel h-100" aria-labelledby="success-heading">
               <div class="admin-panel-heading">
@@ -360,7 +380,7 @@
               {% endif %}
             </section>
           </div>
-
+        </div>
       </div>
     </section>
 

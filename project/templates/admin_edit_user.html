@@ -1,4 +1,9 @@
 {% extends "base.html" %}
+{#
+  Edit user page opened from the edit link on the admin dashboard.
+  Data comes from edit_user() in views.py: user (current details) and form (EditUserForm).
+#}
+
 
 {% block title %}Edit User | MakeArtsFund{% endblock %}
 
@@ -16,10 +21,12 @@
             <h2 id="account-details-heading">Account Details</h2>
           </div>
 
+          {# Role and status are shown for information only and cannot be edited here. #}
           <p>Role: {{ user.role }} | Account status: 
             <span class="table-status status-{{ user.accountStatus|lower }}">{{ user.accountStatus }}</span>
           </p>
 
+          {# novalidate skips the browser's own checks and shows our own error messages if needed #}
           <form method="post" action="{{ url_for('main.edit_user', user_id=user.userId) }}" novalidate>
             {{ form.csrf_token }}
 
@@ -47,9 +54,12 @@
               {% endfor %}
             </div>
 
+            {# Save changes button sends the form (POST). Cancel goes back to the dashboard without saving. #}
             {{ form.submit(class="btn btn-coral") }}
-            <a herf="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+            <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
           </form>
         </section>
+      </div>
+    </section>
 
 {% endblock %}
