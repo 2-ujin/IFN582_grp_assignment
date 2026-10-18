@@ -477,11 +477,13 @@ def project_detail(project_id):
     for msg in donations:
         msg['donorName'] = msg['firstname'] + ' ' + msg['surname']
 
+    # count total number of danation
     cursor.execute("SELECT COUNT(donationId) AS count FROM donation WHERE projectId = %s", (project_id,))
     count_res = cursor.fetchone()
     supporter_count = count_res['count'] if count_res else 0
+    # close cursor
     cursor.close()
-
+    # put in donation.html and pass data to the front end
     return render_template(
         'donation.html',
         project=project_data,
