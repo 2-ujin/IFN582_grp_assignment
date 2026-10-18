@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{# Set the browser-tab title for the campaign management page. #}
 {% block title %}
 Campaign Management | MakeArtsFund
 {% endblock %}
@@ -10,7 +10,7 @@ Campaign Management | MakeArtsFund
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 {% endblock %}
 
-
+{# Add a campaign-management link for authenticated fundraiser. #}
 {% block role_navigation %}
 <li class="nav-item">
     <a class="nav-link" href="{{ url_for('management.management') }}">
@@ -35,7 +35,7 @@ Campaign Management | MakeArtsFund
             {% endif %}
         {% endwith %}
 
-                <!-- Campaign Overview -->
+                <!-- Campaign creation form, New campaigns are submitted with Pending approval status. -->
                  <section class="dashboard-panel mb-4"
                         aria-labelledby="create-campaign-heading">
 
@@ -198,7 +198,7 @@ Campaign Management | MakeArtsFund
                 </section>
 
                 {% if selected_campaign %}
-                <!-- Select Campaign -->
+                <!-- Allow the fundraiser to switch between campaigns they own. -->
                 <div class="dashboard-toolbar mb-4">
                     <div class="campaign-selection">
                         <form method="get" action="{{ url_for('management.management')}}">
@@ -225,7 +225,7 @@ Campaign Management | MakeArtsFund
                 </div>
 
 
-                <!-- Campaign stat -->
+                <!-- Display campaign statistics calculated dynamically from received donations. -->
                 <div class="row g-4 mb-4">
                     <div class="col-sm-6 col-xl-3">
                         <article class="stat-card stat-card-emphasis"><span class="stat-label">Fund raised</span><strong
@@ -246,7 +246,7 @@ Campaign Management | MakeArtsFund
                     </div>
                 </div>
 
-                <!-- Funding progress wif bar n info -->
+                <!-- Visualise the amount raised against the campaign fundrasing goal. -->
                 <div class="row g-4 mb-4">
                     <div class="col-lg-7">
                         <section class="dashboard-panel h-100" aria-labelledby="progress-heading">
@@ -269,6 +269,7 @@ Campaign Management | MakeArtsFund
                         </section>
                     </div>
                     <div class="col-lg-5">
+                        <!-- Display key project information and allow operational status change. Status changes are available only for administrator-approved campaigns. -->
                         <section class="dashboard-panel h-100" aria-labelledby="project-information-heading">
                             <div class="panel-heading-row">
                                 <h2 id="project-information-heading">Project Information</h2><span
@@ -330,7 +331,7 @@ Campaign Management | MakeArtsFund
                     </div>
                 </div>
 
-                <!-- Recent donations -->
+                <!-- Display the five most recent donations for the selected campaign. -->
                 <section class="dashboard-panel mb-4" aria-labelledby="donations-heading">
                     <div class="panel-heading-row">
                         <h2 id="donations-heading">Recent Donations</h2>
@@ -366,7 +367,7 @@ Campaign Management | MakeArtsFund
                     </div>
                 </section>
 
-                <!-- Edit project info -->
+                <!-- Allow the fundraiser to edit key information for the selected campaign. -->
                 <section id="edit-project-information" class="dashboard-panel mb-4"
                     aria-labelledby="edit-project-heading">
                     <div class="panel-heading-row">
@@ -422,11 +423,12 @@ Campaign Management | MakeArtsFund
                 {% endif %}
                 </section>
 
-                <!-- Project updates -->
+                <!-- Create, display, edit and delete campaign posts and optional images. -->
                 <section class="dashboard-panel mb-4" aria-labelledby="updates-heading">
                     <div class="panel-heading-row">
                         <h2 id="updates-heading">Project Updates</h2><span class="update-count">{{ project_updates|length }} Updates</span>
                     </div>
+                    <!-- Form for publishing a new update with an optional image. -->
                     <form method="POST" action="{{ url_for('management.management') }}" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="form_action" value="post_update">
@@ -459,6 +461,7 @@ Campaign Management | MakeArtsFund
                         </div>
                     </form>
                     <div class="updates-list">
+                        {# Render all updates belonging to the currently selected campaign. #}
                         {% if project_updates %}
                             {% for update in project_updates %}
                                 <article class="update-item">
@@ -518,7 +521,7 @@ Campaign Management | MakeArtsFund
                     </div>
                 </section>
 
-                <!-- Supporter msg -->
+                <!-- Display visible supporter messages linked to campaign donations. -->
                 <section class="dashboard-panel" aria-labelledby="messages-heading">
                     <div class="panel-heading-row">
                         <h2 id="messages-heading">Supporter Messages</h2>
@@ -547,6 +550,7 @@ Campaign Management | MakeArtsFund
                     {% endif %}
                 </section>
                 {% else %}
+                    {# Shown when the logged-in fundraiser has not created a campaign yet. #}
                     <div class = "alert alert-info" role="alert">
                         You do not currently have any campaigns to manage.
                     </div>
@@ -557,6 +561,8 @@ Campaign Management | MakeArtsFund
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+
+<!-- Display the selected image fillname beside the custom upload control. -->
 </script>
 
 <script>
