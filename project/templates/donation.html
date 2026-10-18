@@ -109,7 +109,7 @@
                 {% if updates %}
                     {% for update in updates %}
                         <div class="update-item">
-                            <div class="update-date">{{ update.publishedDate.strftime('%-d %B %Y')|upper if update.publishedDate else '' }}</div>
+                            <div class="update-date">{{ update.publishedDate.strftime('%d %B %Y')|upper if update.publishedDate else '' }}</div>
                             <h3>{{ update.title }}</h3>
                             <p>{{ update.description }}</p>
 
@@ -141,7 +141,7 @@
                             <div class="message-avatar">{{ (msg.donorName[:2] | upper) if msg.donorName else 'SP' }}</div>
                             <div>
                             <h3>{{ msg.donorName }}</h3>
-                            <div class="message-date">{{ msg.postedDate.strftime('%-d %B %Y')|upper if msg.postedDate else '' }}</div>
+                            <div class="message-date">{{ msg.postedDate.strftime('%d %B %Y')|upper if msg.postedDate else '' }}</div>
                             <p>{{ msg.message }}</p>
                             </div>
                         </div>
