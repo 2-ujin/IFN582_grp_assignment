@@ -247,7 +247,6 @@ Yujin Lee CREATEd this file
 
 
 -- PROJECT
--- PROJECT
     INSERT INTO project 
     (
         creatorId,
@@ -291,7 +290,7 @@ Yujin Lee CREATEd this file
         Through Croshay, I hope to share my designs with more people at local markets and online. Thank you for supporting my work and my little handmade label!', TRUE, FALSE, 14, '2026-09-01'),
         (6, 4, 'Positioning in Melbourne', 'Melbourne', 'img/Positioning-in-Melbourne.png', '4500', '2026-10-02', 'Suspended', 'Completed', 'A photo series retracing postcard images to identify and photograph their exact original locations in Melbourne.', 'Capture my hometown in Melbourne.', FALSE, TRUE, 10, '2026-07-15'),
         (8, 2, 'Get Thready', 'Brisbane', 'img/Get-Thready.png', '7000', '2026-10-12', 'Suspended', 'Completed', 'Delicate handmade flower accessories crocheted from single strands of embroidery thread.', 'Makes embroidered flower accessories for 12 years.', FALSE, TRUE, 9, '2026-07-01'),
-        (5, 2, 'Doll Craft', 'Gold Coast', 'img/Doll_Craft.jpg', '5500', '2026-12-15', 'Pending', 'Active', 'Handmade fabric dolls with hand-stitched outfits and tiny accessories.', 'Sewing and designing one-of-a-kind dolls for 6 years.', FALSE, FALSE, NULL, '2026-10-02'),
+        (5, 2, 'Doll Craft', 'Gold Coast', 'img/Doll_Craft.png', '5500', '2026-12-15', 'Pending', 'Active', 'Handmade fabric dolls with hand-stitched outfits and tiny accessories.', 'Sewing and designing one-of-a-kind dolls for 6 years.', FALSE, FALSE, NULL, '2026-10-02'),
         (3, 4, 'Brisbane After Dark', 'Brisbane', 'img/Brisbane-After-Dark.png', '4000', '2026-12-20', 'Pending', 'Active', 'A night photography series capturing Brisbane''s laneways, bridges and riverfront after sunset.', 'Shooting long-exposure city photography for 5 years.', FALSE, FALSE, NULL, '2026-10-06'),
         (8, 1, 'Inkwell Botanica', 'Hobart', 'img/Inkwell-Botanica.png', '3500', '2026-11-30', 'Approved', 'Active', 'Botanical ink and watercolour illustrations of native Tasmanian plants, drawn with careful attention to leaf shape, flower structure and natural colour. Each piece starts with field sketches and reference studies before being built up with fine ink linework and layered watercolour washes. The project celebrates Tasmania''s unique flora and the people who protect it. Funding will go toward archival paper, quality pigments and giclée printing for a series of prints and a small illustrated collection, so these plants can be enjoyed at home.', 'Hi, I''m the illustrator behind Inkwell Botanica. For 7 years, I''ve been drawing and painting the native plants of Tasmania, and I never get tired of discovering new ones.
 
@@ -314,7 +313,7 @@ Yujin Lee CREATEd this file
 
         Through Puppet Theatre on Wheels, I hope to bring live theatre to more regional schools, free of charge. Thank you for supporting my work and the children we visit!', TRUE, FALSE, 9, '2026-09-15'),
         (3, 1, 'Street Canvas Project', 'Melbourne', 'img/Street-Canvas-Project.png', '6500', '2026-08-20', 'Approved', 'Completed', 'Community murals painted with local residents on blank laneway walls.', 'Painting public murals for 9 years.', FALSE, TRUE, 9, '2026-06-15'),
-        (5, 5, 'Choir of the Coast', 'Gold Coast', 'img/Choir-of-the-Coast.png', '5000', '2026-07-30', 'Approved', 'Completed', 'A community choir recording its first album of coastal folk songs.', 'Leading a community choir for 15 years.', FALSE, TRUE, 15, '2026-05-20'),
+        (5, 5, 'Choir of the Coast', 'Gold Coast', 'img/Choir-of-the-Coast.png', '5000', '2026-07-30', 'Approved', 'Completed', 'A boys'' choir from the Gold Coast recording its first album of coastal folk songs.', 'Leading a boys'' choir for 15 years.', FALSE, TRUE, 15, '2026-05-20'),
         (3, 3, 'Tiny Terrain', 'Darwin', 'img/Tiny-Terrain.png', '4800', '2027-01-10', 'Pending', 'Active', '3D printed miniature dioramas of Top End landscapes.', 'Designing printable terrain models for 2 years.', FALSE, FALSE, NULL, '2026-10-08'),
         (1, 5, 'Lo-fi Bedroom Beats', 'Sydney', 'img/Lo-fi-Bedroom-Beats.png', '3000', '2027-01-15', 'Suspended', 'Active', 'A lo-fi instrumental album produced entirely in a home studio.', 'Producing chill beats for 3 years.', FALSE, FALSE, 10, '2026-09-12')
 ;
@@ -400,10 +399,10 @@ Yujin Lee CREATEd this file
     INSERT INTO image 
         (updateId, imagePath)
     VALUES
-        (1, 'updates/store.jpg'),
-        (1, 'updates/storecollection.jpg'),
-        (2, 'updates/market.jpg'),
-        (3, 'updates/model.jpg'),
-        (4, 'updates/crochet.jpg'),
-        (5, 'updates/photos.jpg')
+        (1, 'img/store.png'),
+        (1, 'img/storecollection.png'),
+        (2, 'img/market-booth.png'),
+        (3, 'img/model.png'),
+        (4, 'img/crochet.png'),
+        (5, 'img/photos.png')
     ;
