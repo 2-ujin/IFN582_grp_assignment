@@ -306,9 +306,11 @@ def index():
         else:
             p['progressPercentage'] = 0
         # calculate remaining days
-        days = (p['deadline'] - today).days
-        p['daysRemaining'] = days if days > 0 else 0
-
+        if p.get('deadline'):
+            days = (p['deadline'] - today).days
+            p['daysRemaining'] = days if days > 0 else 0
+        else:
+            p['daysRemaining'] = 0
     # only show 3 projects if not click "discover more"
     if not search_query and not category_filter and not show_all:
         projects = projects[:3]
