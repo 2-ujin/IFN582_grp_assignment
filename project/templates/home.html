@@ -99,7 +99,7 @@
                     <a class="project-link" href="{{ url_for('main.project_detail', project_id=project['projectId']) }}">
                     <article class="project-card h-100">
                         <!-- loading="lazy" can display picture efficiently -->
-                        <img class="project-image" src="{{ url_for('static', filename=project['imagePath']) }}" alt="{{ project['projectName'] }}" loading="lazy">
+                        <img class="project-image" src="{{ url_for('static', filename=project['imagePath'] or 'img/No-image.png') }}" alt="{{ project['projectName'] }}" loading="lazy">
                         <!-- display project name, artist name, category name, city, remaining days, goal -->
                         <div class="card-body">
                         <h3>{{ project['projectName'] }}</h3>
@@ -146,7 +146,7 @@
             {% for story in success_stories %}
           <div class="col-md-6">
                 <article class="success-card">
-                <img class="success-image" src="{{ url_for('static', filename=story['imagePath']) }}" alt="{{ story['projectName'] }}" loading="lazy">
+                <img class="success-image" src="{{ url_for('static', filename=story['imagePath'] or 'img/No-image.png') }}" alt="{{ story['projectName'] }}" loading="lazy">
                 <div class="success-content">
                     <div>
                     <h3>{{ story['projectName'] }}</h3>
