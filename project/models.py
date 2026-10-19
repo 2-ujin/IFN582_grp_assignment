@@ -250,6 +250,567 @@ class Image:
     update: ProjectUpdate
     imagePath: str
 
+# ----- Part 4. Campaign Management -----
+def get_fundraiser_campaigns(creator_id):
+    """Return every campaign owned by the logged-in fundraiser."""
+
+    cursor = database.connection.cursor()
+    cursor.execute(
+        """
+        SELECT
+            p.projectId,
+            p.creatorId,
+            p.categoryId,
+            p.projectName,
+            p.approvalStatus,
+            p.projectStatus,
+            p.location,
+            p.imagePath,
+            p.goal,
+            p.deadline,
+            p.projectDescription,
+            p.artistIntro,
+            p.updateDt,
+            c.categoryName
+        FROM project AS p
+        JOIN category AS c
+            ON p.categoryId = c.categoryId
+        WHERE p.creatorId = %s
+        ORDER BY p.updateDt DESC, p.projectId DESC
+        """,
+        (creator_id,),
+    )
+
+    campaigns = cursor.fetchall()
+    cursor.close()
+    return campaigns
+
+
+def get_campaign_categories():
+    """Return all categories for campaign create and edit forms."""
+
+    cursor = database.connection.cursor()
+    cursor.execute(
+        """
+        SELECT categoryId, categoryName
+        FROM category
+        ORDER BY categoryName
+        """
+    )
+
+    categories = cursor.fetchall()
+    cursor.close()
+    return categories
+
+
+def get_campaign_donation_statistics(project_id, creator_id):
+    """Calculate donation statistics for a campaign owned by the fundraiser."""
+
+    cursor = database.connection.cursor()
+    cursor.execute(
+        """
+        SELECT
+            COALESCE(SUM(d.amount), 0) AS fundRaised,
+            COUNT(DISTINCT d.supporterId) AS supporterCount,
+            COUNT(d.donationId) AS donationCount,
+            COALESCE(AVG(d.amount), 0) AS averageDonation
+        FROM project AS p
+        LEFT JOIN donation AS d
+            ON p.projectId = d.projectId
+            AND d.paymentStatus = 'Received'
+        WHERE p.projectId = %s
+            AND p.creatorId = %s
+        GROUP BY p.projectId
+        """,
+        (project_id, creator_id),
+    )
+
+    statistics = cursor.fetchone()
+    cursor.close()
+
+    if statistics is None:
+        return {
+            "fundRaised": 0,
+            "supporterCount": 0,
+            "donationCount": 0,
+            "averageDonation": 0,
+        }
+
+    return statistics
+
+
+def get_recent_campaign_donations(project_id, creator_id):
+    """Return the five most recent donations for an owned campaign."""
+
+    cursor = database.connection.cursor()
+    cursor.execute(
+        """
+        SELECT
+            d.donationId,
+            d.amount,
+            d.donationDate,
+            d.paymentMethod,
+            d.paymentStatus,
+            u.firstname,
+            u.surname
+        FROM donation AS d
+        JOIN project AS p
+            ON d.projectId = p.projectId
+        JOIN `user` AS u
+            ON d.supporterId = u.userId
+        WHERE d.projectId = %s
+            AND p.creatorId = %s
+        ORDER BY d.donationDate DESC
+        LIMIT 5
+        """,
+        (project_id, creator_id),
+    )
+
+    donations = cursor.fetchall()
+    cursor.close()
+    return donations
+
+
+def get_campaign_updates(project_id, creator_id):
+    """Return project updates and their first associated image."""
+
+    cursor = database.connection.cursor()
+    cursor.execute(
+        """
+        SELECT
+            pu.updateId,
+            pu.projectId,
+            pu.publishedDate,
+            pu.title,
+            pu.description,
+            (
+                SELECT MIN(i.imagePath)
+                FROM image AS i
+                WHERE i.updateId = pu.updateId
+            ) AS imagePath
+        FROM projectUpdate AS pu
+        JOIN project AS p
+            ON pu.projectId = p.projectId
+        WHERE pu.projectId = %s
+            AND p.creatorId = %s
+        ORDER BY pu.publishedDate DESC
+        """,
+        (project_id, creator_id),
+    )
+
+    updates = cursor.fetchall()
+    cursor.close()
+    return updates
+
+
+def get_campaign_supporter_messages(project_id, creator_id):
+    """Return visible supporter messages for an owned campaign."""
+
+    cursor = database.connection.cursor()
+    cursor.execute(
+        """
+        SELECT
+            sm.messageId,
+            sm.postedDate,
+            sm.message,
+            u.firstname,
+            u.surname
+        FROM supporterMessage AS sm
+        JOIN donation AS d
+            ON sm.donationId = d.donationId
+        JOIN project AS p
+            ON d.projectId = p.projectId
+        JOIN `user` AS u
+            ON d.supporterId = u.userId
+        WHERE d.projectId = %s
+            AND p.creatorId = %s
+            AND sm.visibility = TRUE
+        ORDER BY sm.postedDate DESC
+        """,
+        (project_id, creator_id),
+    )
+
+    messages = cursor.fetchall()
+    cursor.close()
+    return messages
+
+def create_campaign(
+    creator_id,
+    category_id,
+    project_name,
+    location,
+    goal,
+    deadline,
+    project_description,
+    artist_intro,
+    image_path=None,
+):
+    """Create a new campaign with pending administrator approval."""
+
+    cursor = database.connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            INSERT INTO project (
+                creatorId,
+                categoryId,
+                projectName,
+                location,
+                imagePath,
+                goal,
+                deadline,
+                approvalStatus,
+                projectStatus,
+                projectDescription,
+                artistIntro,
+                updateDt
+            )
+            VALUES (
+                %s, %s, %s, %s, %s, %s, %s,
+                'Pending', 'Active', %s, %s, CURRENT_TIMESTAMP
+            )
+            """,
+            (
+                creator_id,
+                category_id,
+                project_name,
+                location,
+                image_path,
+                goal,
+                deadline,
+                project_description,
+                artist_intro,
+            ),
+        )
+
+        new_project_id = cursor.lastrowid
+        database.connection.commit()
+        return new_project_id
+
+    except Exception:
+        database.connection.rollback()
+        raise
+
+    finally:
+        cursor.close()
+
+
+def update_owned_campaign(
+    project_id,
+    creator_id,
+    category_id,
+    project_name,
+    location,
+    goal,
+    deadline,
+    project_description,
+    artist_intro,
+):
+    """Update campaign information only when it belongs to the fundraiser."""
+
+    cursor = database.connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE project
+            SET
+                categoryId = %s,
+                projectName = %s,
+                location = %s,
+                goal = %s,
+                deadline = %s,
+                projectDescription = %s,
+                artistIntro = %s,
+                updateDt = CURRENT_TIMESTAMP
+            WHERE projectId = %s
+                AND creatorId = %s
+            """,
+            (
+                category_id,
+                project_name,
+                location,
+                goal,
+                deadline,
+                project_description,
+                artist_intro,
+                project_id,
+                creator_id,
+            ),
+        )
+
+        affected_rows = cursor.rowcount
+        database.connection.commit()
+        return affected_rows
+
+    except Exception:
+        database.connection.rollback()
+        raise
+
+    finally:
+        cursor.close()
+
+
+def update_owned_campaign_status(
+    project_id,
+    creator_id,
+    new_status,
+):
+    """Change operational status without overriding administrator decisions."""
+
+    allowed_statuses = ("Active", "Paused", "Closed")
+
+    if new_status not in allowed_statuses:
+        return 0
+
+    cursor = database.connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE project
+            SET
+                projectStatus = %s,
+                updateDt = CURRENT_TIMESTAMP
+            WHERE projectId = %s
+                AND creatorId = %s
+                AND approvalStatus = 'Approved'
+            """,
+            (
+                new_status,
+                project_id,
+                creator_id,
+            ),
+        )
+
+        affected_rows = cursor.rowcount
+        database.connection.commit()
+        return affected_rows
+
+    except Exception:
+        database.connection.rollback()
+        raise
+
+    finally:
+        cursor.close()
+
+def create_owned_project_update(
+    project_id,
+    creator_id,
+    update_title,
+    update_description,
+    image_path=None,
+):
+    """Create a project update only for a campaign owned by the fundraiser."""
+
+    cursor = database.connection.cursor()
+
+    try:
+        # Confirm that the campaign belongs to the logged-in fundraiser.
+        cursor.execute(
+            """
+            SELECT projectId
+            FROM project
+            WHERE projectId = %s
+                AND creatorId = %s
+            """,
+            (project_id, creator_id),
+        )
+
+        owned_project = cursor.fetchone()
+
+        if owned_project is None:
+            database.connection.rollback()
+            return None
+
+        cursor.execute(
+            """
+            INSERT INTO projectUpdate (
+                projectId,
+                publishedDate,
+                title,
+                description
+            )
+            VALUES (%s, NOW(), %s, %s)
+            """,
+            (
+                project_id,
+                update_title,
+                update_description,
+            ),
+        )
+
+        new_update_id = cursor.lastrowid
+
+        # Only create an image record when the user uploaded an image.
+        if image_path:
+            cursor.execute(
+                """
+                INSERT INTO image (
+                    updateId,
+                    imagePath
+                )
+                VALUES (%s, %s)
+                """,
+                (
+                    new_update_id,
+                    image_path,
+                ),
+            )
+
+        database.connection.commit()
+        return new_update_id
+
+    except Exception:
+        database.connection.rollback()
+        raise
+
+    finally:
+        cursor.close()
+
+
+def edit_owned_project_update(
+    update_id,
+    project_id,
+    creator_id,
+    edited_title,
+    edited_description,
+):
+    """Edit an update only when its campaign belongs to the fundraiser."""
+
+    cursor = database.connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE projectUpdate AS pu
+            JOIN project AS p
+                ON pu.projectId = p.projectId
+            SET
+                pu.title = %s,
+                pu.description = %s,
+                pu.publishedDate = NOW()
+            WHERE pu.updateId = %s
+                AND pu.projectId = %s
+                AND p.creatorId = %s
+            """,
+            (
+                edited_title,
+                edited_description,
+                update_id,
+                project_id,
+                creator_id,
+            ),
+        )
+
+        affected_rows = cursor.rowcount
+        database.connection.commit()
+        return affected_rows
+
+    except Exception:
+        database.connection.rollback()
+        raise
+
+    finally:
+        cursor.close()
+
+
+def delete_owned_project_update(
+    update_id,
+    project_id,
+    creator_id,
+):
+    """Delete an owned project update and return its stored image paths."""
+
+    cursor = database.connection.cursor()
+
+    try:
+        # Retrieve image paths before deleting their database records.
+        cursor.execute(
+            """
+            SELECT i.imagePath
+            FROM projectUpdate AS pu
+            JOIN project AS p
+                ON pu.projectId = p.projectId
+            LEFT JOIN image AS i
+                ON pu.updateId = i.updateId
+            WHERE pu.updateId = %s
+                AND pu.projectId = %s
+                AND p.creatorId = %s
+            """,
+            (
+                update_id,
+                project_id,
+                creator_id,
+            ),
+        )
+
+        records = cursor.fetchall()
+
+        # No records means that the update does not exist or is not owned
+        # by the logged-in fundraiser.
+        if not records:
+            database.connection.rollback()
+            return None
+
+        image_paths = [
+            record["imagePath"]
+            for record in records
+            if record["imagePath"]
+        ]
+
+        cursor.execute(
+            """
+            DELETE i
+            FROM image AS i
+            JOIN projectUpdate AS pu
+                ON i.updateId = pu.updateId
+            JOIN project AS p
+                ON pu.projectId = p.projectId
+            WHERE pu.updateId = %s
+                AND pu.projectId = %s
+                AND p.creatorId = %s
+            """,
+            (
+                update_id,
+                project_id,
+                creator_id,
+            ),
+        )
+
+        cursor.execute(
+            """
+            DELETE pu
+            FROM projectUpdate AS pu
+            JOIN project AS p
+                ON pu.projectId = p.projectId
+            WHERE pu.updateId = %s
+                AND pu.projectId = %s
+                AND p.creatorId = %s
+            """,
+            (
+                update_id,
+                project_id,
+                creator_id,
+            ),
+        )
+
+        deleted_rows = cursor.rowcount
+        database.connection.commit()
+
+        return {
+            "deleted": deleted_rows == 1,
+            "image_paths": image_paths,
+        }
+
+    except Exception:
+        database.connection.rollback()
+        raise
+
+    finally:
+        cursor.close()
+
 
 # ----- Part 5. Admin Dashboard -----
 """All function below follow the same pattern:

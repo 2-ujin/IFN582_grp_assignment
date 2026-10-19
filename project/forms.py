@@ -1,13 +1,16 @@
 #Validated forms used by the Part 2 authentication pages
 
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, SelectField, StringField, SubmitField
+from flask_wtf.file import FileAllowed, FileField
+from wtforms import PasswordField, SelectField, StringField, SubmitField, DateField, DecimalField, HiddenField, TextAreaField
 from wtforms.validators import (
     DataRequired,
     Email,
     EqualTo,
     Length,
     Regexp,
+    NumberRange,
+    Optional
 )
 #Part 2- login form + email/pw validation
 
@@ -90,6 +93,267 @@ class RegisterForm(FlaskForm):
     )
     submit = SubmitField("Create account")
 
+# ----- Part 4. Campaign Management -----
+
+ALLOWED_IMAGE_TYPES = ["jpg", "jpeg", "png", "gif", "webp"]
+
+
+class CreateCampaignForm(FlaskForm):
+    """Validate a new campaign created by a fundraiser."""
+
+    form_action = HiddenField(default="create_campaign")
+
+    project_name = StringField(
+        "Project title",
+        filters=[lambda value: value.strip() if value else value],
+        validators=[
+            DataRequired(message="Enter a project title."),
+            Length(
+                max=100,
+                message="Project title must be 100 characters or fewer.",
+            ),
+        ],
+    )
+
+    category_id = SelectField(
+        "Category",
+        coerce=int,
+        validators=[DataRequired(message="Select a category.")],
+    )
+
+    location = StringField(
+        "Location",
+        filters=[lambda value: value.strip() if value else value],
+        validators=[
+            DataRequired(message="Enter the campaign location."),
+            Length(
+                max=100,
+                message="Location must be 100 characters or fewer.",
+            ),
+        ],
+    )
+
+    goal = DecimalField(
+        "Fundraising goal",
+        places=2,
+        validators=[
+            DataRequired(message="Enter a fundraising goal."),
+            NumberRange(
+                min=0.01,
+                max=99999999999999.99,
+                message="Enter a valid fundraising goal greater than zero.",
+            ),
+        ],
+    )
+
+    deadline = DateField(
+        "Campaign deadline",
+        validators=[
+            DataRequired(message="Select a campaign deadline."),
+        ],
+    )
+
+    project_description = TextAreaField(
+        "Project description",
+        filters=[lambda value: value.strip() if value else value],
+        validators=[
+            DataRequired(message="Enter a project description."),
+        ],
+    )
+
+    artist_intro = TextAreaField(
+        "Artist introduction",
+        filters=[lambda value: value.strip() if value else value],
+        validators=[
+            DataRequired(message="Enter an artist introduction."),
+        ],
+    )
+
+    project_image = FileField(
+        "Campaign image",
+        validators=[
+            Optional(),
+            FileAllowed(
+                ALLOWED_IMAGE_TYPES,
+                "Upload a PNG, JPG, JPEG, GIF or WEBP image.",
+            ),
+        ],
+    )
+
+    submit = SubmitField("Create Campaign")
+
+
+class EditCampaignForm(FlaskForm):
+    """Validate changes to an existing campaign."""
+
+    form_action = HiddenField(default="update_project")
+    project_id = HiddenField(validators=[DataRequired()])
+
+    project_name = StringField(
+        "Project title",
+        filters=[lambda value: value.strip() if value else value],
+        validators=[
+            DataRequired(message="Enter a project title."),
+            Length(
+                max=100,
+                message="Project title must be 100 characters or fewer.",
+            ),
+        ],
+    )
+
+    category_id = SelectField(
+        "Category",
+        coerce=int,
+        validators=[DataRequired(message="Select a category.")],
+    )
+
+    location = StringField(
+        "Location",
+        filters=[lambda value: value.strip() if value else value],
+        validators=[
+            DataRequired(message="Enter the campaign location."),
+            Length(
+                max=100,
+                message="Location must be 100 characters or fewer.",
+            ),
+        ],
+    )
+
+    goal = DecimalField(
+        "Fundraising goal",
+        places=2,
+        validators=[
+            DataRequired(message="Enter a fundraising goal."),
+            NumberRange(
+                min=0.01,
+                max=99999999999999.99,
+                message="Enter a valid fundraising goal greater than zero.",
+            ),
+        ],
+    )
+
+    deadline = DateField(
+        "Campaign deadline",
+        validators=[Optional()],
+    )
+
+    project_description = TextAreaField(
+        "Project description",
+        filters=[lambda value: value.strip() if value else value],
+        validators=[
+            DataRequired(message="Enter a project description."),
+        ],
+    )
+
+    artist_intro = TextAreaField(
+        "Artist introduction",
+        filters=[lambda value: value.strip() if value else value],
+        validators=[
+            DataRequired(message="Enter an artist introduction."),
+        ],
+    )
+
+    submit = SubmitField("Save Changes")
+
+
+class CampaignStatusForm(FlaskForm):
+    """Validate an approved campaign's operational status."""
+
+    form_action = HiddenField(default="update_status")
+    project_id = HiddenField(validators=[DataRequired()])
+
+    project_status = SelectField(
+        "Operational status",
+        choices=[
+            ("Active", "Active"),
+            ("Paused", "Paused"),
+            ("Closed", "Closed"),
+        ],
+        validators=[
+            DataRequired(message="Select a campaign status."),
+        ],
+    )
+
+    submit = SubmitField("Update Status")
+
+class ProjectUpdateForm(FlaskForm):
+    """Validate a new project update and optional image."""
+
+    form_action = HiddenField(default="post_update")
+    project_id = HiddenField(validators=[DataRequired()])
+
+    update_title = StringField(
+        "Update title",
+        filters=[lambda value: value.strip() if value else value],
+        validators=[
+            DataRequired(message="Enter an update title."),
+            Length(
+                max=100,
+                message="Update title must be 100 characters or fewer.",
+            ),
+        ],
+    )
+
+    update_description = TextAreaField(
+        "Update description",
+        filters=[lambda value: value.strip() if value else value],
+        validators=[
+            DataRequired(message="Enter an update description."),
+        ],
+    )
+
+    update_image = FileField(
+        "Update image",
+        validators=[
+            Optional(),
+            FileAllowed(
+                ALLOWED_IMAGE_TYPES,
+                "Upload a PNG, JPG, JPEG, GIF or WEBP image.",
+            ),
+        ],
+    )
+
+    submit = SubmitField("Publish Update")
+
+
+class EditProjectUpdateForm(FlaskForm):
+    """Validate changes to an existing project update."""
+
+    form_action = HiddenField(default="edit_update")
+    project_id = HiddenField(validators=[DataRequired()])
+    update_id = HiddenField(validators=[DataRequired()])
+
+    edited_title = StringField(
+        "Update title",
+        filters=[lambda value: value.strip() if value else value],
+        validators=[
+            DataRequired(message="Enter an update title."),
+            Length(
+                max=100,
+                message="Update title must be 100 characters or fewer.",
+            ),
+        ],
+    )
+
+    edited_description = TextAreaField(
+        "Update description",
+        filters=[lambda value: value.strip() if value else value],
+        validators=[
+            DataRequired(message="Enter an update description."),
+        ],
+    )
+
+    submit = SubmitField("Save Update")
+
+
+class DeleteProjectUpdateForm(FlaskForm):
+    """Provide CSRF validation when deleting a project update."""
+
+    form_action = HiddenField(default="delete_update")
+    project_id = HiddenField(validators=[DataRequired()])
+    update_id = HiddenField(validators=[DataRequired()])
+
+    submit = SubmitField("Delete")
 
 # ----- Part 5. Admin Dashboard -----
 
