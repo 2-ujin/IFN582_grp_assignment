@@ -16,7 +16,7 @@
     </section>
 
     <!-- Project overview -->
-    <!-- display project image, project name, artist name and location -->> 
+    <!-- display project image, project name, artist name and location -->
     <section class="details-hero section-padding">
       <div class="container">
         <div class="row g-5 align-items-start">
@@ -58,7 +58,7 @@
                 
               <!-- progress bar cannot over 100% --> 
               <div class="progress mb-3" role="progressbar" aria-label="Funding progress" aria-valuenow="{{ project.progressPercentage }}" aria-valuemin="0" aria-valuemax="100">
-                <div class="progress-bar" style="width: {{ [project.progressPercentage, 100]|min if project else 0 }}%"></div>
+                <div class="progress-bar" style="width: {{ 100 if project.progressPercentage > 100 else project.progressPercentage }}%"></div>
               </div>
                 
               <!-- show how many supporters --> 
@@ -122,7 +122,7 @@
                 <div class="panel-heading-row">
                 <h2>Project Updates</h2>
                 <span class="update-count">{{ updates|length }} Updates</span>
-              </div>
+                </div>
 
                 {% if updates %}
                     {% for update in updates %}
@@ -135,14 +135,13 @@
 
                             <!---- if update has picture-->
                             <!-- display artist picture in artist update -->
-                    {% if update.imagePath %}
-                        <div class="update-image-wrapper mt-3">
-                            <img class="img-fluid rounded" 
-                                src="{{ url_for('static', filename='img/' + update.imagePath.split('/')[-1]) }}" 
-                                alt="{{ update.title }}"
-                                onerror="this.parentElement.style.display='none';">
-                        </div>
-                            {% endif %}
+                        {% if update.imagePath %}
+                            <div class="update-image-wrapper mt-3">
+                                <img class="img-fluid rounded" 
+                                    src="{{ url_for('static', filename=update.imagePath) }}" 
+                                    alt="{{ update.title }}">
+                            </div>        
+                        {% endif %}
                         </div>
                     
                     {% endfor %}

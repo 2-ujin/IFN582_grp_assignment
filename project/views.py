@@ -479,6 +479,8 @@ def project_detail(project_id):
         ORDER BY pu.publishedDate DESC
     """, (project_id,))
     updates = cursor.fetchall()
+    
+
 
     # define supporter messages  
     cursor.execute("""
