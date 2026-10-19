@@ -3,6 +3,7 @@
 {% block content %}
 
     <!-- Breadcrumb -->
+    <!-- click "Home" can return home page -->
     <section class="details-breadcrumb">
       <div class="container">
         <nav aria-label="Breadcrumb">
@@ -15,6 +16,7 @@
     </section>
 
     <!-- Project overview -->
+    <!-- display project image, project name, artist name and location -->> 
     <section class="details-hero section-padding">
       <div class="container">
         <div class="row g-5 align-items-start">
@@ -37,35 +39,43 @@
           </div>
 
           <!-- Funding summary -->
+          <!-- Funding card --> 
           <div class="col-lg-5">
             <aside class="funding-card" aria-labelledby="funding-summary-heading">
               <h2 id="funding-summary-heading">Funding Summary</h2>
-
+            
+              <!-- number use 1,500 to display --> 
               <div class="funding-amount">
                 <strong>${{ "{:,.0f}".format(project.totalRaised) }}</strong>
                 <span>raised of ${{ "{:,.0f}".format(project.goal) }} goal</span>
               </div>
-
+                
+              <!-- percentage of funding --> 
               <div class="progress-label">
                 <span>Funding progress</span>
                 <span>{{ project.progressPercentage }}%</span>
               </div>
-
+                
+              <!-- progress bar cannot over 100% --> 
               <div class="progress mb-3" role="progressbar" aria-label="Funding progress" aria-valuenow="{{ project.progressPercentage }}" aria-valuemin="0" aria-valuemax="100">
                 <div class="progress-bar" style="width: {{ [project.progressPercentage, 100]|min if project else 0 }}%"></div>
               </div>
-
+                
+              <!-- show how many supporters --> 
               <div class="funding-stats">
                 <div>
                   <strong>{{ supporter_count }}</strong>
                   <span>Supporters</span>
                 </div>
+                
+                <!-- show remaining days --> 
                 <div>
                   <strong>{{ project.daysRemaining }}</strong>
                   <span>Days remaining</span>
                 </div>
               </div>
-
+                
+              <!-- button to donation form -->
               <a class="btn btn-coral btn-lg w-100 mt-4" href="#donation-form">
                 Fund This Art
               </a>
@@ -82,16 +92,22 @@
           <div class="col-lg-8">
 
             <!-- About Project -->
+             
+            <!-- project description -->
             <article class="content-panel mb-4">
               <h2>About This Project</h2>
               <p>{{ project.projectDescription or 'No description provided.' }}</p>
             </article>
 
             <!-- About Artist -->
+             
+            <!-- show first letter in artist name and make them to uppercase -->
             <article class="content-panel mb-4">
               <h2>About the Artist</h2>
               <div class="artist-profile">
                 <div class="artist-avatar">{{ (project.artistName[:2] | upper) if project and project.artistName else 'AR' }}</div>
+                
+                <!-- display artist name and intro -->
                 <div>
                   <h3>{{ project.artistName }}</h3>
                   <p>{{ project.artistIntro }}</p>
@@ -101,7 +117,9 @@
 
             <!-- Project updates -->
             <article class="content-panel mb-4">
-              <div class="panel-heading-row">
+              
+                <!-- display count of artist update -->
+                <div class="panel-heading-row">
                 <h2>Project Updates</h2>
                 <span class="update-count">{{ updates|length }} Updates</span>
               </div>
@@ -109,17 +127,18 @@
                 {% if updates %}
                     {% for update in updates %}
                         <div class="update-item">
+
+                            <!-- display day with this style: 14 OCTOBER 2026 -->
                             <div class="update-date">{{ update.publishedDate.strftime('%d %B %Y')|upper if update.publishedDate else '' }}</div>
                             <h3>{{ update.title }}</h3>
                             <p>{{ update.description }}</p>
 
-
-
                             <!---- if update has picture-->
+                            <!-- display artist picture in artist update -->
                     {% if update.imagePath %}
                         <div class="update-image-wrapper mt-3">
                             <img class="img-fluid rounded" 
-                                src="{{ url_for('static', filename=update.imagePath) }}" 
+                                src="{{ url_for('static', filename='img/' + update.imagePath.split('/')[-1]) }}" 
                                 alt="{{ update.title }}"
                                 onerror="this.parentElement.style.display='none';">
                         </div>
@@ -133,6 +152,8 @@
                   </article> 
 
             <!-- Supporter msg -->
+             
+            <!-- display all supporters message and details -->
             <article class="content-panel">
               <h2>Supporter Messages</h2>
                 {% if donations %}
@@ -149,6 +170,8 @@
                             </div>
                         </div>
                     {% endfor %}
+
+                    <!-- if no donation message, show "No messages yet. Be the first to leave a message!" -->
                 {% else %}
                     <p class="text-muted">No messages yet. Be the first to leave a message!</p>
                 {% endif %}
@@ -163,8 +186,10 @@
 
               <form method="POST">
 
+                <!-- CSRF proctection -->
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
+                <!-- space of donation amount and min=1 -->
                 <div class="mb-3">
                   <label class="form-label" for="pledge-amount">Pledge amount</label>
                   <div class="input-group">
@@ -173,19 +198,22 @@
                   </div>
                 </div>
 
+                <!-- name space, auto fill name in already log account -->
                 <div class="mb-3">
                   <label class="form-label" for="supporter-name">Name</label>
-                <!-- auto fill already log in account-->
                   <input id="supporter-name" class="form-control" type="text" name="supporter-name" placeholder="Your name" required
                   value="{{ (current_user.firstname ~ ' ' ~ current_user.surname) if current_user.is_authenticated else '' }}">
                 </div>
 
+                <!-- email space, auto fill email in already log account -->
                 <div class="mb-3">
                   <label class="form-label" for="supporter-email">Email</label>
                   <input id="supporter-email" class="form-control" type="email" name="supporter-email" placeholder="abc@gmail.com" required
                   value="{{ current_user.email if current_user.is_authenticated else '' }}">
                 </div>
 
+
+                <!-- optional message space & payment -->
                 <div class="mb-3">
                   <label class="form-label" for="artist-message">Message to artist</label>
                   <textarea id="artist-message" class="form-control" name="artist-message" rows="4" placeholder="Write a message to the artist..."></textarea>
