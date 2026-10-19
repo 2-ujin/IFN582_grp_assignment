@@ -3,6 +3,8 @@
    
 
     <!-- Hero section -->
+
+    <!-- slogan and intro of this platform -->
     <section class="hero-section">
       <div class="container">
         <div class="row align-items-center">
@@ -17,6 +19,8 @@
     </section>
 
     <!-- Category -->
+     
+    <!-- category button when chick it jump to those projects, and it keep active CSS class -->
     <section id="categories" class="category-strip section-padding-sm bg-white" aria-label="Creative project categories">
       <div class="container">
         <div class="category-grid">
@@ -31,6 +35,8 @@
     </section>
 
     <!-- How work section -->
+
+    <!-- display 3 different section of how to use this web in Bootstrap -->
     <section id="how-it-works" class="section-padding bg-white">
       <div class="container">
         <div class="section-heading text-center">
@@ -64,6 +70,8 @@
     </section>
 
     <!-- Featured projects -->
+
+
     <section id="featured-projects" class="section-padding section-tint">
       <div class="container">
         <div class="featured-heading-row">
@@ -71,35 +79,46 @@
             <h2>Featured Projects</h2>
           </div>
             <!-- discover more button -->
+
+            <!-- this button can keep all things display when click it -->
+            <!-- if websie include "all" display "show less" -->
             {% if request.args.get('all') %}
                 <a class="btn btn-outline-coral" href="{{ url_for('main.index', all_stories=request.args.get('all_stories'), category=request.args.get('category'), q=request.args.get('q')) }}#featured-projects">Show Less</a>
+
+            <!-- if websie no include "all" display "discover more" -->
             {% else %}
                 <a class="btn btn-outline-coral" href="{{ url_for('main.index', all='true', all_stories=request.args.get('all_stories'), category=request.args.get('category'), q=request.args.get('q')) }}#featured-projects">Discover More</a>
             {% endif %}
         </div>
 
+        <!-- display all projects in cards -->
         <div class="row g-4 mt-2">
-        {% for project in projects %}
-          <div class="col-md-6 col-lg-4">
-            <a class="project-link" href="{{ url_for('main.project_detail', project_id=project['projectId']) }}">
-              <article class="project-card h-100">
-                <img class="project-image" src="{{ url_for('static', filename=project['imagePath']) }}" alt="{{ project['projectName'] }}" loading="lazy">
-                <div class="card-body">
-                  <h3>{{ project['projectName'] }}</h3>
-                  <p class="artist-name">{{ project['artistName'] }}</p>
-                  <p class="project-meta">{{ project['categoryName'] }} <span>•</span> {{ project['location'] }}</p>
-                  <div class="progress-label"><span>${{ "{:,.0f}".format(project['totalRaised']) }} raised</span><span>{{ project['progressPercentage'] | int }}%</span></div>
-                  <div class="progress" role="progressbar" aria-label="{{ project['projectName'] }} funding progress" aria-valuenow="{{ project['progressPercentage'] | int }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:{{ [project['progressPercentage'] | int, 100] | min }}%"></div></div>
-                  <div class="card-footer-info"><span>Goal: ${{ "{:,.0f}".format(project['goal']) if project['goal'] else 0 }}</span><strong>{{ project['daysRemaining'] }} days remaining</strong></div>
+        {% if projects %}
+            {% for project in projects %}
+                <div class="col-md-6 col-lg-4">
+                    <a class="project-link" href="{{ url_for('main.project_detail', project_id=project['projectId']) }}">
+                    <article class="project-card h-100">
+                        <!-- loading="lazy" can display picture efficiently -->
+                        <img class="project-image" src="{{ url_for('static', filename=project['imagePath'] or 'img/No-image.png') }}" alt="{{ project['projectName'] }}" loading="lazy">
+                        <!-- display project name, artist name, category name, city, remaining days, goal -->
+                        <div class="card-body">
+                        <h3>{{ project['projectName'] }}</h3>
+                        <p class="artist-name">{{ project['artistName'] }}</p>
+                        <p class="project-meta">{{ project['categoryName'] }} <span>•</span> {{ project['location'] }}</p>
+                        <div class="progress-label"><span>${{ "{:,.0f}".format(project['totalRaised']) }} raised</span><span>{{ project['progressPercentage'] | int }}%</span></div>
+                        <div class="progress" role="progressbar" aria-label="{{ project['projectName'] }} funding progress" aria-valuenow="{{ project['progressPercentage'] | int }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width: {{ 100 if project['progressPercentage'] > 100 else project['progressPercentage'] }}%"></div></div>
+                        <div class="card-footer-info"><span>Goal: ${{ "{:,.0f}".format(project['goal']) if project['goal'] else 0 }}</span><strong>{{ project['daysRemaining'] }} days remaining</strong></div>
+                        </div>
+                    </article>
+                    </a>
                 </div>
-              </article>
-            </a>
-          </div>
+            {% endfor %}
+        <!-- if no project display No projects found matching your search -->
         {% else %}
           <div class="col-12 text-center py-5">
               <p class="text-muted fs-5">No projects found matching your search.</p>
           </div>  
-        {% endfor %}
+        {% endif %}
         </div>  
       </div>   
     </section>
@@ -114,17 +133,20 @@
             <h2>Success Stories</h2>
             </div>
             {% if request.args.get('all_stories') %}
+            <!-- if all stories display "show less" -->
             <a class="btn btn-outline-coral" href="{{ url_for('main.index', all=request.args.get('all'), category=request.args.get('category'), q=request.args.get('q')) }}#success-stories">Show Less</a>
             {% else %}
+            <!-- if only 2 stories display "discover more" -->
             <a class="btn btn-outline-coral" href="{{ url_for('main.index', all=request.args.get('all'), category=request.args.get('category'), q=request.args.get('q'), all_stories='true') }}#success-stories">Discover More</a>
             {% endif %}
         </div>
 
+        <!-- success stories img, name-->
         <div class="row g-4">
             {% for story in success_stories %}
           <div class="col-md-6">
                 <article class="success-card">
-                <img class="success-image" src="{{ url_for('static', filename=story['imagePath']) }}" alt="{{ story['projectName'] }}" loading="lazy">
+                <img class="success-image" src="{{ url_for('static', filename=story['imagePath'] or 'img/No-image.png') }}" alt="{{ story['projectName'] }}" loading="lazy">
                 <div class="success-content">
                     <div>
                     <h3>{{ story['projectName'] }}</h3>
