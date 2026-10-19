@@ -43,7 +43,7 @@ Setup Instructions
 
     > python3 run.py
 
-    After run the code, open http:/127.0.0.1:8888 in your web browser.
+    After run the code, open http://127.0.0.1:8888 in your web browser.
 
 
 
