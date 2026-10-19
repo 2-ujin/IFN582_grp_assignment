@@ -61,10 +61,8 @@ def create_app(test_config=None):
     login_manager.login_message_category = "info"
 
     from .views import main
-    from .management import management_bp
 
     app.register_blueprint(main)
-    app.register_blueprint(management_bp)
 
     @app.context_processor
     def inject_current_year():

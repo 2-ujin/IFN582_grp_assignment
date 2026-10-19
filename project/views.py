@@ -1,5 +1,8 @@
 #Application routes for authentication, fundraising pages, and administration
 
+from datetime import date
+from pathlib import Path
+from uuid import uuid4
 from functools import wraps
 from urllib.parse import urlsplit
 from datetime import datetime
@@ -21,9 +24,10 @@ from flask_login import (
 )
 from MySQLdb import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 from . import database, login_manager
-from .forms import AdminActionForm, EditUserForm, FeatureProjectForm, LoginForm, RegisterForm, SuccessStoryForm
+from .forms import AdminActionForm, EditUserForm, FeatureProjectForm, LoginForm, RegisterForm, SuccessStoryForm, CampaignStatusForm, CreateCampaignForm, DeleteProjectUpdateForm, EditCampaignForm, EditProjectUpdateForm, ProjectUpdateForm
 from .models import (
     AccountStatus,
     User,
@@ -52,6 +56,18 @@ from .models import (
     soft_delete_project,
     soft_delete_user,
     update_user_details,
+    create_campaign,
+    create_owned_project_update,
+    delete_owned_project_update,
+    edit_owned_project_update,
+    get_campaign_categories,
+    get_campaign_donation_statistics,
+    get_campaign_supporter_messages,
+    get_campaign_updates,
+    get_fundraiser_campaigns,
+    get_recent_campaign_donations,
+    update_owned_campaign,
+    update_owned_campaign_status
 )
 
 # Main routes use extensions initialized by the shared app factory.
@@ -490,7 +506,501 @@ def project_detail(project_id):
         updates=updates,
         donations=donations,
         supporter_count=supporter_count
+    )  
+
+# ----- Part 4. Campaign Management Page -----
+
+# ----- Part 4. Campaign Management -----
+
+ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+
+
+def _save_management_image(uploaded_file, folder_name):
+    """Save a validated campaign image using a unique safe filename."""
+
+    if uploaded_file is None or not uploaded_file.filename:
+        return None
+
+    original_filename = secure_filename(uploaded_file.filename)
+
+    if not original_filename or "." not in original_filename:
+        raise ValueError("Please select a valid image file.")
+
+    extension = original_filename.rsplit(".", 1)[1].lower()
+
+    if extension not in ALLOWED_IMAGE_EXTENSIONS:
+        raise ValueError(
+            "Upload a PNG, JPG, JPEG, GIF or WEBP image."
+        )
+
+    unique_filename = f"{uuid4().hex}.{extension}"
+
+    upload_folder = (
+        Path(current_app.static_folder)
+        / "img"
+        / folder_name
     )
+    upload_folder.mkdir(parents=True, exist_ok=True)
+
+    full_path = upload_folder / unique_filename
+    uploaded_file.save(full_path)
+
+    return f"img/{folder_name}/{unique_filename}"
+
+
+def _delete_management_image(image_path):
+    """Safely delete an uploaded image located inside the static folder."""
+
+    if not image_path:
+        return
+
+    static_folder = Path(current_app.static_folder).resolve()
+    full_path = (static_folder / image_path).resolve()
+
+    # Do not allow a database path to delete something outside /static.
+    if not full_path.is_relative_to(static_folder):
+        current_app.logger.warning(
+            "Unsafe image deletion path rejected: %s",
+            image_path,
+        )
+        return
+
+    if full_path.is_file():
+        full_path.unlink()
+
+def _flash_management_form_errors(form):
+    """Display the first validation error from a management form."""
+
+    for field_errors in form.errors.values():
+        if field_errors:
+            flash(field_errors[0], "danger")
+            return
+
+    flash("Please check the submitted information.", "danger")
+
+@main.route("/management", methods=["GET", "POST"])
+@fundraiser_required
+def management():
+    """Display and process the logged-in fundraiser's campaign dashboard."""
+
+    creator_id = current_user.id
+    campaigns = get_fundraiser_campaigns(creator_id)
+    categories = get_campaign_categories()
+
+    category_choices = [
+        (category["categoryId"], category["categoryName"])
+        for category in categories
+    ]
+
+    create_form = CreateCampaignForm()
+    edit_form = EditCampaignForm()
+    status_form = CampaignStatusForm()
+    update_form = ProjectUpdateForm()
+    edit_update_form = EditProjectUpdateForm()
+    delete_update_form = DeleteProjectUpdateForm()
+
+    create_form.category_id.choices = category_choices
+    edit_form.category_id.choices = category_choices
+
+    owned_campaigns = {
+        campaign["projectId"]: campaign
+        for campaign in campaigns
+    }
+
+    # Process create, edit, status and project-update submissions.
+    if request.method == "POST":
+        form_action = request.form.get("form_action", "")
+        project_id = request.form.get("project_id", type=int)
+        saved_image_path = None
+
+        try:
+            if form_action == "create_campaign":
+                if not create_form.validate_on_submit():
+                    _flash_management_form_errors(create_form)
+
+                elif (
+                    create_form.deadline.data is None
+                    or create_form.deadline.data < date.today()
+                ):
+                    flash(
+                        "The campaign deadline cannot be in the past.",
+                        "danger",
+                    )
+
+                else:
+                    saved_image_path = _save_management_image(
+                        create_form.project_image.data,
+                        "campaigns",
+                    )
+
+                    project_id = create_campaign(
+                        creator_id=creator_id,
+                        category_id=create_form.category_id.data,
+                        project_name=create_form.project_name.data,
+                        location=create_form.location.data,
+                        goal=create_form.goal.data,
+                        deadline=create_form.deadline.data,
+                        project_description=create_form.project_description.data,
+                        artist_intro=create_form.artist_intro.data,
+                        image_path=saved_image_path,
+                    )
+
+                    flash(
+                        "Campaign created successfully and submitted "
+                        "for administrator approval.",
+                        "success",
+                    )
+
+            elif form_action == "update_project":
+                if (
+                    project_id is None
+                    or project_id not in owned_campaigns
+                ):
+                    flash(
+                        "You are not authorised to edit this campaign.",
+                        "danger",
+                    )
+
+                elif not edit_form.validate_on_submit():
+                    _flash_management_form_errors(edit_form)
+
+                else:
+                    existing_campaign = owned_campaigns[project_id]
+
+                    # Keep the existing deadline when the edit form does not
+                    # contain a deadline input.
+                    deadline = (
+                        edit_form.deadline.data
+                        or existing_campaign["deadline"]
+                    )
+
+                    affected_rows = update_owned_campaign(
+                        project_id=project_id,
+                        creator_id=creator_id,
+                        category_id=edit_form.category_id.data,
+                        project_name=edit_form.project_name.data,
+                        location=edit_form.location.data,
+                        goal=edit_form.goal.data,
+                        deadline=deadline,
+                        project_description=edit_form.project_description.data,
+                        artist_intro=edit_form.artist_intro.data,
+                    )
+
+                    if affected_rows:
+                        flash(
+                            "Project information updated successfully.",
+                            "success",
+                        )
+                    else:
+                        flash(
+                            "No project information was changed.",
+                            "info",
+                        )
+
+            elif form_action == "update_status":
+                if (
+                    project_id is None
+                    or project_id not in owned_campaigns
+                ):
+                    flash(
+                        "You are not authorised to manage this campaign.",
+                        "danger",
+                    )
+
+                elif not status_form.validate_on_submit():
+                    _flash_management_form_errors(status_form)
+
+                elif (
+                    owned_campaigns[project_id]["approvalStatus"]
+                    != "Approved"
+                ):
+                    flash(
+                        "The operational status cannot be changed because "
+                        "this campaign is not approved.",
+                        "danger",
+                    )
+
+                else:
+                    affected_rows = update_owned_campaign_status(
+                        project_id=project_id,
+                        creator_id=creator_id,
+                        new_status=status_form.project_status.data,
+                    )
+
+                    if affected_rows:
+                        flash(
+                            "Campaign status updated successfully.",
+                            "success",
+                        )
+                    else:
+                        flash(
+                            "The campaign status could not be changed.",
+                            "warning",
+                        )
+
+            elif form_action == "post_update":
+                if (
+                    project_id is None
+                    or project_id not in owned_campaigns
+                ):
+                    flash(
+                        "You are not authorised to update this campaign.",
+                        "danger",
+                    )
+
+                elif not update_form.validate_on_submit():
+                    _flash_management_form_errors(update_form)
+
+                else:
+                    saved_image_path = _save_management_image(
+                        update_form.update_image.data,
+                        "updates",
+                    )
+
+                    new_update_id = create_owned_project_update(
+                        project_id=project_id,
+                        creator_id=creator_id,
+                        update_title=update_form.update_title.data,
+                        update_description=update_form.update_description.data,
+                        image_path=saved_image_path,
+                    )
+
+                    if new_update_id is None:
+                        _delete_management_image(saved_image_path)
+                        flash(
+                            "You are not authorised to update this campaign.",
+                            "danger",
+                        )
+                    else:
+                        flash(
+                            "Project update published successfully.",
+                            "success",
+                        )
+
+            elif form_action == "edit_update":
+                update_id = request.form.get("update_id", type=int)
+
+                if (
+                    project_id is None
+                    or project_id not in owned_campaigns
+                ):
+                    flash(
+                        "You are not authorised to manage this campaign.",
+                        "danger",
+                    )
+
+                elif update_id is None:
+                    flash("Invalid project update.", "danger")
+
+                elif not edit_update_form.validate_on_submit():
+                    _flash_management_form_errors(edit_update_form)
+
+                else:
+                    affected_rows = edit_owned_project_update(
+                        update_id=update_id,
+                        project_id=project_id,
+                        creator_id=creator_id,
+                        edited_title=edit_update_form.edited_title.data,
+                        edited_description=(
+                            edit_update_form.edited_description.data
+                        ),
+                    )
+
+                    if affected_rows:
+                        flash(
+                            "Project update edited successfully.",
+                            "success",
+                        )
+                    else:
+                        flash(
+                            "The project update was not found or no "
+                            "information was changed.",
+                            "warning",
+                        )
+
+            elif form_action == "delete_update":
+                update_id = request.form.get("update_id", type=int)
+
+                if (
+                    project_id is None
+                    or project_id not in owned_campaigns
+                ):
+                    flash(
+                        "You are not authorised to manage this campaign.",
+                        "danger",
+                    )
+
+                elif update_id is None:
+                    flash("Invalid project update.", "danger")
+
+                elif not delete_update_form.validate_on_submit():
+                    _flash_management_form_errors(delete_update_form)
+
+                else:
+                    deletion_result = delete_owned_project_update(
+                        update_id=update_id,
+                        project_id=project_id,
+                        creator_id=creator_id,
+                    )
+
+                    if (
+                        deletion_result
+                        and deletion_result["deleted"]
+                    ):
+                        for image_path in deletion_result["image_paths"]:
+                            _delete_management_image(image_path)
+
+                        flash(
+                            "Project update deleted successfully.",
+                            "success",
+                        )
+                    else:
+                        flash(
+                            "You are not authorised to delete this update.",
+                            "danger",
+                        )
+
+            else:
+                flash("Invalid campaign management action.", "danger")
+
+        except ValueError as error:
+            if saved_image_path:
+                _delete_management_image(saved_image_path)
+
+            flash(str(error), "danger")
+
+        except Exception:
+            if saved_image_path:
+                _delete_management_image(saved_image_path)
+
+            current_app.logger.exception(
+                "Campaign management operation failed."
+            )
+            flash(
+                "An unexpected error occurred. Please try again.",
+                "danger",
+            )
+
+        if project_id in owned_campaigns or form_action == "create_campaign":
+            return redirect(
+                url_for("main.management", project_id=project_id)
+            )
+
+        return redirect(url_for("main.management"))
+
+    # Select only a campaign owned by the logged-in fundraiser.
+    selected_id = request.args.get("project_id", type=int)
+
+    selected_campaign = None
+
+    if campaigns:
+        if selected_id in owned_campaigns:
+            selected_campaign = owned_campaigns[selected_id]
+        else:
+            selected_campaign = campaigns[0]
+
+    days_remaining = 0
+    fund_raised = 0
+    supporter_count = 0
+    donation_count = 0
+    average_donation = 0
+    progress = 0
+    remaining_target = 0
+    recent_donation = []
+    project_updates = []
+    supporter_messages = []
+
+    campaign_message = "Your campaign is ready to begin."
+
+    if selected_campaign:
+        project_id = selected_campaign["projectId"]
+
+        if selected_campaign["deadline"]:
+            days_remaining = max(
+                (
+                    selected_campaign["deadline"]
+                    - date.today()
+                ).days,
+                0,
+            )
+
+        donation_statistics = get_campaign_donation_statistics(
+            project_id,
+            creator_id,
+        )
+
+        fund_raised = donation_statistics["fundRaised"]
+        supporter_count = donation_statistics["supporterCount"]
+        donation_count = donation_statistics["donationCount"]
+        average_donation = donation_statistics["averageDonation"]
+
+        goal = selected_campaign["goal"] or 0
+
+        if goal > 0:
+            progress = round(
+                float(fund_raised / goal * 100),
+                1,
+            )
+
+        remaining_target = max(goal - fund_raised, 0)
+
+        if progress >= 100:
+            campaign_message = (
+                "Congratulations! Your campaign has reached "
+                "its fundraising goal."
+            )
+        elif progress >= 50:
+            campaign_message = (
+                "Great progress! Your campaign is more than "
+                "halfway to its goal."
+            )
+        elif progress > 0:
+            campaign_message = (
+                "Your campaign is gaining support. "
+                "Keep sharing project updates."
+            )
+
+        recent_donation = get_recent_campaign_donations(
+            project_id,
+            creator_id,
+        )
+
+        project_updates = get_campaign_updates(
+            project_id,
+            creator_id,
+        )
+
+        supporter_messages = get_campaign_supporter_messages(
+            project_id,
+            creator_id,
+        )
+
+    return render_template(
+        "management.html",
+        campaigns=campaigns,
+        selected_campaign=selected_campaign,
+        categories=categories,
+        today=date.today(),
+        days_remaining=days_remaining,
+        fund_raised=fund_raised,
+        supporter_count=supporter_count,
+        donation_count=donation_count,
+        average_donation=average_donation,
+        progress=progress,
+        remaining_target=remaining_target,
+        campaign_message=campaign_message,
+        recent_donation=recent_donation,
+        project_updates=project_updates,
+        supporter_messages=supporter_messages,
+        create_form=create_form,
+        edit_form=edit_form,
+        status_form=status_form,
+        update_form=update_form,
+        edit_update_form=edit_update_form,
+        delete_update_form=delete_update_form,
+    )
+
+
 
 # ----- Part 5. Admin Dashboard -----
 """Every route has @admin_required, so only administrators can open it.
