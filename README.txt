@@ -7,6 +7,7 @@ Project Info
 MakeArtsFund is a crowdfunding web application designed to support creative arts projects in Australia. The platform connects local artists with supporters who wish to contribute to original artistic work. It is intended to assist artists in raising funds for projects in various categories such as Visual Arts, Handicrafts, 3D Printing, Photography, Music, and Film & Performance. Users can browse campaigns by category and location, helping them discover creative projects in their local communities.
 
 2. GroupID: Mostafa - Gr 3
+
 3. Team Member:
     - Hao-Chun Chang (n12554839)
     - Hiu Lam Queenie Kwok (n12876615)
