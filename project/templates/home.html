@@ -93,30 +93,32 @@
 
         <!-- display all projects in cards -->
         <div class="row g-4 mt-2">
-        {% for project in projects %}
-          <div class="col-md-6 col-lg-4">
-            <a class="project-link" href="{{ url_for('main.project_detail', project_id=project['projectId']) }}">
-              <article class="project-card h-100">
-                <!-- loading="lazy" can display picture efficiently -->
-                <img class="project-image" src="{{ url_for('static', filename=project['imagePath']) }}" alt="{{ project['projectName'] }}" loading="lazy">
-                <!-- display project name, artist name, category name, city, remaining days, goal -->
-                <div class="card-body">
-                  <h3>{{ project['projectName'] }}</h3>
-                  <p class="artist-name">{{ project['artistName'] }}</p>
-                  <p class="project-meta">{{ project['categoryName'] }} <span>•</span> {{ project['location'] }}</p>
-                  <div class="progress-label"><span>${{ "{:,.0f}".format(project['totalRaised']) }} raised</span><span>{{ project['progressPercentage'] | int }}%</span></div>
-                  <div class="progress" role="progressbar" aria-label="{{ project['projectName'] }} funding progress" aria-valuenow="{{ project['progressPercentage'] | int }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:{{ [project['progressPercentage'] | int, 100] | min }}%"></div></div>
-                  <div class="card-footer-info"><span>Goal: ${{ "{:,.0f}".format(project['goal']) if project['goal'] else 0 }}</span><strong>{{ project['daysRemaining'] }} days remaining</strong></div>
+        {% if projects %}
+            {% for project in projects %}
+                <div class="col-md-6 col-lg-4">
+                    <a class="project-link" href="{{ url_for('main.project_detail', project_id=project['projectId']) }}">
+                    <article class="project-card h-100">
+                        <!-- loading="lazy" can display picture efficiently -->
+                        <img class="project-image" src="{{ url_for('static', filename=project['imagePath']) }}" alt="{{ project['projectName'] }}" loading="lazy">
+                        <!-- display project name, artist name, category name, city, remaining days, goal -->
+                        <div class="card-body">
+                        <h3>{{ project['projectName'] }}</h3>
+                        <p class="artist-name">{{ project['artistName'] }}</p>
+                        <p class="project-meta">{{ project['categoryName'] }} <span>•</span> {{ project['location'] }}</p>
+                        <div class="progress-label"><span>${{ "{:,.0f}".format(project['totalRaised']) }} raised</span><span>{{ project['progressPercentage'] | int }}%</span></div>
+                        <div class="progress" role="progressbar" aria-label="{{ project['projectName'] }} funding progress" aria-valuenow="{{ project['progressPercentage'] | int }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width: {{ 100 if project['progressPercentage'] > 100 else project['progressPercentage'] }}%"></div></div>
+                        <div class="card-footer-info"><span>Goal: ${{ "{:,.0f}".format(project['goal']) if project['goal'] else 0 }}</span><strong>{{ project['daysRemaining'] }} days remaining</strong></div>
+                        </div>
+                    </article>
+                    </a>
                 </div>
-              </article>
-            </a>
-          </div>
+            {% endfor %}
         <!-- if no project display No projects found matching your search -->
         {% else %}
           <div class="col-12 text-center py-5">
               <p class="text-muted fs-5">No projects found matching your search.</p>
           </div>  
-        {% endfor %}
+        {% endif %}
         </div>  
       </div>   
     </section>
