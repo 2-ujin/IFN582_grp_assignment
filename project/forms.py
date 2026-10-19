@@ -253,6 +253,17 @@ class EditCampaignForm(FlaskForm):
         ],
     )
 
+    project_image = FileField(
+        "Replace campaign image",
+        validators=[
+            Optional(),
+            FileAllowed(
+                ALLOWED_IMAGE_TYPES,
+                "Upload a PNG, JPG, JPEG, GIF or WEBP image.",
+            ),
+        ],
+    )
+
     submit = SubmitField("Save Changes")
 
 

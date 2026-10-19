@@ -23,18 +23,6 @@ Campaign Management | MakeArtsFund
 <section class="dashboard-section">
     <div class="container">
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                        </button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
                 <!-- Campaign creation form, New campaigns are submitted with Pending approval status. -->
                  <section class="dashboard-panel mb-4"
                         aria-labelledby="create-campaign-heading">
@@ -56,6 +44,7 @@ Campaign Management | MakeArtsFund
                             <form
                                 method="POST"
                                 action="{{ url_for('main.management') }}"
+                                enctype="multipart/form-data"
                             >
                                 <input
                                     type="hidden"
@@ -186,6 +175,23 @@ Campaign Management | MakeArtsFund
                                         rows="4"
                                         required
                                     ></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="create-project-image">
+                                        Campaign Image (Optional)
+                                    </label>
+
+                                    <input
+                                        id="create-project-image"
+                                        class="form-control"
+                                        type="file"
+                                        name="project_image"
+                                        accept=".png,.jpg,.jpeg,.gif,.webp"
+                                    >
+                                    <div class="form-text">
+                                        Accepted formats: PNG, JPG, JPEG, GIF, and WEBP.
+                                        Maximum request size: 5 MB.
+                                    </div>
                                 </div>
 
                                 <button class="btn btn-coral"
@@ -380,17 +386,26 @@ Campaign Management | MakeArtsFund
                     </div>
                 {% if selected_campaign %}
                     <form method="POST"
-                        action="{{ url_for('main.management') }}">
+                        action="{{ url_for('main.management') }}" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">                     
                         <input type="hidden" name="form_action" value="update_project">
                         <input type="hidden" name="project_id" value="{{ selected_campaign.projectId }}">
                         <div class="row g-4">
-                            <div class="col-md-8"><label class="form-label" for="project-title">Project
-                                    title</label><input id="project-title" class="form-control" type="text" name="project_name"
-                                    value="{{ selected_campaign.projectName }}" maxlength="100" required></div>
-                            <div class="col-md-4"><label class="form-label"
-                                    for="project-category">Category</label><select id="project-category"
-                                    class="form-select" name="category_id">
+                            <div class="col-md-8">
+                                <label class="form-label" for="project-title">
+                                    Project
+                                    title
+                                </label>
+                                <input id="project-title" class="form-control" type="text" name="project_name"
+                                    value="{{ selected_campaign.projectName }}" maxlength="100" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label"
+                                    for="project-category">
+                                    Category
+                                </label>
+                                <select id="project-category"
+                                    class="form-select" name="category_id" required>
                                 {% for category in categories %}
                                     <option value="{{ category.categoryId}}"{% if category.categoryId == selected_campaign.categoryId %} selected {% endif %}>
                                         {{ category.categoryName }}
@@ -415,6 +430,25 @@ Campaign Management | MakeArtsFund
                                     name="artist_intro" class="form-control"
                                     rows="10">{{selected_campaign.artistIntro or ''}}</textarea>
                             </div>
+                            <!-- Optional image replacement for the selected campaign. -->
+                             <div class="col-12">
+                                <label class="form-label" for="edit-project-image">
+                                    Replace Campaign Image (Optional)
+                                </label>
+                                {% if selected_campaign.imagePath %}
+                                    <p class="form-text">
+                                        This campaign currently has an image.
+                                        Select a new file only if you want to replace it.
+                                    </p>
+                                {% endif %}
+                                <input id="edit-project-image" class="form-control" type="file" name="project_image" accept=".png,.jpg,.jpeg,.gif,.webg">
+
+                                <div class="form-text">
+                                    Accepted formats: PNG, JPG, JPEG, GIF and WEBP.
+                                    Maximum request size: 5MB.
+                                </div>
+                             </div>
+
                             <div class="col-12"><button class="btn btn-coral" type="submit">Save Changes</button></div>
                         </div>
                     </form>
@@ -442,17 +476,15 @@ Campaign Management | MakeArtsFund
                             Add a project update
                         </label>
                         <textarea id="new-update" name="update_description" class="form-control" rows="5" placeholder="Share a milestone, event or announcement with supporters." required></textarea>
-                        <label for="update-image">
+                        <div class="mb-3">
+                            <label class="form-label" for="update-image">
                             Update image (optional)
-                        </label>
-                        <div class="d-flex align-items-lg-center gap-3 mb-3">
-                            <input id="update-image" class="visually-hidden" type="file" name="update_image" accept=".png,.jpg,.jpeg,.gif,.webp">
-                            <label class="btn btn-coral choose-image-btn mb-0" for="update-image">
-                            Choose Image
                             </label>
-                            <span id="selected-image-name" class="ms-2">
-                            No file chosen
-                            </span>
+                            <input id="update-image" class="form-control" type="file" name="update-image" accept=".png,.jpg,.jpeg,.gif,.webp">
+                            <div class="form-text">
+                                Accepted formats: PNG, JPG, JPEG, GIF and WEBP.
+                                Maximum request size: 5MB.
+                            </div>
                         </div>
                         <div class="text_center">
                             <button type="submit" class="btn btn-coral">
