@@ -8,11 +8,11 @@ MakeArtsFund is a crowdfunding web application designed to support creative arts
 
 2. GroupID: Mostafa - Gr 3
 3. Team Member:
-    - Yujin Lee (n12537675)
-    - Hao-Chun Chang (n)
-    - Woolim Han (n12873217)
+    - Hao-Chun Chang (n12554839)
     - Hiu Lam Queenie Kwok (n12876615)
-    - Lim Li San (n)
+    - Lim Li San (n12768065)
+    - Woolim Han (n12873217)
+    - Yujin Lee (n12537675)
 
 
 
