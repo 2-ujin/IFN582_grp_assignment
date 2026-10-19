@@ -2,7 +2,7 @@
 
 from functools import wraps
 from urllib.parse import urlsplit
-
+from datetime import datetime
 from flask import (
     Blueprint,
     abort,
@@ -249,96 +249,123 @@ def logout():
 
 
 # ----- Part 3. Home page -----
-# Keep the temporary Part 2 database check at its own path. The Part 3 home
-# page owns `/`, so both pieces remain available without a duplicate route.
-
+# define route from home page
 @main.route('/')
-
 def index():
+    # pick search keyword from URL query(q or search)
     search_query = (request.args.get('q') or request.args.get('search', '')).strip()
+    # pick category from URL query
     category_filter = request.args.get('category', '').strip()
+    # if user click "Discover more" show all feature projets
     show_all = request.args.get('all') == 'true'
-    # Load the featured projects and success stories for the home page.
+    # open databse cursor to apply SQL queries
     cursor = database.connection.cursor()
 
+    # SQL query with projects, category names, creator names and sum of donation
+    # LEFT JOIN means it display project even this project does not have donation
     query = """
-        SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
-                c.categoryName,
-                IFNULL(SUM(d.amount), 0) AS totalRaised,
-                ROUND(IFNULL(SUM(d.amount), 0) / p.goal * 100) AS progressPercentage,
-                GREATEST(DATEDIFF(p.deadline, CURDATE()), 0) AS daysRemaining         
+        SELECT p.*, u.firstname, u.surname, c.categoryName,
+               SUM(d.amount) AS totalRaised
         FROM project p
         JOIN user u ON p.creatorId = u.userId
         JOIN category c ON p.categoryId = c.categoryId
         LEFT JOIN donation d ON p.projectId = d.projectId           
         WHERE p.approvalStatus = 'Approved'
     """
+    # list to store queries safe to prevent SQL attack
     params = []
+    # if user enter keyword it filter project name or description
     if search_query:
         query += " AND (p.projectName LIKE %s OR p.projectDescription LIKE %s)"
         params.extend([f"%{search_query}%", f"%{search_query}%"])
+    # filter category name when select a category
     elif category_filter:
         query += " AND c.categoryName = %s"
         params.append(category_filter)
-
+    # only show feature projects if no click anything
     else:
         query += " AND p.featured = TRUE"
+
+    # group by project id and sort by number small to big
     query += " GROUP BY p.projectId ORDER BY p.projectId ASC"
     
-    if not search_query and not category_filter and not show_all:
-        query += " LIMIT 3"
-    
-    
+    # excute query and match information from fetchall()
     cursor.execute(query, tuple(params))
     projects = cursor.fetchall()
 
-    # show success stories with botton
+    # Calculate display fields in Python
+    # get today's date
+    today = datetime.now().date()
+    # use loop to display details in project
+    for p in projects:
+        p['artistName'] = p['firstname'] + ' ' + p['surname']
+        if p['totalRaised'] is None:
+            p['totalRaised'] = 0
+        if p['goal'] and p['goal'] > 0:
+            p['progressPercentage'] = round(p['totalRaised'] / p['goal'] * 100)
+        else:
+            p['progressPercentage'] = 0
+        # calculate remaining days
+        days = (p['deadline'] - today).days
+        p['daysRemaining'] = days if days > 0 else 0
+
+    # only show 3 projects if not click "discover more"
+    if not search_query and not category_filter and not show_all:
+        projects = projects[:3]
+
+    # Show success stories when click "discover more"
     show_all_stories = request.args.get('all_stories') == 'true'
 
-    stories_query="""
-        SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
-            c.categoryName
+    # search all successStoryFeatured = TRUE in database
+    stories_query = """
+        SELECT p.*, u.firstname, u.surname, c.categoryName
         FROM project p
         JOIN user u ON p.creatorId = u.userId
         JOIN category c ON p.categoryId = c.categoryId
         WHERE p.successStoryFeatured = TRUE
         ORDER BY p.projectId ASC
     """
-    if not show_all_stories:
-        stories_query += " LIMIT 2"
-
+    # get all success stories and close database cursor
     cursor.execute(stories_query)
     success_stories = cursor.fetchall()
     cursor.close()
-
-    # Keep the existing Part 3 home page and its template intact.
+    # artist name in success stories
+    for s in success_stories:
+        s['artistName'] = s['firstname'] + ' ' + s['surname']
+    # show 2 success stories if no click on "discover more"
+    if not show_all_stories:
+        success_stories = success_stories[:2]
+    # put in home.html and pass data to the front end
     return render_template(
         'home.html', 
         projects=projects, 
         success_stories=success_stories,
         selected_category_filter=category_filter,
         search_query=search_query
-        )
+    )
     
 
 # ----- Part 3. Fundraiser details and donation page -----
+# define route from donation page and support GET & POST
 @main.route('/donation/<int:project_id>', methods=['GET', 'POST'])
 def project_detail(project_id):
 
+    # recieved POST when click "pay" button
     if request.method == 'POST':
-        # check log in, if not need log in first
+        # Check login first if not show "Please log in or register as a Supporter to make a donation.", "warning"
         if not current_user.is_authenticated:
             flash("Please log in or register as a Supporter to make a donation.", "warning")
             return redirect(url_for('main.login', next=url_for('main.project_detail', project_id=project_id)))
-        # check only supporter can donation
-        if getattr(current_user, 'role', None) != 'Supporter':
+        
+        # Only supporter can donate
+        if current_user.role != 'Supporter':
             flash("Only registered Supporters can make donations.", "warning")
             return redirect(url_for('main.project_detail', project_id=project_id))
         
-        
+        # get pledge amount and message from supporters submitted in HTML
         amount = request.form.get('pledge-amount')
         message_text = request.form.get('artist-message', '').strip()
-        
+        # payment
         payment_method_raw = request.form.get('payment-method', 'card')
         method_map = {
             'card': 'Card',
@@ -347,7 +374,7 @@ def project_detail(project_id):
         }
         payment_method = method_map.get(payment_method_raw, 'Card')
         
-        # check donation number>0
+        # Check donation number > 0
         try:
             amount_num = float(amount)
             if amount_num <= 0:
@@ -356,57 +383,77 @@ def project_detail(project_id):
             flash("Please enter a valid donation amount greater than 0.", "danger")
             return redirect(url_for('main.project_detail', project_id=project_id))
 
+        # open cursor to save donation data into database
         cursor = database.connection.cursor()
         try:
+            # get log in user id and today's date
             supporter_id = current_user.id
+            today = datetime.now().date()
             
-            cursor.execute("INSERT IGNORE INTO supporter (userId) VALUES (%s)", (supporter_id,))
-            
+            # insert new donation data into "donation" table
             cursor.execute(
-                "INSERT INTO donation (projectId, supporterId, amount, donationDate, paymentMethod, paymentStatus) VALUES (%s, %s, %s, NOW(), %s, 'Received')",
-                (project_id, supporter_id, amount_num, payment_method)
+                "INSERT INTO donation (projectId, supporterId, amount, donationDate, paymentMethod, paymentStatus) VALUES (%s, %s, %s, %s, %s, 'Received')",
+                (project_id, supporter_id, amount_num, today, payment_method)
             )
-            donation_id = cursor.lastrowid
             
-
+            # if supporter have message save it too
             if message_text:
+                cursor.execute("SELECT MAX(donationId) AS id FROM donation")
+                new_donation = cursor.fetchone()
+                donation_id = new_donation['id']
+                # insert message into "supporterMessage" table and set visibility to TRUE
                 cursor.execute(
-                    "INSERT INTO supporterMessage (donationId, postedDate, message, visibility) VALUES (%s, NOW(), %s, TRUE)",
-                    (donation_id, message_text)
+                    "INSERT INTO supporterMessage (donationId, postedDate, message, visibility) VALUES (%s, %s, %s, TRUE)",
+                    (donation_id, today, message_text)
                 )
 
+            # save changes to database
             database.connection.commit()
             flash('Thank you for your generous support!', 'success')
         except Exception:
+            # if there is any error rollback database
             database.connection.rollback()
             flash('Donation failed, please try again.', 'danger')
         finally:
+            # close database 
             cursor.close()
-
+        # return projets detail page and update new details
         return redirect(url_for('main.project_detail', project_id=project_id))
     
-
+    # get request
     cursor = database.connection.cursor()
+    # define selected project details, creator name, category, and total amount raised
     cursor.execute("""
-        SELECT p.*, CONCAT(u.firstname, ' ', u.surname) AS artistName,
-        c.categoryName,
-        IFNULL(SUM(d.amount), 0) AS totalRaised,
-        ROUND(IFNULL(SUM(d.amount), 0) / p.goal * 100) AS progressPercentage,
-        GREATEST(DATEDIFF(p.deadline, CURDATE()), 0) AS daysRemaining         
+        SELECT p.*, u.firstname, u.surname, c.categoryName,
+               SUM(d.amount) AS totalRaised
         FROM project p
         JOIN user u ON p.creatorId = u.userId
         JOIN category c ON p.categoryId = c.categoryId
         LEFT JOIN donation d ON p.projectId = d.projectId           
         WHERE p.projectId = %s AND p.approvalStatus = 'Approved'
         GROUP BY p.projectId
-                         
-    """,(project_id,))
+    """, (project_id,))
     project_data = cursor.fetchone()
 
+    # if project not exist show 404 page
     if not project_data:
         cursor.close()
         abort(404)
-# update project
+
+    # coculate all details(artistName, totalRaised, progressPercentage, daysRemaining)
+    today = datetime.now().date()
+    project_data['artistName'] = project_data['firstname'] + ' ' + project_data['surname']
+    if project_data['totalRaised'] is None:
+        project_data['totalRaised'] = 0
+    if project_data['goal'] and project_data['goal'] > 0:
+        project_data['progressPercentage'] = round(project_data['totalRaised'] / project_data['goal'] * 100)
+    else:
+        project_data['progressPercentage'] = 0
+
+    days = (project_data['deadline'] - today).days
+    project_data['daysRemaining'] = days if days > 0 else 0
+
+    # Project updates, from new to old
     cursor.execute("""
         SELECT pu.*, MIN(im.imagePath) AS imagePath
         FROM projectUpdate pu
@@ -417,31 +464,33 @@ def project_detail(project_id):
     """, (project_id,))
     updates = cursor.fetchall()
 
-#supporter message  
+    # define supporter messages  
     cursor.execute("""
-            SELECT sm.*, d.amount, CONCAT(u.firstname, ' ', u.surname) AS donorName
-            FROM supporterMessage sm
-            JOIN donation d ON sm.donationId = d.donationId
-            JOIN user u ON d.supporterId = u.userId
-            WHERE d.projectId = %s AND sm.visibility = TRUE
-            ORDER BY sm.postedDate DESC
-        """, (project_id,))
+        SELECT sm.*, d.amount, u.firstname, u.surname
+        FROM supporterMessage sm
+        JOIN donation d ON sm.donationId = d.donationId
+        JOIN user u ON d.supporterId = u.userId
+        WHERE d.projectId = %s AND sm.visibility = TRUE
+        ORDER BY sm.postedDate DESC
+    """, (project_id,))
     donations = cursor.fetchall()
+    for msg in donations:
+        msg['donorName'] = msg['firstname'] + ' ' + msg['surname']
+
+    # count total number of danation
     cursor.execute("SELECT COUNT(donationId) AS count FROM donation WHERE projectId = %s", (project_id,))
     count_res = cursor.fetchone()
-    supporter_count = count_res['count'] if isinstance(count_res, dict) else (count_res[0] if count_res else 0)
+    supporter_count = count_res['count'] if count_res else 0
+    # close cursor
     cursor.close()
-
-    
-
+    # put in donation.html and pass data to the front end
     return render_template(
         'donation.html',
         project=project_data,
         updates=updates,
         donations=donations,
         supporter_count=supporter_count
-    )  
-
+    )
 
 # ----- Part 5. Admin Dashboard -----
 """Every route has @admin_required, so only administrators can open it.
