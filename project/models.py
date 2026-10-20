@@ -506,6 +506,7 @@ def update_owned_campaign(
     deadline,
     project_description,
     artist_intro,
+    image_path=None,
 ):
     """Update campaign information only when it belongs to the fundraiser."""
 
@@ -523,6 +524,7 @@ def update_owned_campaign(
                 deadline = %s,
                 projectDescription = %s,
                 artistIntro = %s,
+                imagePath = COALESCE(%s, imagePath),
                 updateDt = CURRENT_TIMESTAMP
             WHERE projectId = %s
                 AND creatorId = %s
@@ -535,6 +537,7 @@ def update_owned_campaign(
                 deadline,
                 project_description,
                 artist_intro,
+                image_path,
                 project_id,
                 creator_id,
             ),

@@ -678,6 +678,13 @@ def management():
                         or existing_campaign["deadline"]
                     )
 
+                    # Save a newly selected campaign image.
+                    # If no image was selected, this returns None.
+                    saved_image_path = _save_management_image(
+                        edit_form.project_image.data,
+                        "capaigns",
+                    )
+
                     affected_rows = update_owned_campaign(
                         project_id=project_id,
                         creator_id=creator_id,
@@ -688,6 +695,7 @@ def management():
                         deadline=deadline,
                         project_description=edit_form.project_description.data,
                         artist_intro=edit_form.artist_intro.data,
+                        image_path=saved_image_path,
                     )
 
                     if affected_rows:
