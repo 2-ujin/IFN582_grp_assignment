@@ -82,4 +82,4 @@ Setup Instructions
     - Donation amount of 0 or invalid is rejected; donating while logged out or as a Fundraiser is blocked.
     - A Supporter opening /admin or /management is denied.
     - 404 error case: http://127.0.0.1:8888/error-404
-    - 500 error template link: http://127.0.0.1:8888/error-eg-500
+    - 500 error: if u disconnect to DB and try to run run.py, then u will face the 500 error page.
