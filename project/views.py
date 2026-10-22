@@ -1015,18 +1015,9 @@ def management():
 
 
 # ----- Part 5. Admin Dashboard -----
-"""Every route has @admin_required, so only administrators can open it.
-Action routes (approve, suspend, delete, etc.) all follow the same pattern:
-1. The button in admin_dashboard.html sends a POST request with a CSRF token.
-2. form.validate_on_submit() checks it is a POST request with a valid token.
-3. The model function runs the UPDATE and returns rowcount (1 = success, 0 = nothing changed).
-4. flash() stores the message and redirect() sends the admin back to the dashboard.
-"""
 
 def create_feature_form():
-    """Build a dropdown with the projects that can be featured.
-    The dropdown shows the name, but sends the project ID. 
-    """
+    """Build a dropdown with the projects that can be featured."""
     feature_form = FeatureProjectForm()
     options = []
     for project in get_feature_candidates():
@@ -1035,8 +1026,7 @@ def create_feature_form():
     return feature_form
 
 def create_success_story_form():
-    """Build a dropdown with the completed projects (same approach as above).
-    """
+    """Build a dropdown with the completed projects."""
     success_story_form = SuccessStoryForm()
     options = []
     for project in get_success_story_candidates():
@@ -1049,7 +1039,6 @@ def create_success_story_form():
 def admin_dashboard():
     """Show the admin dashboard.
     Get every list and statistic from the model functions, then pass them to the template.
-    AdminActionForm provides the CSRF token for all action buttons.
     """
     campaign_stats = get_campaign_stats()
     creator_count = get_creator_count()
@@ -1118,9 +1107,7 @@ def reject_project(project_id):
 @main.route('/admin/projects/<int:project_id>/suspend', methods = ['POST'])
 @admin_required
 def suspend_project(project_id):
-    """Suspend an approved project (Approved -> Suspended). 
-    It is also removed from featured.
-    """
+    """Suspend an approved project (Approved -> Suspended). It is also removed from featured and success stories."""
     form = AdminActionForm()
     if form.validate_on_submit():
         if change_project_status(project_id, 'Approved', 'Suspended') == 1:
@@ -1272,6 +1259,7 @@ def resolve_report(report_id):
 
 
 # ----- Featured Projects -----
+
 @main.route('/admin/featured/add', methods=['POST'])
 @admin_required
 def add_featured_project():
@@ -1331,10 +1319,3 @@ def remove_success_story(project_id):
     else:
         flash('Something went wrong. Please try again.', 'danger')
     return redirect(url_for('main.admin_dashboard'))       
-
-# ===============================================================
-# For Demo
-# Testing view: shows the 500 error page.
-@main.route('/error-eg-500')
-def error_eg_500():
-    abort(500)

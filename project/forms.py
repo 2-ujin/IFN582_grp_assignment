@@ -366,8 +366,8 @@ class DeleteProjectUpdateForm(FlaskForm):
 
     submit = SubmitField("Delete")
 
-# ----- Part 5. Admin Dashboard -----
 
+# ----- Part 5. Admin Dashboard -----
 
 class AdminActionForm(FlaskForm):
     """Empty form used for admin actions such as 'Approve' and 'Delete'.
@@ -382,11 +382,11 @@ class EditUserForm(FlaskForm):
     submit = SubmitField("Save changes")
 
 class FeatureProjectForm(FlaskForm):
-    """Dropdown for adding a project to add to featured section.
+    """Dropdown for adding a project to featured section.
     Choices are filled in the view (approved, active, not yet featured)."""
     project_id = SelectField('Select a project to feature', coerce=int)
 
 class SuccessStoryForm(FlaskForm):
-    """Dropdown for adding a project to show as a successful story.
+    """Dropdown for adding a project to show as a success story.
     Choices are filled in the view (approved, completed, not yet added)."""
     project_id = SelectField('Select a project for success stories', coerce=int)
